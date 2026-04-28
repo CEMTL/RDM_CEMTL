@@ -1,0 +1,31 @@
+﻿@model Solution.ViewModels.MedecinsCourriels.MedecinCourrielDetailsViewModel
+@{
+    ViewBag.Title = "Supprimer MedecinCourriel";
+}
+
+<div class="page-header-custom">
+    <h2>Supprimer MedecinCourriel</h2>
+</div>
+
+<div class="dashboard-card">
+    <p>Confirmez-vous la suppression de cet enregistrement ?</p>
+    <dl class="dl-horizontal">
+        <dt>Médecin</dt>
+        <dd>@Model.MedecinLibelle</dd>
+        <dt>Type</dt>
+        <dd>@Model.TypeCourriel</dd>
+        <dt>Courriel</dt>
+        <dd>@Model.AdresseCourriel</dd>
+        <dt>Rang</dt>
+        <dd>@Model.RangSource</dd>
+        <dt>Principal</dt>
+        <dd>@(Model.EstPrincipal ? "Oui" : "Non")</dd>
+    </dl>
+
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+        <button type="submit" class="btn btn-danger btn-icon-only" title="Supprimer"><i class="fa-solid fa-trash"></i></button>
+        <a href="@Url.Action("Index")" class="btn btn-default btn-icon-only" title="Annuler"><i class="fa-solid fa-xmark"></i></a>
+    }
+</div>

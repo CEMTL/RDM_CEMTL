@@ -1,0 +1,31 @@
+﻿@model Solution.ViewModels.JournalImports.JournalImportDetailsViewModel
+@{
+    ViewBag.Title = "Supprimer JournalImport";
+}
+
+<div class="page-header-custom">
+    <h2>Supprimer JournalImport</h2>
+</div>
+
+<div class="dashboard-card">
+    <p>Confirmez-vous la suppression de cet enregistrement ?</p>
+    <dl class="dl-horizontal">
+        <dt>Nom fichier</dt>
+        <dd>@Model.NomFichier</dd>
+        <dt>Date import</dt>
+        <dd>@Model.DateImport.ToString("yyyy-MM-dd HH:mm")</dd>
+        <dt>Lignes importées</dt>
+        <dd>@Model.LignesImportees</dd>
+        <dt>Lignes rejetées</dt>
+        <dd>@Model.LignesRejetees</dd>
+        <dt>Commentaire</dt>
+        <dd>@Model.Commentaire</dd>
+    </dl>
+
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+        <button type="submit" class="btn btn-danger btn-icon-only" title="Supprimer"><i class="fa-solid fa-trash"></i></button>
+        <a href="@Url.Action("Index")" class="btn btn-default btn-icon-only" title="Annuler"><i class="fa-solid fa-xmark"></i></a>
+    }
+</div>

@@ -1,0 +1,25 @@
+﻿@model Solution.ViewModels.Nominations.NominationFormViewModel
+
+<div class="dashboard-card">
+    <div class="form-group">
+        @Html.LabelFor(m => m.CodeNomination)
+        @Html.TextBoxFor(m => m.CodeNomination, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.CodeNomination, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.LibelleNomination)
+        @Html.TextBoxFor(m => m.LibelleNomination, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.LibelleNomination, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.Description)
+        @Html.TextAreaFor(m => m.Description, 3, 80, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Description, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="checkbox">
+        <label>@Html.CheckBoxFor(m => m.EstActif) Actif</label>
+    </div>
+</div>

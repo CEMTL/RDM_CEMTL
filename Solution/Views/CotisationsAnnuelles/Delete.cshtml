@@ -1,0 +1,53 @@
+﻿@model Solution.ViewModels.CotisationsAnnuelles.CotisationAnnuelleDetailsViewModel
+@{
+    ViewBag.Title = "Supprimer CotisationAnnuelle";
+}
+
+<div class="page-header-custom">
+    <h2>Supprimer CotisationAnnuelle</h2>
+</div>
+
+<div class="dashboard-card">
+    <p>Confirmez-vous la suppression de cet enregistrement ?</p>
+    <dl class="dl-horizontal">
+        <dt>Médecin</dt>
+        <dd>@Model.MedecinLibelle</dd>
+        <dt>Année exercice</dt>
+        <dd>@Model.AnneeExercice</dd>
+        <dt>Code cotisation</dt>
+        <dd>@Model.CodeCotisationLibelle</dd>
+        <dt>Description source</dt>
+        <dd>@Model.DescriptionSource</dd>
+        <dt>Montant initial</dt>
+        <dd>@Model.MontantInitial</dd>
+        <dt>Motif réduction</dt>
+        <dd>@Model.MotifReduction</dd>
+        <dt>Montant réduction</dt>
+        <dd>@Model.MontantReduction</dd>
+        <dt>Montant pénalité</dt>
+        <dd>@Model.MontantPenalite</dd>
+        <dt>Montant final</dt>
+        <dd>@Model.MontantFinal</dd>
+        <dt>État cotisation</dt>
+        <dd>@Model.EtatCotisation</dd>
+        <dt>Montant payé</dt>
+        <dd>@Model.MontantPaye</dd>
+        <dt>Date paiement</dt>
+        <dd>@(Model.DatePaiement.HasValue ? Model.DatePaiement.Value.ToString("yyyy-MM-dd") : "-")</dd>
+        <dt>Type paiement</dt>
+        <dd>@Model.TypePaiementLibelle</dd>
+        <dt>Date dépôt</dt>
+        <dd>@(Model.DateDepot.HasValue ? Model.DateDepot.Value.ToString("yyyy-MM-dd") : "-")</dd>
+        <dt>No dépôt</dt>
+        <dd>@Model.NoDepot</dd>
+        <dt>Reçu imposition</dt>
+        <dd>@Model.RecuImposition</dd>
+    </dl>
+
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+        <button type="submit" class="btn btn-danger btn-icon-only" title="Supprimer"><i class="fa-solid fa-trash"></i></button>
+        <a href="@Url.Action("Index")" class="btn btn-default btn-icon-only" title="Annuler"><i class="fa-solid fa-xmark"></i></a>
+    }
+</div>

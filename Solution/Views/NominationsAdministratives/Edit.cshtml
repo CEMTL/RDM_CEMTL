@@ -1,0 +1,102 @@
+﻿@model Solution.ViewModels.NominationsAdministratives.NominationAdministrativeFormViewModel
+
+@{
+    ViewBag.Title = "Modifier une nomination administrative";
+
+    var hasErrors = false;
+    foreach (var state in ViewData.ModelState.Values)
+    {
+        foreach (var err in state.Errors)
+        {
+            if (!string.IsNullOrWhiteSpace(err.ErrorMessage) || err.Exception != null)
+            {
+                hasErrors = true;
+                break;
+            }
+        }
+        if (hasErrors) { break; }
+    }
+}
+
+<div class="page-header-custom">
+    <div class="row">
+        <div class="col-md-8">
+            <h2>Modifier une nomination administrative</h2>
+        </div>
+        <div class="col-md-4 text-right" style="margin-top:25px;">
+            @Html.ActionLink("Retour à la liste", "Index", null, new { @class = "btn btn-default" })
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-card">
+    @using (Html.BeginForm("Edit", "NominationsAdministratives", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(m => m.NominationAdministrativeId)
+
+        if (hasErrors)
+        {
+            <div class="alert alert-warning">
+                <strong><i class="fa fa-exclamation-triangle"></i> Le formulaire contient des erreurs.</strong>
+                <br />
+                Veuillez corriger les champs indiqués ci-dessous.
+            </div>
+
+            @Html.ValidationSummary(false, "", new { @class = "alert alert-danger" })
+        }
+
+        <div class="form-horizontal">
+            <div class="form-group">
+                @Html.LabelFor(m => m.MedecinId, new { @class = "col-md-2 control-label" })
+                <div class="col-md-6">
+                    @Html.DropDownListFor(m => m.MedecinId, Model.MedecinIdOptions, "-- Sélectionner --", new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.MedecinId, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.LibelleNomination, new { @class = "col-md-2 control-label" })
+                <div class="col-md-6">
+                    @Html.TextBoxFor(m => m.LibelleNomination, new { @class = "form-control", maxlength = "200", placeholder = "Libellé..." })
+                    @Html.ValidationMessageFor(m => m.LibelleNomination, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.DateNomination, new { @class = "col-md-2 control-label" })
+                <div class="col-md-3">
+                    @Html.TextBoxFor(m => m.DateNomination, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+                    @Html.ValidationMessageFor(m => m.DateNomination, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.DateFin, new { @class = "col-md-2 control-label" })
+                <div class="col-md-3">
+                    @Html.TextBoxFor(m => m.DateFin, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+                    @Html.ValidationMessageFor(m => m.DateFin, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.EstActive, new { @class = "col-md-2 control-label" })
+                <div class="col-md-6" style="padding-top:7px;">
+                    <label class="checkbox-inline">
+                        @Html.CheckBoxFor(m => m.EstActive) Active
+                    </label>
+                    @Html.ValidationMessageFor(m => m.EstActive, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <hr />
+
+            <div class="text-right">
+                @Html.ActionLink("Annuler", "Index", null, new { @class = "btn btn-default" })
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa-solid fa-save"></i> Enregistrer
+                </button>
+            </div>
+        </div>
+    }
+</div>

@@ -1,0 +1,69 @@
+﻿@model Solution.ViewModels.Privileges.MedecinPrivilegeDetailsViewModel
+
+@{
+    ViewBag.Title = "Détails du privilège";
+}
+
+<div class="page-header-custom">
+    <h2>Détails du privilège</h2>
+</div>
+
+<div class="dashboard-card">
+    <dl class="dl-horizontal">
+        <dt>Médecin</dt>
+        <dd>@Model.MedecinNomComplet</dd>
+
+        <dt>Code</dt>
+        <dd>@Model.CodePrivilege</dd>
+
+        <dt>Privilège</dt>
+        <dd>@Model.PrivilegeLibelle</dd>
+
+        <dt>Installation</dt>
+        <dd>@Model.InstallationLibelle</dd>
+
+        <dt>Département</dt>
+        <dd>@Model.UniteLibelle</dd>
+
+        <dt>Date début</dt>
+        <dd>@(Model.DateDebut.HasValue ? Model.DateDebut.Value.ToString("yyyy-MM-dd") : "")</dd>
+
+        <dt>Date fin</dt>
+        <dd>@(Model.DateFin.HasValue ? Model.DateFin.Value.ToString("yyyy-MM-dd") : "")</dd>
+
+        <dt>État</dt>
+        <dd>@Model.Etat</dd>
+
+        <dt>Nature des activités</dt>
+        <dd>@Model.NatureActivites</dd>
+
+        <dt>Champ des activités</dt>
+        <dd>@Model.ChampActivites</dd>
+
+        <dt>Obligations</dt>
+        <dd>@Model.Obligations</dd>
+
+        <dt>Commentaire</dt>
+        <dd>@Model.Commentaire</dd>
+
+        <dt>No résolution CA</dt>
+        <dd>@Model.NumeroResolutionCA</dd>
+
+        <dt>Date résolution CA</dt>
+        <dd>@(Model.DateResolutionCA.HasValue ? Model.DateResolutionCA.Value.ToString("yyyy-MM-dd") : "")</dd>
+
+        <dt>Reconnaissance écrite reçue</dt>
+        <dd>@(Model.ReconnaissanceEcriteRecue ? "Oui" : "Non")</dd>
+
+        <dt>Actif</dt>
+        <dd>@(Model.EstActif ? "Oui" : "Non")</dd>
+    </dl>
+</div>
+
+<div class="dashboard-card">
+    @Html.ActionLink("Retour", "Index", null, new { @class = "btn btn-default" })
+    @if (User.IsInRole("Admin") || User.IsInRole("SuperUtilisateur"))
+    {
+        @Html.ActionLink("Modifier", "Edit", new { id = Model.MedecinPrivilegeId }, new { @class = "btn btn-warning" })
+    }
+</div>

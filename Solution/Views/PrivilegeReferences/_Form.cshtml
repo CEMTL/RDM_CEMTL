@@ -1,0 +1,49 @@
+﻿@model Solution.ViewModels.Privileges.PrivilegeReferenceFormViewModel
+
+<div class="dashboard-card">
+    <div class="form-group">
+        @Html.LabelFor(m => m.CodePrivilege)
+        @Html.TextBoxFor(m => m.CodePrivilege, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.CodePrivilege, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.LibellePrivilege)
+        @Html.TextBoxFor(m => m.LibellePrivilege, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.LibellePrivilege, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.Categorie)
+        @Html.TextBoxFor(m => m.Categorie, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Categorie, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.Description)
+        @Html.TextAreaFor(m => m.Description, 4, 80, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Description, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="checkbox">
+        <label>@Html.CheckBoxFor(m => m.NecessiteBlocOperatoire) Nécessite le bloc opératoire</label>
+    </div>
+
+    <div class="checkbox">
+        <label>@Html.CheckBoxFor(m => m.NecessiteInstallation) Nécessite une installation</label>
+    </div>
+
+    <div class="checkbox">
+        <label>@Html.CheckBoxFor(m => m.NecessiteUnite) Nécessite une unité organisationnelle</label>
+    </div>
+
+    <div class="checkbox">
+        <label>@Html.CheckBoxFor(m => m.EstActif) Actif</label>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.OrdreAffichage)
+        @Html.TextBoxFor(m => m.OrdreAffichage, new { @class = "form-control", type = "number" })
+        @Html.ValidationMessageFor(m => m.OrdreAffichage, "", new { @class = "text-danger" })
+    </div>
+</div>

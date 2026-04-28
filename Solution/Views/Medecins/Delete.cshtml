@@ -1,0 +1,60 @@
+﻿@model Solution.ViewModels.Medecins.MedecinDeleteViewModel
+
+@{
+    ViewBag.Title = "Supprimer un médecin";
+}
+
+<div class="page-header">
+    <div class="row">
+        <div class="col-md-8">
+            <h2><i class="fa-solid fa-trash"></i> Supprimer un médecin</h2>
+        </div>
+        <div class="col-md-4 text-right" style="margin-top:25px;">
+            @Html.ActionLink("Retour à la liste", "Index", null, new { @class = "btn btn-default" })
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-card">
+    <div class="alert alert-danger">
+        <strong>Attention :</strong> cette action supprimera définitivement le médecin et ses données liées.
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <table class="table table-bordered table-striped">
+                <tr><th>Permis</th><td>@Model.Permis</td></tr>
+                <tr><th>Médecin</th><td>@Model.NomComplet</td></tr>
+                <tr><th>Type permis</th><td>@Model.TypePermis</td></tr>
+                <tr><th>Statut</th><td>@Model.StatutMedecin</td></tr>
+                <tr><th>Catégorie</th><td>@Model.CategoriePratique</td></tr>
+                <tr><th>Actif</th><td>@(Model.EstActif ? "Oui" : "Non")</td></tr>
+            </table>
+        </div>
+
+        <div class="col-md-6">
+            <table class="table table-bordered table-striped">
+                <tr><th>Adresses</th><td>@Model.NbAdresses</td></tr>
+                <tr><th>Téléphones</th><td>@Model.NbTelephones</td></tr>
+                <tr><th>Courriels</th><td>@Model.NbCourriels</td></tr>
+                <tr><th>Installations</th><td>@Model.NbInstallations</td></tr>
+                <tr><th>Départements</th><td>@Model.NbUnitesOrganisationnelles</td></tr>
+                <tr><th>Nominations</th><td>@Model.NbNominationsAdministratives</td></tr>
+                <tr class="danger"><th>Total</th><td><strong>@Model.TotalDependances</strong></td></tr>
+            </table>
+        </div>
+    </div>
+
+    @using (Html.BeginForm("Delete", "Medecins", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(m => m.MedecinId)
+
+        <div class="text-right">
+            @Html.ActionLink("Annuler", "Index", null, new { @class = "btn btn-default" })
+            <button type="submit" class="btn btn-danger">
+                <i class="fa-solid fa-trash"></i> Confirmer la suppression
+            </button>
+        </div>
+    }
+</div>

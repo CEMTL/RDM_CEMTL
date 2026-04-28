@@ -1,0 +1,80 @@
+﻿@model Solution.ViewModels.AuditLogs.AuditLogDetailsViewModel
+
+@{
+    ViewBag.Title = "Détail du journal d'audit";
+}
+
+<div class="page-header">
+    <div class="row">
+        <div class="col-md-8">
+            <h2>
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                Détail du journal d'audit
+            </h2>
+        </div>
+        <div class="col-md-4 text-right" style="margin-top:25px;">
+            @Html.ActionLink("Retour à la liste", "Index", null, new { @class = "btn btn-default" })
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <strong><i class="fa-solid fa-circle-info"></i> Informations générales</strong>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-3"><strong>ID audit</strong><br />@Model.AuditLogId</div>
+            <div class="col-md-3"><strong>Table</strong><br />@Model.TableName</div>
+            <div class="col-md-3"><strong>ID enregistrement</strong><br />@Model.RecordId</div>
+            <div class="col-md-3"><strong>Action</strong><br />@Model.Action</div>
+        </div>
+        <hr />
+        <div class="row">
+            <div class="col-md-4"><strong>Utilisateur</strong><br />@Model.NomUtilisateur</div>
+            <div class="col-md-2"><strong>UtilisateurId</strong><br />@(Model.UtilisateurId.HasValue ? Model.UtilisateurId.ToString() : "-")</div>
+            <div class="col-md-3"><strong>Date action</strong><br />@Model.DateAction.ToString("yyyy-MM-dd HH:mm:ss")</div>
+            <div class="col-md-3"><strong>Adresse IP</strong><br />@Model.AdresseIP</div>
+        </div>
+        <hr />
+        <div class="row">
+            <div class="col-md-12"><strong>UserAgent</strong><br />@Model.UserAgent</div>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading"><strong>Champs modifiés</strong></div>
+    <div class="panel-body">
+        <pre class="audit-pre">@(string.IsNullOrWhiteSpace(Model.ChangedFields) ? "-" : Model.ChangedFields)</pre>
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading"><strong>Anciennes valeurs</strong></div>
+    <div class="panel-body">
+        <pre class="audit-pre">@(string.IsNullOrWhiteSpace(Model.OldValues) ? "-" : Model.OldValues)</pre>
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading"><strong>Nouvelles valeurs</strong></div>
+    <div class="panel-body">
+        <pre class="audit-pre">@(string.IsNullOrWhiteSpace(Model.NewValues) ? "-" : Model.NewValues)</pre>
+    </div>
+</div>
+
+@section Styles{
+    <style>
+        .audit-pre {
+            white-space: pre-wrap;
+            word-break: break-word;
+            background: #f8f9fb;
+            border: 1px solid #e1e5ea;
+            border-radius: 8px;
+            padding: 12px;
+            max-height: 350px;
+            overflow: auto;
+        }
+    </style>
+}

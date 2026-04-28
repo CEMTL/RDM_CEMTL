@@ -1,0 +1,99 @@
+﻿@model IEnumerable<Solution.ViewModels.Nominations.NominationAdministrativeListViewModel>
+
+@{
+    ViewBag.Title = "Nominations administratives";
+    var canManage = ViewBag.CanManage != null && (bool)ViewBag.CanManage;
+}
+
+<div class="page-header-custom">
+    <div class="row">
+       
+        <div class="col-md-4 text-right" style="margin-top:25px;">
+            @if (canManage)
+            {
+                @Html.ActionLink("+ Nouvelle", "Create", null, new { @class = "btn btn-success" })
+            }
+        </div>
+    </div>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+@using (Html.BeginForm("Index", "NominationsAdministratives", FormMethod.Get, new { @class = "dashboard-card" }))
+{
+    <div class="row">
+        <div class="col-md-4">
+            <label>Recherche</label>
+            <input type="text" name="search" value="@ViewBag.Search" class="form-control" placeholder="Médecin, permis, nomination..." />
+        </div>
+        <div class="col-md-3">
+            <label>Médecin</label>
+            @Html.DropDownList("medecinId", (SelectList)ViewBag.MedecinId, "-- Tous --", new { @class = "form-control" })
+        </div>
+        <div class="col-md-3">
+            <label>Type nomination</label>
+            @Html.DropDownList("typeNominationId", (SelectList)ViewBag.TypeNominationId, "-- Tous --", new { @class = "form-control" })
+        </div>
+        <div class="col-md-2">
+            <label>&nbsp;</label>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="activesSeulement" value="true" @(ViewBag.ActivesSeulement != null && (bool)ViewBag.ActivesSeulement ? "checked" : "") />
+                    Actives seulement
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div style="margin-top:15px;">
+        <button type="submit" class="btn btn-primary">Filtrer</button>
+        @Html.ActionLink("Réinitialiser", "Index", null, new { @class = "btn btn-default" })
+    </div>
+}
+
+<div class="dashboard-card">
+    <table class="table table-bordered table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Médecin</th>
+                <th>Nomination</th>
+                <th>Type</th>
+                <th>Date nomination</th>
+                <th>Date fin</th>
+                <th>Active</th>
+                <th style="width:220px;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.MedecinNomComplet</td>
+                        <td>@item.LibelleNomination</td>
+                        <td>@item.TypeNominationLibelle</td>
+                        <td>@(item.DateNomination.HasValue ? item.DateNomination.Value.ToString("yyyy-MM-dd") : "")</td>
+                        <td>@(item.DateFin.HasValue ? item.DateFin.Value.ToString("yyyy-MM-dd") : "")</td>
+                        <td>@(item.EstActive ? "Oui" : "Non")</td>
+                        <td>
+                            @Html.ActionLink("Détails", "Details", new { id = item.NominationAdministrativeId }, new { @class = "btn btn-info btn-sm" })
+                            @if (canManage)
+                            {
+                                @Html.ActionLink("Modifier", "Edit", new { id = item.NominationAdministrativeId }, new { @class = "btn btn-warning btn-sm" })
+                                @Html.ActionLink("Supprimer", "Delete", new { id = item.NominationAdministrativeId }, new { @class = "btn btn-danger btn-sm" })
+                            }
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr><td colspan="7" class="text-center">Aucune nomination administrative trouvée.</td></tr>
+            }
+        </tbody>
+    </table>
+</div>

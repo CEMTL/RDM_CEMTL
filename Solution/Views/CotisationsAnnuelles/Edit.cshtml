@@ -1,0 +1,37 @@
+﻿@model Solution.ViewModels.CotisationsAnnuelles.CotisationAnnuelleFormViewModel
+
+@{
+    ViewBag.Title = "Modifier une cotisation annuelle";
+}
+
+<div class="page-header-custom">
+    <h2>Modifier une cotisation annuelle</h2>
+</div>
+
+@using (Html.BeginForm("Edit", "CotisationsAnnuelles", new { id = Model.CotisationAnnuelleId }, FormMethod.Post, new { role = "form" }))
+{
+    @Html.AntiForgeryToken()
+
+    @Html.ValidationSummary(true, "Veuillez corriger les erreurs ci-dessous.", new { @class = "alert alert-danger" })
+
+    @Html.HiddenFor(m => m.CotisationAnnuelleId)
+
+    @Html.Partial("_Form", Model)
+
+    <div class="dashboard-card">
+        <button type="submit" class="btn btn-success">
+            <i class="fa fa-save"></i> Enregistrer
+        </button>
+
+        @Html.ActionLink(
+            "Retour à la liste",
+            "Index",
+            null,
+            new { @class = "btn btn-default" }
+        )
+    </div>
+}
+
+@section Scripts {
+    @Html.Partial("_ValidationScriptsPartial")
+}

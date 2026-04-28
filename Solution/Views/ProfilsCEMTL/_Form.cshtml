@@ -1,0 +1,239 @@
+﻿@model Solution.ViewModels.ProfilsCEMTL.MedecinProfilCEMTLFormViewModel
+
+<div class="dashboard-card">
+    <div class="form-group">
+        @Html.LabelFor(m => m.MedecinId)
+        @Html.DropDownListFor(m => m.MedecinId, Model.MedecinIdOptions, "-- Sélectionner --", new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.MedecinId, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.Telephone1)
+        @Html.TextBoxFor(m => m.Telephone1, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Telephone1, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.CellulaireNo)
+        @Html.TextBoxFor(m => m.CellulaireNo, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.CellulaireNo, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.Telephone2)
+        @Html.TextBoxFor(m => m.Telephone2, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Telephone2, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.DomicileNo)
+        @Html.TextBoxFor(m => m.DomicileNo, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.DomicileNo, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.Telephone3)
+        @Html.TextBoxFor(m => m.Telephone3, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Telephone3, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.PagetteNo)
+        @Html.TextBoxFor(m => m.PagetteNo, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.PagetteNo, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.Departement1)
+        @Html.TextBoxFor(m => m.Departement1, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Departement1, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.Departement2)
+        @Html.TextBoxFor(m => m.Departement2, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Departement2, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.ServiceSecteur1)
+        @Html.TextBoxFor(m => m.ServiceSecteur1, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.ServiceSecteur1, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.ServiceSecteur2)
+        @Html.TextBoxFor(m => m.ServiceSecteur2, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.ServiceSecteur2, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.Installation1Source)
+        @Html.TextBoxFor(m => m.Installation1Source, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Installation1Source, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.Installation2Source)
+        @Html.TextBoxFor(m => m.Installation2Source, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Installation2Source, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.Installation3Source)
+        @Html.TextBoxFor(m => m.Installation3Source, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Installation3Source, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.Courriel1)
+        @Html.TextBoxFor(m => m.Courriel1, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Courriel1, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.Courriel2)
+        @Html.TextBoxFor(m => m.Courriel2, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Courriel2, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.CourrielMed)
+        @Html.TextBoxFor(m => m.CourrielMed, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.CourrielMed, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.NominationAdministrativeCourante)
+        @Html.TextBoxFor(m => m.NominationAdministrativeCourante, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.NominationAdministrativeCourante, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.DateNominationAdministrative)
+        @Html.TextBoxFor(m => m.DateNominationAdministrative, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+        @Html.ValidationMessageFor(m => m.DateNominationAdministrative, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.DateAvisCongeDepart)
+        @Html.TextBoxFor(m => m.DateAvisCongeDepart, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+        @Html.ValidationMessageFor(m => m.DateAvisCongeDepart, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.AbsenceTemporaire)
+        @Html.TextBoxFor(m => m.AbsenceTemporaire, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.AbsenceTemporaire, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.DateAbsence)
+        @Html.TextBoxFor(m => m.DateAbsence, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+        @Html.ValidationMessageFor(m => m.DateAbsence, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.DateRetourAbsence)
+        @Html.TextBoxFor(m => m.DateRetourAbsence, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+        @Html.ValidationMessageFor(m => m.DateRetourAbsence, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.DateDebutPratique)
+        @Html.TextBoxFor(m => m.DateDebutPratique, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+        @Html.ValidationMessageFor(m => m.DateDebutPratique, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.DateFinPratique)
+        @Html.TextBoxFor(m => m.DateFinPratique, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+        @Html.ValidationMessageFor(m => m.DateFinPratique, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.EngagementFDC)
+        @Html.TextBoxFor(m => m.EngagementFDC, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.EngagementFDC, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.DateAdhesionFDC)
+        @Html.TextBoxFor(m => m.DateAdhesionFDC, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+        @Html.ValidationMessageFor(m => m.DateAdhesionFDC, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.DateFinFDC)
+        @Html.TextBoxFor(m => m.DateFinFDC, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+        @Html.ValidationMessageFor(m => m.DateFinFDC, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.PEMVise)
+        @Html.TextBoxFor(m => m.PEMVise, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.PEMVise, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.PEMAilleurs)
+        @Html.TextBoxFor(m => m.PEMAilleurs, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.PEMAilleurs, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.RLS)
+        @Html.TextBoxFor(m => m.RLS, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.RLS, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.ListeNomin)
+        @Html.TextBoxFor(m => m.ListeNomin, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.ListeNomin, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.Engagement)
+        @Html.TextBoxFor(m => m.Engagement, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Engagement, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.PrivilegesTexte)
+        @Html.TextAreaFor(m => m.PrivilegesTexte, 4, 80, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.PrivilegesTexte, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.PrivilegesEnseignement)
+        @Html.TextAreaFor(m => m.PrivilegesEnseignement, 4, 80, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.PrivilegesEnseignement, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.PrivilegesRecherche)
+        @Html.TextAreaFor(m => m.PrivilegesRecherche, 4, 80, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.PrivilegesRecherche, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.DemandeMSSS)
+        @Html.TextBoxFor(m => m.DemandeMSSS, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+        @Html.ValidationMessageFor(m => m.DemandeMSSS, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.ApprobMSSS)
+        @Html.TextBoxFor(m => m.ApprobMSSS, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+        @Html.ValidationMessageFor(m => m.ApprobMSSS, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.DemandeUdeM)
+        @Html.TextBoxFor(m => m.DemandeUdeM, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+        @Html.ValidationMessageFor(m => m.DemandeUdeM, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.ApprobUdeM)
+        @Html.TextBoxFor(m => m.ApprobUdeM, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+        @Html.ValidationMessageFor(m => m.ApprobUdeM, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.DateDMSP)
+        @Html.TextBoxFor(m => m.DateDMSP, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+        @Html.ValidationMessageFor(m => m.DateDMSP, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.DateCECMDP)
+        @Html.TextBoxFor(m => m.DateCECMDP, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+        @Html.ValidationMessageFor(m => m.DateCECMDP, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.DateCA)
+        @Html.TextBoxFor(m => m.DateCA, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+        @Html.ValidationMessageFor(m => m.DateCA, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.NumeroResolution)
+        @Html.TextBoxFor(m => m.NumeroResolution, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.NumeroResolution, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.DateRenouvellement)
+        @Html.TextBoxFor(m => m.DateRenouvellement, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+        @Html.ValidationMessageFor(m => m.DateRenouvellement, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.FitTestCourant)
+        @Html.TextBoxFor(m => m.FitTestCourant, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.FitTestCourant, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.CommentairesOperationnels)
+        @Html.TextAreaFor(m => m.CommentairesOperationnels, 4, 80, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.CommentairesOperationnels, "", new { @class = "text-danger" })
+    </div>
+</div>

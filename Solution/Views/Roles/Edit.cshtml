@@ -1,0 +1,30 @@
+﻿@model Solution.ViewModels.RoleFormViewModel
+@{ ViewBag.Title = "Modifier le rôle"; }
+
+<div class="page-header">
+    <h2>Modifier le rôle — @Model.Name</h2>
+</div>
+
+@using (Html.BeginForm("Edit", "Roles", FormMethod.Post, new { @class = "form-horizontal" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.Id)
+    @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.Name, new { @class = "col-sm-3 control-label" })
+        <div class="col-sm-5">
+            @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.Name, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-sm-offset-3 col-sm-9">
+            <button type="submit" class="btn btn-primary">Enregistrer</button>
+            @Html.ActionLink("Annuler", "Index", null, new { @class = "btn btn-default" })
+        </div>
+    </div>
+}
+
+@section Scripts { @Scripts.Render("~/bundles/jqueryval") }

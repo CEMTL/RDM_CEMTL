@@ -1,0 +1,62 @@
+﻿@model Solution.ViewModels.NominationsAdministratives.NominationAdministrativeDetailsViewModel
+
+@{
+    ViewBag.Title = "Supprimer une nomination administrative";
+}
+
+<div class="page-header-custom">
+    <div class="row">
+        <div class="col-md-8">
+            <h2>Supprimer une nomination administrative</h2>
+        </div>
+        <div class="col-md-4 text-right" style="margin-top:25px;">
+            @Html.ActionLink("Retour à la liste", "Index", null, new { @class = "btn btn-default" })
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-card">
+    <div class="alert alert-danger">
+        <strong>Attention :</strong> cette action supprimera définitivement cette nomination administrative.
+    </div>
+
+    <table class="table table-bordered table-striped">
+        <tr>
+            <th style="width:220px;">ID</th>
+            <td>@Model.NominationAdministrativeId</td>
+        </tr>
+        <tr>
+            <th>Médecin</th>
+            <td>@Model.MedecinLibelle</td>
+        </tr>
+        <tr>
+            <th>Libellé</th>
+            <td>@Model.LibelleNomination</td>
+        </tr>
+        <tr>
+            <th>Date nomination</th>
+            <td>@(Model.DateNomination.HasValue ? Model.DateNomination.Value.ToString("yyyy-MM-dd") : "")</td>
+        </tr>
+        <tr>
+            <th>Date fin</th>
+            <td>@(Model.DateFin.HasValue ? Model.DateFin.Value.ToString("yyyy-MM-dd") : "")</td>
+        </tr>
+        <tr>
+            <th>Active</th>
+            <td>@(Model.EstActive ? "Oui" : "Non")</td>
+        </tr>
+    </table>
+
+    @using (Html.BeginForm("Delete", "NominationsAdministratives", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(m => m.NominationAdministrativeId)
+
+        <div class="text-right">
+            @Html.ActionLink("Annuler", "Index", null, new { @class = "btn btn-default" })
+            <button type="submit" class="btn btn-danger">
+                <i class="fa-solid fa-trash"></i> Confirmer la suppression
+            </button>
+        </div>
+    }
+</div>

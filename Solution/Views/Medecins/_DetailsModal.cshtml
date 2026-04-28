@@ -1,0 +1,155 @@
+﻿@model Solution.ViewModels.Medecins.MedecinDetailsModalViewModel
+
+@functions{
+    public string F(DateTime? d)
+    {
+        return d.HasValue ? d.Value.ToString("yyyy-MM-dd") : "";
+    }
+}
+
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <h3 class="modal-title">
+        <i class="fa fa-id-card-o"></i> @Model.NomComplet
+    </h3>
+</div>
+
+<div class="modal-body" style="max-height:80vh; overflow-y:auto;">
+    <div class="row">
+        <div class="col-md-4">
+            <table class="table table-bordered table-condensed">
+                <tr><th>Permis</th><td>@Model.Permis</td></tr>
+                <tr><th>Type permis</th><td>@Model.TypePermis</td></tr>
+                <tr><th>Statut</th><td>@Model.StatutMedecin</td></tr>
+                <tr><th>Catégorie</th><td>@Model.CategoriePratique</td></tr>
+                <tr><th>Genre</th><td>@Model.Genre</td></tr>
+                <tr><th>NAM</th><td>@Model.NAM</td></tr>
+                <tr><th>Actif</th><td>@(Model.EstActif ? "Oui" : "Non")</td></tr>
+            </table>
+        </div>
+
+        <div class="col-md-8">
+            <ul class="nav nav-tabs">
+                <li class="active"><a href="#d1" data-toggle="tab">Coordonnées</a></li>
+                <li><a href="#d2" data-toggle="tab">Organisation</a></li>
+                <li><a href="#d3" data-toggle="tab">Nominations</a></li>
+            </ul>
+
+            <div class="tab-content" style="padding-top:15px;">
+                <div class="tab-pane active" id="d1">
+                    <h4>Adresses</h4>
+                    <table class="table table-striped table-condensed">
+                        <thead><tr><th>Adresse</th><th>Ville</th><th>Province</th><th>CP</th><th>Principale</th></tr></thead>
+                        <tbody>
+                            @foreach (var item in Model.Adresses)
+                            {
+                                <tr>
+                                    <td>@item.AdresseLigne1</td>
+                                    <td>@item.Ville</td>
+                                    <td>@item.Province</td>
+                                    <td>@item.CodePostal</td>
+                                    <td>@(item.EstPrincipale ? "Oui" : "")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+
+                    <h4>Téléphones</h4>
+                    <table class="table table-striped table-condensed">
+                        <thead><tr><th>Type</th><th>Numéro</th><th>Principal</th></tr></thead>
+                        <tbody>
+                            @foreach (var item in Model.Telephones)
+                            {
+                                <tr>
+                                    <td>@item.TypeTelephone</td>
+                                    <td>@item.NumeroTelephone</td>
+                                    <td>@(item.EstPrincipal ? "Oui" : "")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+
+                    <h4>Courriels</h4>
+                    <table class="table table-striped table-condensed">
+                        <thead><tr><th>Type</th><th>Adresse</th><th>Principal</th></tr></thead>
+                        <tbody>
+                            @foreach (var item in Model.Courriels)
+                            {
+                                <tr>
+                                    <td>@item.TypeCourriel</td>
+                                    <td>@item.AdresseCourriel</td>
+                                    <td>@(item.EstPrincipal ? "Oui" : "")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="tab-pane" id="d2">
+                    <h4>Installations</h4>
+                    <table class="table table-striped table-condensed">
+                        <thead><tr><th>Installation</th><th>Code</th><th>Début</th><th>Fin</th><th>Principale</th></tr></thead>
+                        <tbody>
+                            @foreach (var item in Model.Installations)
+                            {
+                                <tr>
+                                    <td>@item.NomInstallation</td>
+                                    <td>@item.CodeInstallation</td>
+                                    <td>@F(item.DateDebut)</td>
+                                    <td>@F(item.DateFin)</td>
+                                    <td>@(item.EstPrincipale ? "Oui" : "")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+
+                    <h4>Départements</h4>
+                    <table class="table table-striped table-condensed">
+                        <thead><tr><th>Département</th><th>Type</th><th>Rôle</th><th>Début</th><th>Fin</th></tr></thead>
+                        <tbody>
+                            @foreach (var item in Model.UnitesOrganisationnelles)
+                            {
+                                <tr>
+                                    <td>@item.Unite</td>
+                                    <td>@item.TypeUnite</td>
+                                    <td>@item.RoleOrganisationnel</td>
+                                    <td>@F(item.DateDebut)</td>
+                                    <td>@F(item.DateFin)</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="tab-pane" id="d3">
+                    <table class="table table-bordered table-striped">
+                        <thead><tr><th>Nomination</th><th>Date nomination</th><th>Date fin</th><th>Active</th></tr></thead>
+                        <tbody>
+                            @foreach (var item in Model.NominationsAdministratives)
+                            {
+                                <tr>
+                                    <td>@item.LibelleNomination</td>
+                                    <td>@F(item.DateNomination)</td>
+                                    <td>@F(item.DateFin)</td>
+                                    <td>@(item.EstActive ? "Oui" : "Non")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(Model.Commentaires))
+    {
+        <hr />
+        <h4>Commentaires</h4>
+        <div class="well">@Html.Raw((Model.Commentaires ?? "").Replace("\n", "<br />"))</div>
+    }
+</div>
+
+<div class="modal-footer">
+    @Html.ActionLink("Modifier", "Edit", new { id = Model.MedecinId }, new { @class = "btn btn-primary" })
+    <button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
+</div>

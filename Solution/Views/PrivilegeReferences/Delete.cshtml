@@ -1,0 +1,48 @@
+﻿@model Solution.ViewModels.Privileges.PrivilegeReferenceDetailsViewModel
+
+@{
+    ViewBag.Title = "Supprimer un privilège de référence";
+}
+
+<div class="page-header-custom">
+    <div class="row">
+        <div class="col-md-8">
+            <h2>Supprimer un privilège de référence</h2>
+        </div>
+        <div class="col-md-4 text-right" style="margin-top:25px;">
+            @Html.ActionLink("Retour à la liste", "Index", null, new { @class = "btn btn-default" })
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-card">
+    <div class="alert alert-danger">
+        <strong>Attention :</strong> cette action supprimera définitivement ce privilège de référence.
+    </div>
+
+    <table class="table table-bordered table-striped">
+        <tr><th style="width:220px;">ID</th><td>@Model.PrivilegeReferenceId</td></tr>
+        <tr><th>Code</th><td>@Model.CodePrivilege</td></tr>
+        <tr><th>Libellé</th><td>@Model.LibellePrivilege</td></tr>
+        <tr><th>Catégorie</th><td>@Model.Categorie</td></tr>
+        <tr><th>Description</th><td>@Model.Description</td></tr>
+        <tr><th>Bloc opératoire</th><td>@(Model.NecessiteBlocOperatoire ? "Oui" : "Non")</td></tr>
+        <tr><th>Installation</th><td>@(Model.NecessiteInstallation ? "Oui" : "Non")</td></tr>
+        <tr><th>Unité</th><td>@(Model.NecessiteUnite ? "Oui" : "Non")</td></tr>
+        <tr><th>Ordre affichage</th><td>@Model.OrdreAffichage</td></tr>
+        <tr><th>Actif</th><td>@(Model.EstActif ? "Oui" : "Non")</td></tr>
+    </table>
+
+    @using (Html.BeginForm("Delete", "PrivilegeReferences", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(m => m.PrivilegeReferenceId)
+
+        <div class="text-right">
+            @Html.ActionLink("Annuler", "Index", null, new { @class = "btn btn-default" })
+            <button type="submit" class="btn btn-danger">
+                <i class="fa-solid fa-trash"></i> Confirmer la suppression
+            </button>
+        </div>
+    }
+</div>

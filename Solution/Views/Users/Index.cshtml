@@ -1,0 +1,93 @@
+﻿@model IEnumerable<Solution.ViewModels.UserIndexViewModel>
+
+@{ ViewBag.Title = "Utilisateurs"; }
+
+<div class="page-header">
+    <h2><span class="glyphicon glyphicon-user"></span> Utilisateurs</h2>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        @TempData["Success"]
+    </div>
+}
+@if (TempData["Erreur"] != null)
+{
+    <div class="alert alert-danger alert-dismissible">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        @TempData["Erreur"]
+    </div>
+}
+
+<p>@Html.ActionLink("+ Nouvel utilisateur", "Create", null, new { @class = "btn btn-success" })</p>
+
+<table class="table table-striped table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>Nom</th>
+            <th>Prénom</th>
+            <th>Nom d'utilisateur</th>
+            <th>Courriel</th>
+            <th>Rôles</th>
+            <th>Actif</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var u in Model)
+        {
+            var estCompteAdmin = string.Equals((u.UserName ?? "").Trim(), "Admin", System.StringComparison.OrdinalIgnoreCase);
+
+            <tr>
+                <td>@u.Nom</td>
+                <td>@u.Prenom</td>
+                <td>
+                    @u.UserName
+                    @if (estCompteAdmin)
+                    {
+                        <span class="label label-info" style="margin-left:6px;">Protégé</span>
+                    }
+                </td>
+                <td>@u.Email</td>
+                <td>@u.Roles</td>
+                <td class="text-center">
+                    @using (Html.BeginForm("ToggleActive", "Users", FormMethod.Post, new { style = "display:inline-block;margin:0;" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.Hidden("id", u.Id)
+                        <input type="hidden" name="isActive" value="@(u.EstActif ? "true" : "false")" class="js-is-active-value" />
+
+                        <input type="checkbox"
+                               @(u.EstActif ? "checked=\"checked\"" : "")
+                               @(estCompteAdmin ? "disabled=\"disabled\"" : "")
+                               onchange="var h=this.form.querySelector('.js-is-active-value'); h.value=this.checked ? 'true' : 'false'; this.form.submit();" />
+                    }
+                </td>
+                <td class="text-nowrap">
+                    @Html.ActionLink("Modifier", "Edit", new { id = u.Id },
+                        new { @class = "btn btn-xs btn-primary" })
+
+                    @if (!estCompteAdmin)
+                    {
+                        using (Html.BeginForm("Delete", "Users", new { id = u.Id }, FormMethod.Post, new { style = "display:inline" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-xs btn-danger"
+                                    onclick="return confirm('Supprimer cet utilisateur ?')">
+                                Supprimer
+                            </button>
+                        }
+                    }
+                    else
+                    {
+                        <button type="button" class="btn btn-xs btn-danger" disabled="disabled">
+                            Supprimer
+                        </button>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

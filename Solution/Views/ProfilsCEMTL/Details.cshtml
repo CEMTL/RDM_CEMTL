@@ -1,0 +1,40 @@
+﻿@model Solution.ViewModels.ProfilsCEMTL.MedecinProfilCEMTLDetailsViewModel
+@{
+    ViewBag.Title = "Détails MedecinProfilCEMTL";
+}
+
+<div class="page-header-custom">
+    <h2>Détails MedecinProfilCEMTL</h2>
+</div>
+
+<div class="dashboard-card">
+    <dl class="dl-horizontal">
+        <dt>Médecin</dt>
+        <dd>@Model.MedecinLibelle</dd>
+        <dt>Département 1</dt>
+        <dd>@Model.Departement1</dd>
+        <dt>Département 2</dt>
+        <dd>@Model.Departement2</dd>
+        <dt>Service / secteur 1</dt>
+        <dd>@Model.ServiceSecteur1</dd>
+        <dt>Service / secteur 2</dt>
+        <dd>@Model.ServiceSecteur2</dd>
+        <dt>Installation 1</dt>
+        <dd>@Model.Installation1Source</dd>
+        <dt>Courriel 1</dt>
+        <dd>@Model.Courriel1</dd>
+        <dt>Date début pratique</dt>
+        <dd>@(Model.DateDebutPratique.HasValue ? Model.DateDebutPratique.Value.ToString("yyyy-MM-dd") : "-")</dd>
+        <dt>Date fin pratique</dt>
+        <dd>@(Model.DateFinPratique.HasValue ? Model.DateFinPratique.Value.ToString("yyyy-MM-dd") : "-")</dd>
+        <dt>PEM visé</dt>
+        <dd>@Model.PEMVise</dd>
+        <dt>Fit test courant</dt>
+        <dd>@Model.FitTestCourant</dd>
+    </dl>
+</div>
+
+<div class="dashboard-card actions-card">
+    <a href="@Url.Action("Edit", new { id = Model.MedecinProfilCEMTLId })" class="btn btn-warning btn-icon-only" title="Modifier"><i class="fa-solid fa-pen-to-square"></i></a>
+    <a href="@Url.Action("Index")" class="btn btn-default btn-icon-only" title="Retour"><i class="fa-solid fa-arrow-left"></i></a>
+</div>

@@ -1,0 +1,28 @@
+﻿@model Solution.ViewModels.MedecinsTelephones.MedecinTelephoneDetailsViewModel
+@{
+    ViewBag.Title = "Détails MedecinTelephone";
+}
+
+<div class="page-header-custom">
+    <h2>Détails MedecinTelephone</h2>
+</div>
+
+<div class="dashboard-card">
+    <dl class="dl-horizontal">
+        <dt>Médecin</dt>
+        <dd>@Model.MedecinLibelle</dd>
+        <dt>Type</dt>
+        <dd>@Model.TypeTelephone</dd>
+        <dt>Numéro</dt>
+        <dd>@Model.NumeroTelephone</dd>
+        <dt>Rang</dt>
+        <dd>@Model.RangSource</dd>
+        <dt>Principal</dt>
+        <dd>@(Model.EstPrincipal ? "Oui" : "Non")</dd>
+    </dl>
+</div>
+
+<div class="dashboard-card actions-card">
+    <a href="@Url.Action("Edit", new { id = Model.MedecinTelephoneId })" class="btn btn-warning btn-icon-only" title="Modifier"><i class="fa-solid fa-pen-to-square"></i></a>
+    <a href="@Url.Action("Index")" class="btn btn-default btn-icon-only" title="Retour"><i class="fa-solid fa-arrow-left"></i></a>
+</div>

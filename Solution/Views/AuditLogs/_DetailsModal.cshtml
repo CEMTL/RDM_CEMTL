@@ -1,0 +1,66 @@
+﻿@model Solution.ViewModels.AuditLogs.AuditLogDetailsViewModel
+
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
+        <span aria-hidden="true">&times;</span>
+    </button>
+    <h4 class="modal-title">
+        <i class="fa-solid fa-clock-rotate-left"></i>
+        Détails audit #@Model.AuditLogId
+    </h4>
+</div>
+
+<div class="modal-body">
+    <div class="row">
+        <div class="col-md-3"><strong>Table</strong><br />@Model.TableName</div>
+        <div class="col-md-3"><strong>Enregistrement</strong><br />@Model.RecordId</div>
+        <div class="col-md-2"><strong>Action</strong><br />@Model.Action</div>
+        <div class="col-md-4"><strong>Date</strong><br />@Model.DateAction.ToString("yyyy-MM-dd HH:mm:ss")</div>
+    </div>
+
+    <hr />
+
+    <div class="row">
+        <div class="col-md-4"><strong>Utilisateur</strong><br />@Model.NomUtilisateur</div>
+        <div class="col-md-2"><strong>UtilisateurId</strong><br />@(Model.UtilisateurId.HasValue ? Model.UtilisateurId.ToString() : "-")</div>
+        <div class="col-md-2"><strong>IP</strong><br />@Model.AdresseIP</div>
+        <div class="col-md-4"><strong>UserAgent</strong><br />@Model.UserAgent</div>
+    </div>
+
+    <hr />
+
+    <div class="form-group">
+        <label>Champs modifiés</label>
+        <pre class="audit-pre">@(string.IsNullOrWhiteSpace(Model.ChangedFields) ? "-" : Model.ChangedFields)</pre>
+    </div>
+
+    <div class="form-group">
+        <label>Anciennes valeurs</label>
+        <pre class="audit-pre">@(string.IsNullOrWhiteSpace(Model.OldValues) ? "-" : Model.OldValues)</pre>
+    </div>
+
+    <div class="form-group" style="margin-bottom:0;">
+        <label>Nouvelles valeurs</label>
+        <pre class="audit-pre">@(string.IsNullOrWhiteSpace(Model.NewValues) ? "-" : Model.NewValues)</pre>
+    </div>
+</div>
+
+<div class="modal-footer">
+    <a href="@Url.Action("Details", "AuditLogs", new { id = Model.AuditLogId })" class="btn btn-default">
+        Ouvrir la fiche complète
+    </a>
+    <button type="button" class="btn btn-primary" data-dismiss="modal">Fermer</button>
+</div>
+
+<style>
+    .audit-pre {
+        white-space: pre-wrap;
+        word-break: break-word;
+        background: #f8f9fb;
+        border: 1px solid #e1e5ea;
+        border-radius: 8px;
+        padding: 12px;
+        max-height: 260px;
+        overflow: auto;
+    }
+</style>

@@ -1,0 +1,115 @@
+﻿@model Solution.ViewModels.Shared.PagedListViewModel<Solution.ViewModels.CotisationsAnnuelles.CotisationAnnuelleListViewModel>
+@{
+    ViewBag.Title = "Cotisations annuelles";
+    var canManage = User.IsInRole("Admin") || User.IsInRole("SuperUtilisateur");
+}
+
+<div class="page-header-custom">
+    <h2>Cotisations annuelles</h2>
+</div>
+
+@Html.Partial("~/Views/Shared/_Alerts.cshtml")
+
+<div class="dashboard-card filters-bar">
+    @using (Html.BeginForm("Index", "CotisationsAnnuelles", FormMethod.Get, new { id = "formRechercheCotisations" }))
+    {
+        <div class="row">
+            <div class="col-md-8">
+                <input type="text"
+                       name="search"
+                       value="@Request.QueryString["search"]"
+                       class="form-control"
+                       placeholder="Recherche..." />
+            </div>
+            <div class="col-md-4 text-right">
+                <button type="submit" class="btn btn-default">
+                    <i class="fa-solid fa-magnifying-glass"></i> Rechercher
+                </button>
+                @if (canManage)
+                {
+                    @Html.ActionLink("Nouveau", "Create", null, new { @class = "btn btn-primary" })
+                }
+            </div>
+        </div>
+    }
+</div>
+
+<div class="dashboard-card">
+    <table id="tableCotisationsAnnuelles" class="table table-bordered table-striped table-hover registre-table">
+        <thead>
+            <tr>
+                <th>Médecin</th>
+                <th>Année</th>
+                <th>Code cotisation</th>
+                <th>Montant final</th>
+                <th>État</th>
+                <th>Type paiement</th>
+                <th class="nowrap" style="width:140px;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Items)
+            {
+                <tr>
+                    <td>@item.MedecinNomComplet</td>
+                    <td>@item.AnneeExercice</td>
+                    <td>@item.CodeCotisationLibelle</td>
+                    <td>@(item.MontantFinal.HasValue ? item.MontantFinal.Value.ToString("N2") : "")</td>
+                    <td>@item.EtatCotisation</td>
+                    <td>@item.TypePaiementLibelle</td>
+                    <td class="table-actions nowrap">
+                        <a href="@Url.Action("Details", new { id = item.CotisationAnnuelleId })" class="btn btn-info btn-sm btn-icon-only" title="Détails">
+                            <i class="fa-solid fa-circle-info"></i>
+                        </a>
+                        @if (canManage)
+                        {
+                            <a href="@Url.Action("Edit", new { id = item.CotisationAnnuelleId })" class="btn btn-warning btn-sm btn-icon-only" title="Modifier">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </a>
+                            <a href="@Url.Action("Delete", new { id = item.CotisationAnnuelleId })" class="btn btn-danger btn-sm btn-icon-only" title="Supprimer">
+                                <i class="fa-solid fa-trash"></i>
+                            </a>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@Html.Partial("~/Views/Shared/_Pager.cshtml")
+
+@section Scripts{
+    <script>
+        $(function () {
+            $("#tableCotisationsAnnuelles").DataTable({
+                paging: false,
+                info: false,
+                ordering: true,
+                searching: true,
+                autoWidth: false,
+                order: [[1, "desc"]],
+                columnDefs: [
+                    { orderable: false, searchable: false, targets: 6 }
+                ],
+                language: {
+                    processing: "Traitement en cours...",
+                    search: "Rechercher dans cette page :",
+                    lengthMenu: "Afficher _MENU_ éléments",
+                    info: "Affichage de l'élément _START_ à _END_ sur _TOTAL_ éléments",
+                    infoEmpty: "Affichage de l'élément 0 à 0 sur 0 élément",
+                    infoFiltered: "(filtré de _MAX_ éléments au total)",
+                    loadingRecords: "Chargement en cours...",
+                    zeroRecords: "Aucun élément à afficher",
+                    emptyTable: "Aucune donnée disponible dans le tableau",
+                    paginate: {
+                        first: "Premier",
+                        previous: "Précédent",
+                        next: "Suivant",
+                        last: "Dernier"
+                    }
+                }
+            });
+        });
+    </script>
+}

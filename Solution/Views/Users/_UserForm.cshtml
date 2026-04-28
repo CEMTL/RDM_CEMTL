@@ -1,0 +1,84 @@
+@* Partial partagé entre Create et Edit pour les champs AspNetUsers *@
+@model Solution.ViewModels.UserCreateViewModel
+
+<div class="form-group">
+    @Html.LabelFor(m => m.Nom, new { @class = "col-sm-3 control-label" })
+    <div class="col-sm-6">
+        @Html.TextBoxFor(m => m.Nom, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Nom, "", new { @class = "text-danger" })
+    </div>
+</div>
+
+<div class="form-group">
+    @Html.LabelFor(m => m.Prenom, new { @class = "col-sm-3 control-label" })
+    <div class="col-sm-6">
+        @Html.TextBoxFor(m => m.Prenom, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Prenom, "", new { @class = "text-danger" })
+    </div>
+</div>
+
+<div class="form-group">
+    @Html.LabelFor(m => m.Email, new { @class = "col-sm-3 control-label" })
+    <div class="col-sm-6">
+        @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+    </div>
+</div>
+
+<div class="form-group">
+    @Html.LabelFor(m => m.UserName, new { @class = "col-sm-3 control-label" })
+    <div class="col-sm-6">
+        @Html.TextBoxFor(m => m.UserName, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.UserName, "", new { @class = "text-danger" })
+    </div>
+</div>
+
+<div class="form-group">
+    @Html.LabelFor(m => m.PhoneNumber, new { @class = "col-sm-3 control-label" })
+    <div class="col-sm-6">
+        @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control", placeholder = "514-555-1234" })
+        @Html.ValidationMessageFor(m => m.PhoneNumber, "", new { @class = "text-danger" })
+    </div>
+</div>
+
+<div class="form-group">
+    @Html.LabelFor(m => m.Password, new { @class = "col-sm-3 control-label" })
+    <div class="col-sm-6">
+        @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+    </div>
+</div>
+
+<div class="form-group">
+    @Html.LabelFor(m => m.ConfirmPassword, new { @class = "col-sm-3 control-label" })
+    <div class="col-sm-6">
+        @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.ConfirmPassword, "", new { @class = "text-danger" })
+    </div>
+</div>
+
+@* AspNetUserRoles — cases à cocher *@
+<div class="form-group">
+    <label class="col-sm-3 control-label">
+        Rôles <small class="text-muted">(AspNetUserRoles)</small>
+    </label>
+    <div class="col-sm-6">
+        @foreach (var r in Model.RolesDisponibles)
+        {
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="RolesSelectionnes" value="@r.Value"
+                           @(r.Selected ? "checked" : "") />
+                    @r.Text
+                </label>
+            </div>
+        }
+        @if (!Model.RolesDisponibles.Any())
+        {
+            <p class="text-muted">
+                Aucun rôle dans AspNetRoles.
+                @Html.ActionLink("En créer un", "Create", "Roles")
+            </p>
+        }
+    </div>
+</div>

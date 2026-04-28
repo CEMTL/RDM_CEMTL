@@ -1,0 +1,47 @@
+﻿@model Solution.ViewModels.Genres.GenreDetailsViewModel
+
+@{
+    ViewBag.Title = "Détails du genre";
+}
+
+<div class="page-header-custom">
+    <div class="row">
+        <div class="col-md-8">
+            <h2>Détails du genre</h2>
+        </div>
+        <div class="col-md-4 text-right" style="margin-top:25px;">
+            @Html.ActionLink("Retour à la liste", "Index", null, new { @class = "btn btn-default" })
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-card">
+    <table class="table table-bordered table-striped">
+        <tr>
+            <th style="width:220px;">ID</th>
+            <td>@Model.GenreId</td>
+        </tr>
+        <tr>
+            <th>Code</th>
+            <td>@Model.CodeGenre</td>
+        </tr>
+        <tr>
+            <th>Libellé</th>
+            <td>@Model.Libelle</td>
+        </tr>
+    </table>
+
+    <div class="text-right">
+        @if (User.IsInRole("Admin") || User.IsInRole("SuperUtilisateur"))
+        {
+            <a href="@Url.Action("Edit", new { id = Model.GenreId })" class="btn btn-warning">
+                <i class="fa-solid fa-pen-to-square"></i> Modifier
+            </a>
+            <a href="@Url.Action("Delete", new { id = Model.GenreId })" class="btn btn-danger">
+                <i class="fa-solid fa-trash"></i> Supprimer
+            </a>
+        }
+
+        @Html.ActionLink("Retour", "Index", null, new { @class = "btn btn-default" })
+    </div>
+</div>

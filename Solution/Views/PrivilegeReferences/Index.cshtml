@@ -1,0 +1,184 @@
+﻿@model IEnumerable<Solution.ViewModels.Privileges.PrivilegeReferenceListViewModel>
+
+@{
+    ViewBag.Title = "Référentiel des privilèges";
+    var actifsSeulement = ViewBag.ActifsSeulement != null && (bool)ViewBag.ActifsSeulement;
+    var canManage = ViewBag.CanManage != null && (bool)ViewBag.CanManage;
+}
+
+@section Styles{
+    <style>
+        .dataTables_wrapper .dataTables_paginate {
+            position: relative !important;
+            z-index: 20 !important;
+        }
+
+        .dataTables_wrapper .pagination {
+            position: relative !important;
+            z-index: 21 !important;
+            margin: 0 !important;
+        }
+
+            .dataTables_wrapper .pagination > li > a,
+            .dataTables_wrapper .pagination > li > span {
+                position: relative !important;
+                z-index: 22 !important;
+                pointer-events: auto !important;
+                cursor: pointer !important;
+            }
+
+        .dataTables_wrapper .paginate_button.disabled > a,
+        .dataTables_wrapper .paginate_button.disabled > span {
+            pointer-events: none !important;
+            cursor: not-allowed !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            overflow: visible !important;
+        }
+    </style>
+}
+
+<div class="page-header-custom">
+    <h2>Référentiel des privilèges</h2>
+</div>
+
+@Html.Partial("~/Views/Shared/_Alerts.cshtml")
+
+<div class="dashboard-card filters-bar">
+    @using (Html.BeginForm("Index", "PrivilegeReferences", FormMethod.Get))
+    {
+        <div class="row">
+            <div class="col-md-5">
+                <input type="text"
+                       name="search"
+                       value="@ViewBag.Search"
+                       class="form-control"
+                       placeholder="Recherche par code, libellé ou catégorie..." />
+            </div>
+
+            <div class="col-md-3">
+                <label class="checkbox-inline" style="margin-top:7px;">
+                    <input type="checkbox"
+                           name="actifsSeulement"
+                           value="true"
+                           @(actifsSeulement ? "checked=\"checked\"" : "") />
+                    Actifs seulement
+                </label>
+            </div>
+
+            <div class="col-md-4 text-right">
+                <button type="submit" class="btn btn-default">
+                    <i class="fa-solid fa-magnifying-glass"></i> Rechercher
+                </button>
+
+                <a href="@Url.Action("Index", "PrivilegeReferences")" class="btn btn-default">
+                    <i class="fa-solid fa-rotate-left"></i> Réinitialiser
+                </a>
+
+                @if (canManage)
+                {
+                    @Html.ActionLink("Nouveau", "Create", null, new { @class = "btn btn-primary" })
+                }
+            </div>
+        </div>
+    }
+</div>
+
+<div class="dashboard-card">
+    <table id="tablePrivilegeReferences" class="table table-bordered table-striped table-hover registre-table">
+        <thead>
+            <tr>
+                <th>Code</th>
+                <th>Libellé</th>
+                <th>Catégorie</th>
+                <th>Bloc opératoire</th>
+                <th>Installation</th>
+                <th>Unité</th>
+                <th>Ordre</th>
+                <th>Actif</th>
+                <th class="nowrap" style="width:140px;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.CodePrivilege</td>
+                    <td>@item.LibellePrivilege</td>
+                    <td>@item.Categorie</td>
+                    <td>@(item.NecessiteBlocOperatoire ? "Oui" : "Non")</td>
+                    <td>@(item.NecessiteInstallation ? "Oui" : "Non")</td>
+                    <td>@(item.NecessiteUnite ? "Oui" : "Non")</td>
+                    <td>@item.OrdreAffichage</td>
+                    <td>@(item.EstActif ? "Oui" : "Non")</td>
+                    <td class="table-actions nowrap">
+                        <a href="@Url.Action("Details", new { id = item.PrivilegeReferenceId })"
+                           class="btn btn-info btn-sm btn-icon-only"
+                           title="Détails">
+                            <i class="fa-solid fa-circle-info"></i>
+                        </a>
+
+                        @if (canManage)
+                        {
+                            <a href="@Url.Action("Edit", new { id = item.PrivilegeReferenceId })"
+                               class="btn btn-warning btn-sm btn-icon-only"
+                               title="Modifier">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </a>
+
+                            <a href="@Url.Action("Delete", new { id = item.PrivilegeReferenceId })"
+                               class="btn btn-danger btn-sm btn-icon-only"
+                               title="Supprimer">
+                                <i class="fa-solid fa-trash"></i>
+                            </a>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts{
+    <script>
+        $(function () {
+            var table = $("#tablePrivilegeReferences");
+
+            if ($.fn.DataTable.isDataTable(table)) {
+                table.DataTable().destroy();
+            }
+
+            table.DataTable({
+                pageLength: 10,
+                lengthMenu: [[5, 10, 25, 50, 100], [5, 10, 25, 50, 100]],
+                paging: true,
+                ordering: true,
+                searching: true,
+                info: true,
+                autoWidth: false,
+                order: [[6, "asc"], [1, "asc"]],
+                language: {
+                    processing: "Traitement en cours...",
+                    search: "Recherche rapide :",
+                    lengthMenu: "Afficher _MENU_ éléments",
+                    info: "Affichage de l'élément _START_ à _END_ sur _TOTAL_ éléments",
+                    infoEmpty: "Affichage de l'élément 0 à 0 sur 0 élément",
+                    infoFiltered: "(filtré de _MAX_ éléments au total)",
+                    loadingRecords: "Chargement en cours...",
+                    zeroRecords: "Aucun élément à afficher",
+                    emptyTable: "Aucune donnée disponible dans le tableau",
+                    paginate: {
+                        first: "Premier",
+                        previous: "Précédent",
+                        next: "Suivant",
+                        last: "Dernier"
+                    }
+                },
+                columnDefs: [
+                    { orderable: false, searchable: false, targets: 8 }
+                ]
+            });
+        });
+    </script>
+}

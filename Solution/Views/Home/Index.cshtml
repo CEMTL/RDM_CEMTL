@@ -1,0 +1,285 @@
+﻿@{
+    ViewBag.Title = "Tableau de bord";
+}
+
+<!-- Styles additionnels pour le dashboard -->
+<style>
+    .dashboard-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        transition: transform 0.2s, box-shadow 0.2s;
+        border-left: 6px solid;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card .kpi-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.75rem;
+            opacity: 0.7;
+        }
+
+    .stat-value {
+        font-size: 2.2rem;
+        font-weight: 700;
+        line-height: 1.2;
+        margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #6c757d;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-sub {
+        font-size: 0.85rem;
+        color: #6c757d;
+        border-top: 1px solid #eee;
+        padding-top: 0.5rem;
+        margin-top: 0.5rem;
+    }
+
+    /* Couleurs par carte (via border-left) */
+    .stat-card:nth-child(1) {
+        border-left-color: #0d6efd;
+    }
+
+    .stat-card:nth-child(2) {
+        border-left-color: #198754;
+    }
+
+    .stat-card:nth-child(3) {
+        border-left-color: #ffc107;
+    }
+
+    .stat-card:nth-child(4) {
+        border-left-color: #dc3545;
+    }
+
+    .dashboard-links {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.2rem;
+        margin: 2rem 0;
+    }
+
+    .quick-link {
+        background: #f8f9fa;
+        border-radius: 1rem;
+        padding: 1.2rem;
+        text-decoration: none;
+        color: #1e2a3e;
+        transition: all 0.2s;
+        border: 1px solid #e9ecef;
+    }
+
+        .quick-link:hover {
+            background: white;
+            border-color: #dee2e6;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transform: translateY(-2px);
+            text-decoration: none;
+            color: #0d6efd;
+        }
+
+        .quick-link h4 {
+            margin: 0 0 0.5rem 0;
+            font-weight: 600;
+        }
+
+        .quick-link p {
+            margin: 0;
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+
+    .dashboard-card {
+        background: white;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        margin-top: 1.5rem;
+    }
+
+    .chart-container {
+        max-width: 100%;
+        margin-top: 1rem;
+    }
+
+    canvas {
+        max-height: 280px;
+        width: 100%;
+    }
+
+    hr {
+        margin: 1rem 0;
+    }
+
+    @@media (max-width: 768px) {
+        .stat-value {
+            font-size: 1.8rem;
+        }
+
+        .kpi-icon {
+            font-size: 2rem;
+        }
+
+        .dashboard-links {
+            gap: 0.8rem;
+        }
+    }
+</style>
+
+<div class="dashboard-stats">
+    <div class="stat-card">
+        <div class="kpi-icon"><i class="fa-solid fa-user-doctor"></i></div>
+        <div class="stat-value">@ViewBag.TotalMedecins</div>
+        <div class="stat-label">Médecins au registre</div>
+        <div class="stat-sub">
+            <i class="fa-regular fa-circle-check text-success"></i> Actifs : @ViewBag.MedecinsActifs
+        </div>
+    </div>
+    @*<div class="stat-card">
+        <div class="kpi-icon"><i class="fa-solid fa-id-card"></i></div>
+        <div class="stat-value">@ViewBag.TotalProfils</div>
+        <div class="stat-label">Profils CEMTL</div>
+        <div class="stat-sub">
+            <i class="fa-regular fa-building"></i> Complétude en cours
+        </div>
+    </div>*@
+    <div class="stat-card">
+        <div class="kpi-icon"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+        <div class="stat-value">@ViewBag.TotalCotisations</div>
+        <div class="stat-label">Cotisations</div>
+        <div class="stat-sub text-warning">
+            <i class="fa-regular fa-clock"></i> À surveiller : @ViewBag.CotisationsNonReglees
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="kpi-icon"><i class="fa-solid fa-scale-balanced"></i></div>
+        <div class="stat-value">@ViewBag.TotalPrivileges</div>
+        <div class="stat-label">Dossiers de privilèges</div>
+        <div class="stat-sub text-success">
+            <i class="fa-regular fa-thumbs-up"></i> Actifs : @ViewBag.PrivilegesActifs
+        </div>
+    </div>
+</div>
+
+<!-- Graphiques simples (Chart.js) -->
+<div class="dashboard-card">
+    <h3 style="margin-top:0;">Aperçu des données</h3>
+    <div style="display: flex; flex-wrap: wrap; gap: 2rem; justify-content: space-between;">
+        <div style="flex: 1; min-width: 200px;">
+            <canvas id="medecinsChart" width="400" height="250"></canvas>
+        </div>
+        <div style="flex: 1; min-width: 200px;">
+            <canvas id="cotisationsChart" width="400" height="250"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-links">
+    <a class="quick-link" href="@Url.Action("Index", "Medecins")">
+        <h4><i class="fa-solid fa-user-doctor"></i> Médecins</h4>
+        <p>Recherche, filtres par statut et catégorie, pagination serveur et export.</p>
+    </a>
+    @*<a class="quick-link" href="@Url.Action("Index", "ProfilsCEMTL")">
+            <h4><i class="fa-solid fa-id-card"></i> Profils CEMTL</h4>
+            <p>Coordonnées, départements, services, absences, FDC et profil opérationnel.</p>
+        </a>*@
+    <a class="quick-link" href="@Url.Action("Index", "CotisationsAnnuelles")">
+        <h4><i class="fa-solid fa-file-invoice-dollar"></i> Cotisations annuelles</h4>
+        <p>Suivi par année, état, type de paiement et médecins concernés.</p>
+    </a>
+    <a class="quick-link" href="@Url.Action("Index", "DossiersPrivilege")">
+        <h4><i class="fa-solid fa-scale-balanced"></i> Dossiers de privilèges</h4>
+        <p>Suivi des renouvellements, décisions, PEM, FDC et absences.</p>
+    </a>
+    <a class="quick-link" href="@Url.Action("Index", "Installations")">
+        <h4><i class="fa-solid fa-building"></i> Structure CEMTL</h4>
+        <p>Installations, unités organisationnelles, comités et référentiels.</p>
+    </a>
+    @*<a class="quick-link" href="@Url.Action("Index", "JournalImports")">
+        <h4><i class="fa-solid fa-clock-rotate-left"></i> Journal d'import</h4>
+        <p>Historique des chargements et validation des fichiers sources.</p>
+    </a>*@
+    <a class="quick-link" href="@Url.Action("Index", "AuditLogs")">
+        <h4><i class="fa-solid fa-clock-rotate-left"></i> Journal d'audit</h4>
+        <p>Historique des chargements .</p>
+    </a>
+</div>
+
+ 
+
+@section scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Graphique médecins
+            const ctx1 = document.getElementById('medecinsChart').getContext('2d');
+            new Chart(ctx1, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Médecins actifs', 'Médecins inactifs'],
+                    datasets: [{
+                        data: [@ViewBag.MedecinsActifs, @ViewBag.TotalMedecins - @ViewBag.MedecinsActifs],
+                        backgroundColor: ['#198754', '#adb5bd'],
+                        borderWidth: 0,
+                        hoverOffset: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        title: { display: true, text: 'Médecins (actifs vs inactifs)' }
+                    }
+                }
+            });
+
+            // Graphique cotisations
+            const ctx2 = document.getElementById('cotisationsChart').getContext('2d');
+            new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: ['Cotisations réglées', 'Cotisations non réglées'],
+                    datasets: [{
+                        data: [@ViewBag.TotalCotisations - @ViewBag.CotisationsNonReglees, @ViewBag.CotisationsNonReglees],
+                        backgroundColor: ['#0d6efd', '#ffc107'],
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { display: false },
+                        title: { display: true, text: 'État des cotisations' }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, grid: { drawBorder: false } }
+                    }
+                }
+            });
+        });
+    </script>
+}

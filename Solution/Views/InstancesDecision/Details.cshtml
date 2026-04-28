@@ -1,0 +1,26 @@
+﻿@model Solution.ViewModels.InstancesDecision.InstanceDecisionDetailsViewModel
+@{
+    ViewBag.Title = "Détails InstanceDecision";
+}
+
+<div class="page-header-custom">
+    <h2>Détails InstanceDecision</h2>
+</div>
+
+<div class="dashboard-card">
+    <dl class="dl-horizontal">
+        <dt>Type instance</dt>
+        <dd>@Model.TypeInstanceDecisionLibelle</dd>
+        <dt>Code instance</dt>
+        <dd>@Model.CodeInstance</dd>
+        <dt>Date instance</dt>
+        <dd>@(Model.DateInstance.HasValue ? Model.DateInstance.Value.ToString("yyyy-MM-dd") : "-")</dd>
+        <dt>Libellé instance</dt>
+        <dd>@Model.LibelleInstance</dd>
+    </dl>
+</div>
+
+<div class="dashboard-card actions-card">
+    <a href="@Url.Action("Edit", new { id = Model.InstanceDecisionId })" class="btn btn-warning btn-icon-only" title="Modifier"><i class="fa-solid fa-pen-to-square"></i></a>
+    <a href="@Url.Action("Index")" class="btn btn-default btn-icon-only" title="Retour"><i class="fa-solid fa-arrow-left"></i></a>
+</div>

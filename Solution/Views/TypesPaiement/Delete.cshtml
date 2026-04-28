@@ -1,0 +1,50 @@
+﻿@model Solution.ViewModels.TypesPaiement.TypePaiementDetailsViewModel
+
+@{
+    ViewBag.Title = "Supprimer un type paiement";
+}
+
+<div class="page-header-custom">
+    <div class="row">
+        <div class="col-md-8">
+            <h2>Supprimer un type paiement</h2>
+        </div>
+        <div class="col-md-4 text-right" style="margin-top:25px;">
+            @Html.ActionLink("Retour à la liste", "Index", null, new { @class = "btn btn-default" })
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-card">
+    <div class="alert alert-danger">
+        <strong>Attention :</strong> cette action supprimera définitivement ce type paiement.
+    </div>
+
+    <table class="table table-bordered table-striped">
+        <tr>
+            <th style="width:220px;">ID</th>
+            <td>@Model.TypePaiementId</td>
+        </tr>
+        <tr>
+            <th>Libellé</th>
+            <td>@Model.Libelle</td>
+        </tr>
+        <tr>
+            <th>Actif</th>
+            <td>@(Model.EstActif ? "Oui" : "Non")</td>
+        </tr>
+    </table>
+
+    @using (Html.BeginForm("Delete", "TypesPaiement", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(m => m.TypePaiementId)
+
+        <div class="text-right">
+            @Html.ActionLink("Annuler", "Index", null, new { @class = "btn btn-default" })
+            <button type="submit" class="btn btn-danger">
+                <i class="fa-solid fa-trash"></i> Confirmer la suppression
+            </button>
+        </div>
+    }
+</div>

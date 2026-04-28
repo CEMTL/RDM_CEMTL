@@ -1,0 +1,60 @@
+﻿@model IEnumerable<Solution.ViewModels.RoleIndexViewModel>
+@{ ViewBag.Title = "Rôles"; }
+
+<div class="page-header">
+    <h2><span class="glyphicon glyphicon-lock"></span> Rôles</h2>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        @TempData["Success"]
+    </div>
+}
+@if (TempData["Erreur"] != null)
+{
+    <div class="alert alert-warning alert-dismissible">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        @TempData["Erreur"]
+    </div>
+}
+
+<p>@Html.ActionLink("+ Nouveau rôle", "Create", null, new { @class = "btn btn-success" })</p>
+
+<table class="table table-striped table-bordered" style="max-width:100%">
+    <thead>
+        <tr>
+            <th>Nom du rôle</th>
+            <th class="text-center">
+                Utilisateurs <small class="text-muted"></small>
+            </th>
+            <th class="text-center">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var r in Model)
+        {
+            <tr>
+                <td>@r.Name</td>
+                <td class="text-center">
+                    <span class="badge">@r.NbUtilisateurs</span>
+                </td>
+                <td class="text-nowrap text-center">
+                    @Html.ActionLink("Modifier", "Edit", new { id = r.Id },
+                        new { @class = "btn btn-xs btn-primary" })
+
+                    @using (Html.BeginForm("Delete", "Roles", new { id = r.Id },
+                        FormMethod.Post, new { style = "display:inline" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-xs btn-danger"
+                                onclick="return confirm('Supprimer ce rôle ?')">
+                            Supprimer
+                        </button>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

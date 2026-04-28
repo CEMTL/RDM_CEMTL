@@ -1,0 +1,56 @@
+﻿@model Solution.ViewModels.RoleDetailsViewModel
+
+@{
+    ViewBag.Title = "Détails du rôle";
+}
+
+<div class="container-fluid">
+    <h2>@ViewBag.Title</h2>
+    <hr />
+
+    <dl class="dl-horizontal">
+        <dt>Nom du rôle</dt>
+        <dd>@Model.Name</dd>
+
+        <dt>Nombre d'utilisateurs</dt>
+        <dd>@(Model.Users != null ? Model.Users.Count : 0)</dd>
+    </dl>
+
+    <h4>Utilisateurs associés</h4>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Nom complet</th>
+                    <th>Nom d'utilisateur</th>
+                    <th>Courriel</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Users != null && Model.Users.Any())
+                {
+                    foreach (var user in Model.Users)
+                    {
+                        <tr>
+                            <td>@user.FullName</td>
+                            <td>@user.UserName</td>
+                            <td>@user.Email</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="3" class="text-center">Aucun utilisateur associé à ce rôle.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <p>
+        @Html.ActionLink("Modifier", "Edit", new { id = Model.Id }, new { @class = "btn btn-warning" })
+        @Html.ActionLink("Retour à la liste", "Index", null, new { @class = "btn btn-default" })
+    </p>
+</div>

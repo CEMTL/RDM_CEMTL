@@ -1,0 +1,118 @@
+﻿@model Solution.ViewModels.Privileges.PrivilegeReferenceFormViewModel
+
+@{
+    ViewBag.Title = "Modifier un privilège de référence";
+
+    var hasErrors = false;
+    foreach (var state in ViewData.ModelState.Values)
+    {
+        foreach (var err in state.Errors)
+        {
+            if (!string.IsNullOrWhiteSpace(err.ErrorMessage) || err.Exception != null)
+            {
+                hasErrors = true;
+                break;
+            }
+        }
+        if (hasErrors) { break; }
+    }
+}
+
+<div class="page-header-custom">
+    <div class="row">
+        <div class="col-md-8">
+            <h2>Modifier un privilège de référence</h2>
+        </div>
+        <div class="col-md-4 text-right" style="margin-top:25px;">
+            @Html.ActionLink("Retour à la liste", "Index", null, new { @class = "btn btn-default" })
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-card">
+    @using (Html.BeginForm("Edit", "PrivilegeReferences", new { id = Model.PrivilegeReferenceId }, FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(m => m.PrivilegeReferenceId)
+
+        if (hasErrors)
+        {
+            <div class="alert alert-warning">
+                <strong><i class="fa fa-exclamation-triangle"></i> Le formulaire contient des erreurs.</strong>
+                <br />
+                Veuillez corriger les champs indiqués ci-dessous.
+            </div>
+
+            @Html.ValidationSummary(false, "", new { @class = "alert alert-danger" })
+        }
+
+        <div class="form-horizontal">
+            <div class="form-group">
+                @Html.LabelFor(m => m.CodePrivilege, new { @class = "col-md-2 control-label" })
+                <div class="col-md-4">
+                    @Html.TextBoxFor(m => m.CodePrivilege, new { @class = "form-control", maxlength = "50", placeholder = "Code..." })
+                    @Html.ValidationMessageFor(m => m.CodePrivilege, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.LibellePrivilege, new { @class = "col-md-2 control-label" })
+                <div class="col-md-6">
+                    @Html.TextBoxFor(m => m.LibellePrivilege, new { @class = "form-control", maxlength = "255", placeholder = "Libellé..." })
+                    @Html.ValidationMessageFor(m => m.LibellePrivilege, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.Categorie, new { @class = "col-md-2 control-label" })
+                <div class="col-md-4">
+                    @Html.TextBoxFor(m => m.Categorie, new { @class = "form-control", maxlength = "100", placeholder = "Catégorie..." })
+                    @Html.ValidationMessageFor(m => m.Categorie, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.Description, new { @class = "col-md-2 control-label" })
+                <div class="col-md-8">
+                    @Html.TextAreaFor(m => m.Description, 4, 60, new { @class = "form-control", placeholder = "Description..." })
+                    @Html.ValidationMessageFor(m => m.Description, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.OrdreAffichage, new { @class = "col-md-2 control-label" })
+                <div class="col-md-2">
+                    @Html.TextBoxFor(m => m.OrdreAffichage, new { @class = "form-control", type = "number" })
+                    @Html.ValidationMessageFor(m => m.OrdreAffichage, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.Label("Contraintes", new { @class = "col-md-2 control-label" })
+                <div class="col-md-8" style="padding-top:7px;">
+                    <label class="checkbox-inline">@Html.CheckBoxFor(m => m.NecessiteBlocOperatoire) Bloc opératoire</label>
+                    <label class="checkbox-inline">@Html.CheckBoxFor(m => m.NecessiteInstallation) Installation</label>
+                    <label class="checkbox-inline">@Html.CheckBoxFor(m => m.NecessiteUnite) Unité</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.EstActif, new { @class = "col-md-2 control-label" })
+                <div class="col-md-6" style="padding-top:7px;">
+                    <label class="checkbox-inline">
+                        @Html.CheckBoxFor(m => m.EstActif) Actif
+                    </label>
+                </div>
+            </div>
+
+            <hr />
+
+            <div class="text-right">
+                @Html.ActionLink("Annuler", "Index", null, new { @class = "btn btn-default" })
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa-solid fa-save"></i> Enregistrer
+                </button>
+            </div>
+        </div>
+    }
+</div>

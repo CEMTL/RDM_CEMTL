@@ -1,0 +1,43 @@
+﻿@model Solution.ViewModels.Nominations.NominationDetailsViewModel
+
+@{
+    ViewBag.Title = "Supprimer une nomination";
+}
+
+<div class="page-header-custom">
+    <div class="row">
+        <div class="col-md-8">
+            <h2>Supprimer une nomination</h2>
+        </div>
+        <div class="col-md-4 text-right" style="margin-top:25px;">
+            @Html.ActionLink("Retour à la liste", "Index", null, new { @class = "btn btn-default" })
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-card">
+    <div class="alert alert-danger">
+        <strong>Attention :</strong> cette action supprimera définitivement cette nomination.
+    </div>
+
+    <table class="table table-bordered table-striped">
+        <tr><th style="width:220px;">ID</th><td>@Model.NominationId</td></tr>
+        <tr><th>Code</th><td>@Model.CodeNomination</td></tr>
+        <tr><th>Libellé</th><td>@Model.LibelleNomination</td></tr>
+        <tr><th>Description</th><td>@Model.Description</td></tr>
+        <tr><th>Actif</th><td>@(Model.EstActif ? "Oui" : "Non")</td></tr>
+    </table>
+
+    @using (Html.BeginForm("Delete", "Nominations", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(m => m.NominationId)
+
+        <div class="text-right">
+            @Html.ActionLink("Annuler", "Index", null, new { @class = "btn btn-default" })
+            <button type="submit" class="btn btn-danger">
+                <i class="fa-solid fa-trash"></i> Confirmer la suppression
+            </button>
+        </div>
+    }
+</div>

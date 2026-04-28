@@ -1,0 +1,26 @@
+﻿@model Solution.ViewModels.Privileges.MedecinPrivilegeFormViewModel
+
+@{
+    ViewBag.Title = "Modifier un privilège";
+}
+
+<div class="page-header-custom">
+    <h2>Modifier un privilège</h2>
+</div>
+
+@using (Html.BeginForm("Edit", "MedecinPrivileges", new { id = Model.MedecinPrivilegeId }, FormMethod.Post, null))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.MedecinPrivilegeId)
+    @Html.ValidationSummary(true, "Veuillez corriger les erreurs.", new { @class = "alert alert-danger" })
+
+    @Html.Partial("_Form", Model)
+
+    <div class="dashboard-card">
+        <button type="submit" class="btn btn-success">Enregistrer</button>
+        @Html.ActionLink("Retour", "Index", null, new { @class = "btn btn-default" })
+    </div>
+}
+@section Scripts {
+    @Html.Partial("_ValidationScriptsPartial")
+}

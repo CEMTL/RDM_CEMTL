@@ -1,0 +1,206 @@
+﻿@model Solution.ViewModels.Medecins.MedecinCreateViewModel
+
+@{
+    ViewBag.Title = "Nouveau médecin";
+}
+
+<div class="page-header">
+    <div class="row">
+        <div class="col-md-8">
+            <h2><i class="fa fa-user-md"></i> Nouveau médecin</h2>
+            <p class="text-muted">
+                Création de la fiche principale du médecin
+            </p>
+        </div>
+        <div class="col-md-4 text-right" style="margin-top:25px;">
+            @Html.ActionLink("Retour à la liste", "Index", null, new { @class = "btn btn-default" })
+        </div>
+    </div>
+</div>
+
+@using (Html.BeginForm("Create", "Medecins", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <strong><i class="fa fa-id-card-o"></i> Informations générales</strong>
+        </div>
+        <div class="panel-body">
+
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.TitreId, new { @class = "control-label" })
+                        @Html.DropDownListFor(m => m.TitreId, Model.Titres, "-- Sélectionner --", new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.TitreId, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Permis, new { @class = "control-label" })
+                        @Html.TextBoxFor(m => m.Permis, new { @class = "form-control", maxlength = "20" })
+                        @Html.ValidationMessageFor(m => m.Permis, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.NAM, new { @class = "control-label" })
+                        @Html.TextBoxFor(m => m.NAM, new { @class = "form-control", maxlength = "20" })
+                        @Html.ValidationMessageFor(m => m.NAM, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.EstActif, new { @class = "control-label d-block" })
+                        <div class="checkbox" style="margin-top:8px;">
+                            <label>
+                                @Html.CheckBoxFor(m => m.EstActif) Actif
+                            </label>
+                        </div>
+                        @Html.ValidationMessageFor(m => m.EstActif, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Nom, new { @class = "control-label" })
+                        @Html.TextBoxFor(m => m.Nom, new { @class = "form-control", maxlength = "150" })
+                        @Html.ValidationMessageFor(m => m.Nom, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Prenom, new { @class = "control-label" })
+                        @Html.TextBoxFor(m => m.Prenom, new { @class = "form-control", maxlength = "150" })
+                        @Html.ValidationMessageFor(m => m.Prenom, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.GenreId, new { @class = "control-label" })
+                        @Html.DropDownListFor(m => m.GenreId, Model.Genres, "-- Sélectionner --", new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.GenreId, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <strong><i class="fa fa-briefcase"></i> Informations professionnelles</strong>
+        </div>
+        <div class="panel-body">
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.TypePermisId, new { @class = "control-label" })
+                        @Html.DropDownListFor(m => m.TypePermisId, Model.TypesPermis, "-- Sélectionner --", new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.TypePermisId, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.StatutMedecinId, new { @class = "control-label" })
+                        @Html.DropDownListFor(m => m.StatutMedecinId, Model.StatutsMedecin, "-- Sélectionner --", new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.StatutMedecinId, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.CategoriePratiqueId, new { @class = "control-label" })
+                        @Html.DropDownListFor(m => m.CategoriePratiqueId, Model.CategoriesPratique, "-- Sélectionner --", new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.CategoriePratiqueId, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                @*<div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.TypeNomination, new { @class = "control-label" })
+                        @Html.TextBoxFor(m => m.TypeNomination, new { @class = "form-control", maxlength = "150" })
+                        @Html.ValidationMessageFor(m => m.TypeNomination, "", new { @class = "text-danger" })
+                    </div>
+                </div>*@
+
+                <div class="col-md-3">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.DateEntreeFonction, new { @class = "control-label" })
+                        @Html.TextBoxFor(m => m.DateEntreeFonction, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+                        @Html.ValidationMessageFor(m => m.DateEntreeFonction, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.DateDepart, new { @class = "control-label" })
+                        @Html.TextBoxFor(m => m.DateDepart, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+                        @Html.ValidationMessageFor(m => m.DateDepart, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <strong><i class="fa fa-calendar"></i> Informations personnelles</strong>
+        </div>
+        <div class="panel-body">
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.DateNaissance, new { @class = "control-label" })
+                        @Html.TextBoxFor(m => m.DateNaissance, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+                        @Html.ValidationMessageFor(m => m.DateNaissance, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="panel panel-warning">
+        <div class="panel-heading">
+            <strong><i class="fa fa-commenting"></i> Commentaires</strong>
+        </div>
+        <div class="panel-body">
+            <div class="form-group">
+                @Html.LabelFor(m => m.Commentaires, new { @class = "control-label" })
+                @Html.TextAreaFor(m => m.Commentaires, 6, 20, new
+                {
+                    @class = "form-control",
+                    placeholder = "Ajouter des commentaires, notes administratives ou observations..."
+                })
+                @Html.ValidationMessageFor(m => m.Commentaires, "", new { @class = "text-danger" })
+            </div>
+        </div>
+    </div>
+
+    <div class="text-right" style="margin-bottom:30px;">
+        @Html.ActionLink("Annuler", "Index", null, new { @class = "btn btn-default" })
+        <button type="submit" class="btn btn-primary">
+            <i class="fa fa-save"></i> Enregistrer
+        </button>
+    </div>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

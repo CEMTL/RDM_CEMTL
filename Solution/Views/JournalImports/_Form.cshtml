@@ -1,0 +1,29 @@
+﻿@model Solution.ViewModels.JournalImports.JournalImportFormViewModel
+
+<div class="dashboard-card">
+    <div class="form-group">
+        @Html.LabelFor(m => m.NomFichier)
+        @Html.TextBoxFor(m => m.NomFichier, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.NomFichier, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.DateImport)
+        @Html.TextBoxFor(m => m.DateImport, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+        @Html.ValidationMessageFor(m => m.DateImport, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.LignesImportees)
+        @Html.TextBoxFor(m => m.LignesImportees, new { @class = "form-control", type = "number" })
+        @Html.ValidationMessageFor(m => m.LignesImportees, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.LignesRejetees)
+        @Html.TextBoxFor(m => m.LignesRejetees, new { @class = "form-control", type = "number" })
+        @Html.ValidationMessageFor(m => m.LignesRejetees, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.Commentaire)
+        @Html.TextAreaFor(m => m.Commentaire, 4, 80, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Commentaire, "", new { @class = "text-danger" })
+    </div>
+</div>

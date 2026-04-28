@@ -1,0 +1,611 @@
+﻿@using Solution.ViewModels.Account
+@model LoginViewModel
+@{
+    ViewBag.Title = "Connexion";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewBag.Title — Solution</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
+    <style>
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: #011a35;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ── Animated background ── */
+        .bg-scene {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse 80% 60% at 20% 50%, #003d7a 0%, #011a35 60%), radial-gradient(ellipse 50% 80% at 80% 20%, #004488 0%, transparent 60%);
+            z-index: 0;
+        }
+
+            .bg-scene::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background-image: radial-gradient(circle, rgba(255,170,0,0.06) 1px, transparent 1px);
+                background-size: 36px 36px;
+                animation: gridDrift 20s linear infinite;
+            }
+
+            .bg-scene::after {
+                content: '';
+                position: absolute;
+                width: 600px;
+                height: 600px;
+                border-radius: 50%;
+                background: radial-gradient(circle, rgba(0,100,200,0.15) 0%, transparent 70%);
+                top: -150px;
+                right: -100px;
+                animation: pulse 8s ease-in-out infinite;
+            }
+
+        @@keyframes gridDrift {
+            from {
+                transform: translateY(0);
+            }
+
+            to {
+                transform: translateY(36px);
+            }
+        }
+
+        @@keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.5;
+            }
+
+            50% {
+                transform: scale(1.15);
+                opacity: 1;
+            }
+        }
+
+        /* ── Layout ── */
+        .login-wrapper {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        /* ── Card ── */
+        .login-card {
+            width: 100%;
+            max-width: 420px;
+            background: rgba(255,255,255,0.97);
+            border-radius: 20px;
+            box-shadow: 0 0 0 1px rgba(255,255,255,0.12), 0 40px 80px rgba(0,0,0,0.45), 0 0 60px rgba(0,68,136,0.3);
+            overflow: hidden;
+            animation: cardRise 0.6s cubic-bezier(0.22,1,0.36,1) both;
+        }
+
+        @@keyframes cardRise {
+            from {
+                opacity: 0;
+                transform: translateY(32px) scale(0.97);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* ── Header ── */
+        .login-header {
+            background: linear-gradient(150deg, #002855 0%, #004080 50%, #003366 100%);
+            padding: 32px 28px 24px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .login-header::before {
+                content: '';
+                position: absolute;
+                width: 200px;
+                height: 200px;
+                border-radius: 50%;
+                background: rgba(255,170,0,0.08);
+                top: -80px;
+                right: -50px;
+            }
+
+            .login-header::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                height: 3px;
+                background: linear-gradient(90deg, transparent, #ffaa00, #ffcc44, #ffaa00, transparent);
+            }
+
+        .header-icon-wrap {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            background: rgba(255,170,0,0.15);
+            border: 1px solid rgba(255,170,0,0.3);
+            margin-bottom: 14px;
+        }
+
+            .header-icon-wrap i {
+                font-size: 26px;
+                color: #ffaa00;
+            }
+
+        .login-header h4 {
+            color: #ffffff;
+            font-family: 'DM Serif Display', serif;
+            font-size: 22px;
+            font-weight: 400;
+            letter-spacing: 0.3px;
+            margin-bottom: 6px;
+        }
+
+        .login-header p {
+            color: rgba(255,255,255,0.55);
+            font-size: 13px;
+            font-weight: 300;
+            letter-spacing: 0.3px;
+        }
+
+        /* ── Body ── */
+        .login-body {
+            padding: 28px 28px 20px;
+        }
+
+        /* ── Form ── */
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .control-label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            color: #7a8799;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 7px;
+        }
+
+        .input-wrap {
+            display: flex;
+            border: 1.5px solid #dde3ed;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #f7f9fc;
+            transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+        }
+
+            .input-wrap:focus-within {
+                border-color: #003d7a;
+                background: #ffffff;
+                box-shadow: 0 0 0 4px rgba(0,61,122,0.08);
+            }
+
+        .input-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 14px;
+            color: #b0bbc9;
+            font-size: 15px;
+            transition: color 0.2s;
+            flex-shrink: 0;
+        }
+
+        .input-wrap:focus-within .input-icon {
+            color: #ffaa00;
+        }
+
+        .input-wrap .form-control {
+            flex: 1;
+            border: none;
+            background: transparent;
+            height: 46px;
+            font-size: 14px;
+            font-family: 'DM Sans', sans-serif;
+            color: #1a2535;
+            padding: 0 12px 0 0;
+            outline: none;
+            box-shadow: none;
+        }
+
+            .input-wrap .form-control::placeholder {
+                color: #b8c2ce;
+            }
+
+            .input-wrap .form-control:focus {
+                outline: none;
+                box-shadow: none;
+                border: none;
+            }
+
+        .toggle-password {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 14px;
+            color: #b0bbc9;
+            cursor: pointer;
+            transition: color 0.2s;
+            flex-shrink: 0;
+        }
+
+            .toggle-password:hover {
+                color: #003d7a;
+            }
+
+        /* ── Validation ── */
+        .text-danger {
+            color: #d63b3b;
+            font-size: 12px;
+            margin-top: 5px;
+            display: block;
+            padding-left: 2px;
+        }
+
+        .validation-summary-errors {
+            background: #fff3f3;
+            color: #c0392b;
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin-bottom: 18px;
+            border-left: 3px solid #e74c3c;
+            font-size: 13px;
+        }
+
+            .validation-summary-errors ul {
+                margin: 0;
+                padding-left: 18px;
+            }
+
+        /* ── Alert ── */
+        .alert {
+            border-radius: 10px;
+            border: none;
+            padding: 12px 16px;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+        }
+
+        .alert-info {
+            background: #edf5ff;
+            color: #003d7a;
+            border-left: 3px solid #0066cc;
+        }
+
+        /* ── Button ── */
+        .btn-login {
+            width: 100%;
+            background: linear-gradient(135deg, #002855 0%, #004488 100%);
+            border: none;
+            height: 48px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0,51,102,0.35);
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .btn-login::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(135deg, rgba(255,170,0,0.12) 0%, transparent 60%);
+                opacity: 0;
+                transition: opacity 0.3s;
+            }
+
+            .btn-login:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 30px rgba(0,51,102,0.45);
+            }
+
+                .btn-login:hover::before {
+                    opacity: 1;
+                }
+
+            .btn-login:active {
+                transform: translateY(0);
+            }
+
+            .btn-login.loading {
+                pointer-events: none;
+                opacity: 0.75;
+            }
+
+                .btn-login.loading::after {
+                    content: "";
+                    width: 18px;
+                    height: 18px;
+                    border: 2.5px solid rgba(255,255,255,0.3);
+                    border-radius: 50%;
+                    border-top-color: white;
+                    animation: spin 0.8s linear infinite;
+                }
+
+        @@keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ── Footer ── */
+        .login-footer {
+            background: #f7f9fc;
+            padding: 16px 28px 20px;
+            text-align: center;
+            border-top: 1px solid #eaecf0;
+        }
+
+        .footer-divider {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+            .footer-divider span {
+                flex: 1;
+                height: 1px;
+                background: #dde3ed;
+            }
+
+            .footer-divider p {
+                font-size: 11px;
+                color: #a0aab6;
+                text-transform: uppercase;
+                letter-spacing: 0.6px;
+                white-space: nowrap;
+            }
+
+        .help-text {
+            color: #7a8799;
+            font-size: 12.5px;
+            margin: 6px 0;
+            line-height: 1.6;
+        }
+
+            .help-text i {
+                color: #003d7a;
+                margin-right: 5px;
+                font-size: 12px;
+            }
+
+            .help-text a {
+                color: #003d7a;
+                font-weight: 600;
+                text-decoration: none;
+                border-bottom: 1px solid rgba(0,61,122,0.25);
+                transition: all 0.2s;
+            }
+
+                .help-text a:hover {
+                    color: #ffaa00;
+                    border-bottom-color: #ffaa00;
+                }
+
+            .help-text b {
+                color: #002855;
+            }
+
+        .brand-tag {
+            display: inline-block;
+            margin-top: 12px;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #b0bbc9;
+            font-weight: 500;
+        }
+
+        /* ── Responsive ── */
+        @@media (max-width: 480px) {
+            .login-card {
+                border-radius: 16px;
+            }
+
+            .login-header {
+                padding: 24px 20px 20px;
+            }
+
+            .login-body {
+                padding: 20px;
+            }
+
+            .login-footer {
+                padding: 14px 20px 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-scene"></div>
+
+    <div class="login-wrapper">
+        <div class="login-card">
+
+            <div class="login-header">
+                <div class="header-icon-wrap">
+                    <i class="glyphicon glyphicon-heart"></i>
+                </div>
+                <h4>Bienvenue</h4>
+                <p>Veuillez vous identifier pour accéder à Solution</p>
+            </div>
+
+            <div class="login-body">
+                @if (!string.IsNullOrEmpty(ViewBag.Resultat))
+                {
+                    <div class="alert alert-info">
+                        <i class="glyphicon glyphicon-info-sign"></i>
+                        <span>@ViewBag.Resultat</span>
+                    </div>
+                }
+
+                @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl },
+                    FormMethod.Post, new { role = "form", id = "loginForm" }))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.UserName, "Nom d'utilisateur", new { @class = "control-label" })
+                        <div class="input-wrap">
+                            <span class="input-icon">
+                                <i class="glyphicon glyphicon-user"></i>
+                            </span>
+                            @Html.TextBoxFor(m => m.UserName, new
+                            {
+                                @class = "form-control",
+                                placeholder = "Entrez votre nom d'utilisateur",
+                                autocomplete = "username",
+                                autofocus = "autofocus",
+                                id = "UserName"
+                            })
+                        </div>
+                        @Html.ValidationMessageFor(m => m.UserName, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Password, "Mot de passe", new { @class = "control-label" })
+                        <div class="input-wrap">
+                            <span class="input-icon">
+                                <i class="glyphicon glyphicon-lock"></i>
+                            </span>
+                            @Html.PasswordFor(m => m.Password, new
+                            {
+                                @class = "form-control",
+                                id = "passwordField",
+                                placeholder = "Entrez votre mot de passe",
+                                autocomplete = "current-password"
+                            })
+                            <span class="toggle-password" id="togglePassword" title="Afficher/masquer">
+                                <i class="glyphicon glyphicon-eye-open" id="eyeIcon"></i>
+                            </span>
+                        </div>
+                        @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn-login" id="submitBtn">
+                            <i class="glyphicon glyphicon-log-in"></i>
+                            <span>Se connecter</span>
+                        </button>
+                    </div>
+                }
+            </div>
+
+            <div class="login-footer">
+                <div class="footer-divider">
+                    <span></span>
+                    <p>Informations</p>
+                    <span></span>
+                </div>
+                <p class="help-text">
+                    <i class="glyphicon glyphicon-question-sign"></i>
+                    Pas de compte ?
+                    @Html.ActionLink("Inscrivez-vous ici", "Register", "Account")
+                </p>
+                <p class="help-text">
+                    <i class="glyphicon glyphicon-earphone"></i>
+                    Aide : <b>438-824-8794</b>
+                </p>
+                <span class="brand-tag">Service régional de soins à domicile</span>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var togglePassword = document.getElementById('togglePassword');
+            var passwordField = document.getElementById('passwordField');
+            var eyeIcon = document.getElementById('eyeIcon');
+
+            if (togglePassword && passwordField && eyeIcon) {
+                togglePassword.addEventListener('click', function () {
+                    var isPassword = passwordField.type === 'password';
+                    passwordField.type = isPassword ? 'text' : 'password';
+                    eyeIcon.className = 'glyphicon glyphicon-eye-' + (isPassword ? 'close' : 'open');
+                });
+            }
+
+            var loginForm = document.getElementById('loginForm');
+            if (loginForm) {
+                loginForm.addEventListener('submit', function (e) {
+                    var username = document.getElementById('UserName').value.trim();
+                    var password = passwordField.value.trim();
+                    var hasError = false;
+                    var userNameError = document.querySelector('[data-valmsg-for="UserName"]');
+                    var passwordError = document.querySelector('[data-valmsg-for="Password"]');
+
+                    if (userNameError) userNameError.textContent = '';
+                    if (passwordError) passwordError.textContent = '';
+
+                    if (!username) {
+                        if (userNameError) userNameError.textContent = "Le nom d'utilisateur est requis";
+                        hasError = true;
+                    }
+                    if (!password) {
+                        if (passwordError) passwordError.textContent = 'Le mot de passe est requis';
+                        hasError = true;
+                    }
+
+                    if (hasError) {
+                        e.preventDefault();
+                    } else {
+                        document.getElementById('submitBtn').classList.add('loading');
+                    }
+                });
+            }
+        });
+    </script>
+
+</body>
+</html>

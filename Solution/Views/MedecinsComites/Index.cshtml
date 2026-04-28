@@ -1,0 +1,118 @@
+﻿@model IEnumerable<Solution.ViewModels.MedecinsComites.MedecinComiteListViewModel>
+@{
+    ViewBag.Title = "MedecinsComites";
+    var canManage = User.IsInRole("Admin") || User.IsInRole("SuperUtilisateur");
+}
+
+@Html.Partial("~/Views/Shared/_Alerts.cshtml")
+
+<div class="dashboard-card filters-bar">
+    @using (Html.BeginForm("Index", "MedecinsComites", FormMethod.Get, new { id = "formRechercheMedecinsComites" }))
+    {
+        <div class="row">
+            <div class="col-md-8">
+                <input type="text"
+                       name="search"
+                       value="@ViewBag.Search"
+                       class="form-control"
+                       placeholder="Recherche..." />
+            </div>
+            <div class="col-md-4 text-right">
+                <button type="submit" class="btn btn-default">
+                    <i class="fa-solid fa-magnifying-glass"></i> Rechercher
+                </button>
+                @if (canManage)
+                {
+                    @Html.ActionLink("Nouveau", "Create", null, new { @class = "btn btn-primary" })
+                }
+            </div>
+        </div>
+    }
+</div>
+
+<div class="dashboard-card">
+    <table id="tableMedecinsComites" class="table table-bordered table-striped table-hover registre-table">
+        <thead>
+            <tr>
+                <th>Médecin</th>
+                <th>Comité</th>
+                <th>Rôle</th>
+                <th>Date début</th>
+                <th>Date fin</th>
+                <th class="nowrap" style="width:140px;">Actions</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+@section Scripts{
+    <script>
+        $(function () {
+            var table = $("#tableMedecinsComites").DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: '@Url.Action("GetMedecinsComites", "MedecinsComites")',
+                    type: "POST",
+                    data: function (d) {
+                        d.searchTop = $('input[name="search"]').val();
+                    }
+                },
+                pageLength: 10,
+                lengthMenu: [[5, 10, 25, 50, 100], [5, 10, 25, 50, 100]],
+                paging: true,
+                ordering: true,
+                info: true,
+                autoWidth: false,
+                pagingType: "simple_numbers",
+                order: [[0, "asc"]],
+                language: {
+                    processing: "Traitement en cours...",
+                    search: "Rechercher :",
+                    lengthMenu: "Afficher _MENU_ éléments",
+                    info: "Affichage de l'élément _START_ à _END_ sur _TOTAL_ éléments",
+                    infoEmpty: "Affichage de l'élément 0 à 0 sur 0 élément",
+                    infoFiltered: "(filtré de _MAX_ éléments au total)",
+                    loadingRecords: "Chargement en cours...",
+                    zeroRecords: "Aucun élément à afficher",
+                    emptyTable: "Aucune donnée disponible dans le tableau",
+                    paginate: {
+                        first: "Premier",
+                        previous: "Précédent",
+                        next: "Suivant",
+                        last: "Dernier"
+                    }
+                },
+                columns: [
+                    { data: "MedecinLibelle", name: "MedecinLibelle" },
+                    { data: "ComiteLibelle", name: "ComiteLibelle" },
+                    { data: "RoleMembre", name: "RoleMembre" },
+                    { data: "DateDebut", name: "DateDebut" },
+                    { data: "DateFin", name: "DateFin" },
+                    {
+                        data: "MedecinComiteId",
+                        render: function (data, type, row) {
+                            var actions = '<a href="@Url.Action("Details", "MedecinsComites")?id=' + data + '" class="btn btn-info btn-sm btn-icon-only" title="Détails"><i class="fa-solid fa-circle-info"></i></a>';
+                            @if (User.IsInRole("Admin") || User.IsInRole("SuperUtilisateur"))
+                            {
+                                <text>
+                                    actions += ' <a href="@Url.Action("Edit", "MedecinsComites")?id=' + data + '" class="btn btn-warning btn-sm btn-icon-only" title="Modifier"><i class="fa-solid fa-pen-to-square"></i></a>';
+                                    actions += ' <a href="@Url.Action("Delete", "MedecinsComites")?id=' + data + '" class="btn btn-danger btn-sm btn-icon-only" title="Supprimer"><i class="fa-solid fa-trash"></i></a>';
+                                </text>
+                            }
+                            return actions;
+                        },
+                        orderable: false,
+                        searchable: false
+                    }
+                ]
+            });
+
+            $("#formRechercheMedecinsComites").on("submit", function (e) {
+                e.preventDefault();
+                table.ajax.reload();
+            });
+        });
+    </script>
+}

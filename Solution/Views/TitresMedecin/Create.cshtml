@@ -1,0 +1,70 @@
+﻿@model Solution.ViewModels.TitresMedecin.TitreMedecinFormViewModel
+
+@{
+    ViewBag.Title = "Créer un titre médecin";
+}
+
+<div class="page-header-custom">
+    <div class="row">
+        <div class="col-md-8">
+            <h2>Créer un titre médecin</h2>
+        </div>
+        <div class="col-md-4 text-right" style="margin-top:25px;">
+            @Html.ActionLink("Retour à la liste", "Index", null, new { @class = "btn btn-default" })
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-card">
+    @using (Html.BeginForm("Create", "TitresMedecin", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        @{
+            var erreursModel = ViewData.ModelState.Values
+                .SelectMany(v => v.Errors)
+                .Where(e => !string.IsNullOrWhiteSpace(e.ErrorMessage) || e.Exception != null)
+                .ToList();
+        }
+
+        @if (erreursModel.Any())
+        {
+            <div class="alert alert-warning">
+                <strong><i class="fa fa-exclamation-triangle"></i> Le formulaire contient des erreurs.</strong>
+                <br />
+                Veuillez corriger les champs indiqués ci-dessous.
+            </div>
+
+            @Html.ValidationSummary(false, "", new { @class = "alert alert-danger" })
+        }
+
+        <div class="form-group">
+            @Html.LabelFor(m => m.Libelle, new { @class = "col-md-2 control-label" })
+            <div class="col-md-6">
+                @Html.TextBoxFor(m => m.Libelle, new { @class = "form-control", maxlength = "50", placeholder = "Libellé du titre..." })
+                @Html.ValidationMessageFor(m => m.Libelle, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(m => m.EstActif, new { @class = "col-md-2 control-label" })
+            <div class="col-md-6" style="padding-top:7px;">
+                <label class="checkbox-inline">
+                    @Html.CheckBoxFor(m => m.EstActif) Actif
+                </label>
+                @Html.ValidationMessageFor(m => m.EstActif, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="text-right">
+            @Html.ActionLink("Annuler", "Index", null, new { @class = "btn btn-default" })
+            <button type="submit" class="btn btn-primary">
+                <i class="fa-solid fa-save"></i> Enregistrer
+            </button>
+        </div>
+    </div>
+    }
+</div>

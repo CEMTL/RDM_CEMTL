@@ -1,0 +1,24 @@
+﻿@model Solution.ViewModels.DossiersPrivilegeDecision.DossierPrivilegeDecisionDetailsViewModel
+@{
+    ViewBag.Title = "Détails DossierPrivilegeDecision";
+}
+
+<div class="page-header-custom">
+    <h2>Détails DossierPrivilegeDecision</h2>
+</div>
+
+<div class="dashboard-card">
+    <dl class="dl-horizontal">
+        <dt>Dossier</dt>
+        <dd>@Model.DossierPrivilegeLibelle</dd>
+        <dt>Instance</dt>
+        <dd>@Model.InstanceDecisionLibelle</dd>
+        <dt>Texte décision</dt>
+        <dd>@Model.TexteDecision</dd>
+    </dl>
+</div>
+
+<div class="dashboard-card actions-card">
+    <a href="@Url.Action("Edit", new { id = Model.DossierPrivilegeDecisionId })" class="btn btn-warning btn-icon-only" title="Modifier"><i class="fa-solid fa-pen-to-square"></i></a>
+    <a href="@Url.Action("Index")" class="btn btn-default btn-icon-only" title="Retour"><i class="fa-solid fa-arrow-left"></i></a>
+</div>

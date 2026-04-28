@@ -1,0 +1,151 @@
+﻿@model IEnumerable<Solution.ViewModels.Privileges.MedecinPrivilegeListViewModel>
+
+@{
+    ViewBag.Title = "Privilèges des médecins";
+    var canManage = ViewBag.CanManage != null && (bool)ViewBag.CanManage;
+}
+
+<div class="page-header-custom">
+    <div class="row">
+       
+        <div class="col-md-4 text-right" style="margin-top:25px;">
+            @if (canManage)
+            {
+                @Html.ActionLink("+ Nouveau", "Create", null, new { @class = "btn btn-success" })
+            }
+        </div>
+    </div>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+@using (Html.BeginForm("Index", "MedecinPrivileges", FormMethod.Get, new { @class = "dashboard-card", id = "formFiltresPrivileges" }))
+{
+    <div class="row">
+        <div class="col-md-4">
+            <label>Recherche</label>
+            <input type="text" name="search" value="@ViewBag.Search" class="form-control" placeholder="Médecin, permis, privilège..." />
+        </div>
+        <div class="col-md-4">
+            <label>Privilège</label>
+            @Html.DropDownList("privilegeReferenceId", (SelectList)ViewBag.PrivilegeReferenceId, "-- Tous --", new { @class = "form-control" })
+        </div>
+        <div class="col-md-2">
+            <label>État</label>
+            <select name="etat" class="form-control">
+                <option value="">-- Tous --</option>
+                <option value="Actif" @(ViewBag.Etat == "Actif" ? "selected" : "")>Actif</option>
+                <option value="Suspendu" @(ViewBag.Etat == "Suspendu" ? "selected" : "")>Suspendu</option>
+                <option value="Expiré" @(ViewBag.Etat == "Expiré" ? "selected" : "")>Expiré</option>
+                <option value="En attente" @(ViewBag.Etat == "En attente" ? "selected" : "")>En attente</option>
+                <option value="Refusé" @(ViewBag.Etat == "Refusé" ? "selected" : "")>Refusé</option>
+                <option value="Non renouvelé" @(ViewBag.Etat == "Non renouvelé" ? "selected" : "")>Non renouvelé</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label>&nbsp;</label>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="actifsSeulement" value="true" @(ViewBag.ActifsSeulement != null && (bool)ViewBag.ActifsSeulement ? "checked" : "") />
+                    Actifs seulement
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div style="margin-top:15px;">
+        <button type="submit" class="btn btn-primary">Filtrer</button>
+        @Html.ActionLink("Réinitialiser", "Index", null, new { @class = "btn btn-default" })
+    </div>
+}
+
+<div class="dashboard-card">
+    <table id="tableMedecinPrivileges" class="table table-bordered table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Médecin</th>
+                <th>Code</th>
+                <th>Privilège</th>
+                <th>Installation</th>
+                <th>Département</th>
+                <th>Date début</th>
+                <th>Date fin</th>
+                <th>État</th>
+                <th>Actif</th>
+                <th style="width:230px;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.MedecinNomComplet</td>
+                        <td>@item.CodePrivilege</td>
+                        <td>@item.PrivilegeLibelle</td>
+                        <td>@item.InstallationLibelle</td>
+                        <td>@item.UniteLibelle</td>
+                        <td>@item.DateDebut.ToString("yyyy-MM-dd")</td>
+                        <td>@(item.DateFin.HasValue ? item.DateFin.Value.ToString("yyyy-MM-dd") : "")</td>
+                        <td>@item.Etat</td>
+                        <td>@(item.EstActif ? "Oui" : "Non")</td>
+                        <td>
+                            @Html.ActionLink("Détails", "Details", new { id = item.MedecinPrivilegeId }, new { @class = "btn btn-info btn-sm" })
+                            @if (canManage)
+                            {
+                                @Html.ActionLink("Modifier", "Edit", new { id = item.MedecinPrivilegeId }, new { @class = "btn btn-warning btn-sm" })
+                                @Html.ActionLink("Supprimer", "Delete", new { id = item.MedecinPrivilegeId }, new { @class = "btn btn-danger btn-sm" })
+                            }
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr><td colspan="10" class="text-center">Aucun privilège trouvé.</td></tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts{
+    <script>
+        $(function () {
+            $("#tableMedecinPrivileges").DataTable({
+                pageLength: 10,
+                lengthMenu: [[5, 10, 25, 50, 100], [5, 10, 25, 50, 100]],
+                paging: true,
+                ordering: true,
+                info: true,
+                searching: true,
+                autoWidth: false,
+                pagingType: "simple_numbers",
+                order: [[0, "asc"]],
+                columnDefs: [
+                    { orderable: false, searchable: false, targets: 9 }
+                ],
+                language: {
+                    processing: "Traitement en cours...",
+                    search: "Rechercher :",
+                    lengthMenu: "Afficher _MENU_ éléments",
+                    info: "Affichage de l'élément _START_ à _END_ sur _TOTAL_ éléments",
+                    infoEmpty: "Affichage de l'élément 0 à 0 sur 0 élément",
+                    infoFiltered: "(filtré de _MAX_ éléments au total)",
+                    loadingRecords: "Chargement en cours...",
+                    zeroRecords: "Aucun élément à afficher",
+                    emptyTable: "Aucune donnée disponible dans le tableau",
+                    paginate: {
+                        first: "Premier",
+                        previous: "Précédent",
+                        next: "Suivant",
+                        last: "Dernier"
+                    }
+                }
+            });
+        });
+    </script>
+}

@@ -1,0 +1,109 @@
+﻿@model Solution.ViewModels.EntentesFDC.EntenteFDCFormViewModel
+
+@{
+    ViewBag.Title = "Créer une entente FDC";
+
+    var hasErrors = false;
+    foreach (var state in ViewData.ModelState.Values)
+    {
+        foreach (var err in state.Errors)
+        {
+            if (!string.IsNullOrWhiteSpace(err.ErrorMessage) || err.Exception != null)
+            {
+                hasErrors = true;
+                break;
+            }
+        }
+        if (hasErrors) { break; }
+    }
+}
+
+<div class="page-header-custom">
+    <div class="row">
+        <div class="col-md-8">
+            <h2>Créer une entente FDC</h2>
+        </div>
+        <div class="col-md-4 text-right" style="margin-top:25px;">
+            @Html.ActionLink("Retour à la liste", "Index", null, new { @class = "btn btn-default" })
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-card">
+    @using (Html.BeginForm("Create", "EntentesFDC", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+
+        if (hasErrors)
+        {
+            <div class="alert alert-warning">
+                <strong><i class="fa fa-exclamation-triangle"></i> Le formulaire contient des erreurs.</strong>
+                <br />
+                Veuillez corriger les champs indiqués ci-dessous.
+            </div>
+
+            @Html.ValidationSummary(false, "", new { @class = "alert alert-danger" })
+        }
+
+        <div class="form-horizontal">
+            <div class="form-group">
+                @Html.LabelFor(m => m.MedecinId, new { @class = "col-md-2 control-label" })
+                <div class="col-md-6">
+                    @Html.DropDownListFor(m => m.MedecinId, Model.MedecinIdOptions, "-- Sélectionner --", new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.MedecinId, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.TypeEntenteFDC, new { @class = "col-md-2 control-label" })
+                <div class="col-md-6">
+                    @Html.TextBoxFor(m => m.TypeEntenteFDC, new { @class = "form-control", maxlength = "100", placeholder = "Type entente..." })
+                    @Html.ValidationMessageFor(m => m.TypeEntenteFDC, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.DateAdhesion, new { @class = "col-md-2 control-label" })
+                <div class="col-md-3">
+                    @Html.TextBoxFor(m => m.DateAdhesion, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+                    @Html.ValidationMessageFor(m => m.DateAdhesion, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.DateFin, new { @class = "col-md-2 control-label" })
+                <div class="col-md-3">
+                    @Html.TextBoxFor(m => m.DateFin, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+                    @Html.ValidationMessageFor(m => m.DateFin, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.PEMVise, new { @class = "col-md-2 control-label" })
+                <div class="col-md-6">
+                    @Html.TextBoxFor(m => m.PEMVise, new { @class = "form-control", maxlength = "150", placeholder = "PEM visé..." })
+                    @Html.ValidationMessageFor(m => m.PEMVise, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.EstActive, new { @class = "col-md-2 control-label" })
+                <div class="col-md-6" style="padding-top:7px;">
+                    <label class="checkbox-inline">
+                        @Html.CheckBoxFor(m => m.EstActive) Active
+                    </label>
+                    @Html.ValidationMessageFor(m => m.EstActive, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <hr />
+
+            <div class="text-right">
+                @Html.ActionLink("Annuler", "Index", null, new { @class = "btn btn-default" })
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa-solid fa-save"></i> Enregistrer
+                </button>
+            </div>
+        </div>
+    }
+</div>

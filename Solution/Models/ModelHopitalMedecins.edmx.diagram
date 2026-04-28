@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="db980690e17f4ab3a72c263814fc5521" Name="Diagram1">
+        <EntityTypeShape EntityType="HopitalMedecinsDbModel.C__MigrationHistory" Width="1.5" PointX="0.75" PointY="0.75" />
+        <EntityTypeShape EntityType="HopitalMedecinsDbModel.AspNetRoles" Width="1.5" PointX="8.75" PointY="2.5" />
+        <EntityTypeShape EntityType="HopitalMedecinsDbModel.AspNetUserClaims" Width="1.5" PointX="13.25" PointY="3.625" />
+        <EntityTypeShape EntityType="HopitalMedecinsDbModel.AspNetUserLogins" Width="1.5" PointX="13.25" PointY="1" />
+        <EntityTypeShape EntityType="HopitalMedecinsDbModel.AspNetUsers" Width="1.5" PointX="11" PointY="1.125" />
+        <EntityTypeShape EntityType="HopitalMedecinsDbModel.AuditLog" Width="1.5" PointX="2.75" PointY="0.75" />
+        <EntityTypeShape EntityType="HopitalMedecinsDbModel.CodeCotisation" Width="1.5" PointX="3" PointY="36.25" />
+        <EntityTypeShape EntityType="HopitalMedecinsDbModel.Comite" Width="1.5" PointX="6" PointY="17.5" />
+        <EntityTypeShape EntityType="HopitalMedecinsDbModel.CotisationAnnuelle" Width="1.5" PointX="5.25" PointY="34.5" />
+        <EntityTypeShape EntityType="HopitalMedecinsDbModel.DossierPrivilege" Width="1.5" PointX="5.25" PointY="20.75" />
+        <EntityTypeShape EntityType="HopitalMedecinsDbModel.DossierPrivilegeDecision" Width="1.5" PointX="7.5" PointY="23.375" />
+        <EntityTypeShape EntityType="HopitalMedecinsDbModel.EntenteFDC" Width="1.5" PointX="5.25" PointY="43.125" />
+        <EntityTypeShape EntityType="HopitalMedecinsDbModel.FitTest" Width="1.5" PointX="5.25" PointY="53.25" />
+        <EntityTypeShape EntityType="HopitalMedecinsDbModel.Installation" Width="1.5" PointX="8" PointY="26.5" />
+        <EntityTypeShape EntityType="HopitalMedecinsDbModel.InstanceDecision" Width="1.5" PointX="5.25" PointY="10.25" />
+        <EntityTypeShape EntityType="HopitalMedecinsDbModel.JournalImport" Width="1.5" PointX="0.75" PointY="5.75" />
+        <EntityTypeShape EntityType="HopitalMedecinsDbModel.Medecin" Width="1.5" PointX="3" PointY="27.75" />
+        <EntityTypeShape EntityType="HopitalMedecinsDbModel.MedecinAdresse" Width="1.5" PointX="5.25" PointY="49.875" />
+        <EntityTypeShape EntityType="HopitalMedecinsDbModel.MedecinComite" Width="1.5" PointX="8.25" PointY="30.125" />
+        <EntityTypeShape EntityType="HopitalMedecinsDbModel.MedecinCourriel" Width="1.5" PointX="5.25" PointY="14.25" />
+        <EntityTypeShape EntityType="HopitalMedecinsDbModel.MedecinInstallation" Width="1.5" PointX="10.25" PointY="26.125" />
+        <EntityTypeShape EntityType="HopitalMedecinsDbModel.MedecinProfilCEMTL" Width="1.5" PointX="5.25" PointY="59.375" />
+        <EntityTypeShape EntityType="HopitalMedecinsDbModel.MedecinTelephone" Width="1.5" PointX="5.25" PointY="56.25" />
+        <EntityTypeShape EntityType="HopitalMedecinsDbModel.MedecinUniteOrganisationnelle" Width="1.5" PointX="5.25" PointY="30.125" />
+        <EntityTypeShape EntityType="HopitalMedecinsDbModel.Nomination" Width="1.5" PointX="6" PointY="6.625" />
+        <EntityTypeShape EntityType="HopitalMedecinsDbModel.NominationAdministrative" Width="1.5" PointX="8.25" PointY="34" />
+        <EntityTypeShape EntityType="HopitalMedecinsDbModel.TypeInstanceDecision" Width="1.5" PointX="3" PointY="10.625" />
+        <EntityTypeShape EntityType="HopitalMedecinsDbModel.TypeNomination" Width="1.5" PointX="6" PointY="2.875" />
+        <EntityTypeShape EntityType="HopitalMedecinsDbModel.TypePaiement" Width="1.5" PointX="3" PointY="39" />
+        <EntityTypeShape EntityType="HopitalMedecinsDbModel.UniteOrganisationnelle" Width="1.5" PointX="3" PointY="24.25" />
+        <EntityTypeShape EntityType="HopitalMedecinsDbModel.UtilisateurMetier" Width="1.5" PointX="2.75" PointY="5.75" />
+        <EntityTypeShape EntityType="HopitalMedecinsDbModel.CategoriePratique" Width="1.5" PointX="0.75" PointY="38.5" />
+        <EntityTypeShape EntityType="HopitalMedecinsDbModel.Genre" Width="1.5" PointX="0.75" PointY="30.625" />
+        <EntityTypeShape EntityType="HopitalMedecinsDbModel.StatutMedecin" Width="1.5" PointX="0.75" PointY="26.75" />
+        <EntityTypeShape EntityType="HopitalMedecinsDbModel.TitreMedecin" Width="1.5" PointX="0.75" PointY="36" />
+        <EntityTypeShape EntityType="HopitalMedecinsDbModel.TypePermis" Width="1.5" PointX="0.75" PointY="33.5" />
+        <EntityTypeShape EntityType="HopitalMedecinsDbModel.vw_CotisationsParAnnee" Width="1.5" PointX="8.75" PointY="6.75" />
+        <EntityTypeShape EntityType="HopitalMedecinsDbModel.vw_MedecinsRegistreCourant" Width="1.5" PointX="10.75" PointY="6.75" />
+        <AssociationConnector Association="HopitalMedecinsDbModel.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId" />
+        <AssociationConnector Association="HopitalMedecinsDbModel.FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId" />
+        <AssociationConnector Association="HopitalMedecinsDbModel.FK_CotisationAnnuelle_CodeCotisation" />
+        <AssociationConnector Association="HopitalMedecinsDbModel.FK_MedecinComite_Comite" />
+        <AssociationConnector Association="HopitalMedecinsDbModel.FK_CotisationAnnuelle_Medecin" />
+        <AssociationConnector Association="HopitalMedecinsDbModel.FK_CotisationAnnuelle_TypePaiement" />
+        <AssociationConnector Association="HopitalMedecinsDbModel.FK_DossierPrivilege_Medecin" />
+        <AssociationConnector Association="HopitalMedecinsDbModel.FK_DossierPrivilegeDecision_Dossier" />
+        <AssociationConnector Association="HopitalMedecinsDbModel.FK_DossierPrivilegeDecision_Instance" />
+        <AssociationConnector Association="HopitalMedecinsDbModel.FK_EntenteFDC_Medecin" />
+        <AssociationConnector Association="HopitalMedecinsDbModel.FK_FitTest_Medecin" />
+        <AssociationConnector Association="HopitalMedecinsDbModel.FK_MedecinInstallation_Installation" />
+        <AssociationConnector Association="HopitalMedecinsDbModel.FK_InstanceDecision_Type" />
+        <AssociationConnector Association="HopitalMedecinsDbModel.FK_Medecin_CategoriePratique" />
+        <AssociationConnector Association="HopitalMedecinsDbModel.FK_Medecin_Genre" />
+        <AssociationConnector Association="HopitalMedecinsDbModel.FK_Medecin_Statut" />
+        <AssociationConnector Association="HopitalMedecinsDbModel.FK_Medecin_Titre" />
+        <AssociationConnector Association="HopitalMedecinsDbModel.FK_Medecin_TypePermis" />
+        <AssociationConnector Association="HopitalMedecinsDbModel.FK_MedecinAdresse_Medecin" />
+        <AssociationConnector Association="HopitalMedecinsDbModel.FK_MedecinComite_Medecin" />
+        <AssociationConnector Association="HopitalMedecinsDbModel.FK_MedecinCourriel_Medecin" />
+        <AssociationConnector Association="HopitalMedecinsDbModel.FK_MedecinInstallation_Medecin" />
+        <AssociationConnector Association="HopitalMedecinsDbModel.FK_MedecinProfilCEMTL_Medecin" />
+        <AssociationConnector Association="HopitalMedecinsDbModel.FK_MedecinTelephone_Medecin" />
+        <AssociationConnector Association="HopitalMedecinsDbModel.FK_MedecinUniteOrganisationnelle_Medecin" />
+        <AssociationConnector Association="HopitalMedecinsDbModel.FK_NominationAdministrative_Medecin" />
+        <AssociationConnector Association="HopitalMedecinsDbModel.FK_MedecinUniteOrganisationnelle_Unite" />
+        <AssociationConnector Association="HopitalMedecinsDbModel.FK_NominationAdministrative_Nomination" />
+        <AssociationConnector Association="HopitalMedecinsDbModel.FK_NominationAdministrative_TypeNomination" />
+        <AssociationConnector Association="HopitalMedecinsDbModel.FK_UniteOrganisationnelle_Parent" />
+        <AssociationConnector Association="HopitalMedecinsDbModel.AspNetUserRoles" />
+        <EntityTypeShape EntityType="HopitalMedecinsDbModel.MedecinPrivilege" Width="1.5" PointX="11.25" PointY="30.25" />
+        <EntityTypeShape EntityType="HopitalMedecinsDbModel.PrivilegeReference" Width="1.5" PointX="9" PointY="38.125" />
+        <AssociationConnector Association="HopitalMedecinsDbModel.FK_MedecinPrivilege_Installation" />
+        <AssociationConnector Association="HopitalMedecinsDbModel.FK_MedecinPrivilege_Medecin" />
+        <AssociationConnector Association="HopitalMedecinsDbModel.FK_MedecinPrivilege_PrivilegeReference" />
+        <AssociationConnector Association="HopitalMedecinsDbModel.FK_MedecinPrivilege_UniteOrganisationnelle" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

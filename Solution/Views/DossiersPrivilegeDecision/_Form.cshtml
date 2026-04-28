@@ -1,0 +1,19 @@
+﻿@model Solution.ViewModels.DossiersPrivilegeDecision.DossierPrivilegeDecisionFormViewModel
+
+<div class="dashboard-card">
+    <div class="form-group">
+        @Html.LabelFor(m => m.DossierPrivilegeId)
+        @Html.DropDownListFor(m => m.DossierPrivilegeId, Model.DossierPrivilegeIdOptions, "-- Sélectionner --", new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.DossierPrivilegeId, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.InstanceDecisionId)
+        @Html.DropDownListFor(m => m.InstanceDecisionId, Model.InstanceDecisionIdOptions, "-- Sélectionner --", new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.InstanceDecisionId, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.TexteDecision)
+        @Html.TextAreaFor(m => m.TexteDecision, 4, 80, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.TexteDecision, "", new { @class = "text-danger" })
+    </div>
+</div>

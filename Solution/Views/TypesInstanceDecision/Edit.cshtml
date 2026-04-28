@@ -1,0 +1,76 @@
+﻿@model Solution.ViewModels.TypesInstanceDecision.TypeInstanceDecisionFormViewModel
+
+@{
+    ViewBag.Title = "Modifier un type instance décision";
+
+    var hasErrors = false;
+    foreach (var state in ViewData.ModelState.Values)
+    {
+        foreach (var err in state.Errors)
+        {
+            if (!string.IsNullOrWhiteSpace(err.ErrorMessage) || err.Exception != null)
+            {
+                hasErrors = true;
+                break;
+            }
+        }
+        if (hasErrors) { break; }
+    }
+}
+
+<div class="page-header-custom">
+    <div class="row">
+        <div class="col-md-8">
+            <h2>Modifier un type instance décision</h2>
+        </div>
+        <div class="col-md-4 text-right" style="margin-top:25px;">
+            @Html.ActionLink("Retour à la liste", "Index", null, new { @class = "btn btn-default" })
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-card">
+    @using (Html.BeginForm("Edit", "TypesInstanceDecision", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(m => m.TypeInstanceDecisionId)
+
+        if (hasErrors)
+        {
+            <div class="alert alert-warning">
+                <strong><i class="fa fa-exclamation-triangle"></i> Le formulaire contient des erreurs.</strong>
+                <br />
+                Veuillez corriger les champs indiqués ci-dessous.
+            </div>
+
+            @Html.ValidationSummary(false, "", new { @class = "alert alert-danger" })
+        }
+
+        <div class="form-horizontal">
+            <div class="form-group">
+                @Html.LabelFor(m => m.CodeType, new { @class = "col-md-2 control-label" })
+                <div class="col-md-4">
+                    @Html.TextBoxFor(m => m.CodeType, new { @class = "form-control", maxlength = "30", placeholder = "Code..." })
+                    @Html.ValidationMessageFor(m => m.CodeType, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.Libelle, new { @class = "col-md-2 control-label" })
+                <div class="col-md-6">
+                    @Html.TextBoxFor(m => m.Libelle, new { @class = "form-control", maxlength = "100", placeholder = "Libellé..." })
+                    @Html.ValidationMessageFor(m => m.Libelle, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <hr />
+
+            <div class="text-right">
+                @Html.ActionLink("Annuler", "Index", null, new { @class = "btn btn-default" })
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa-solid fa-save"></i> Enregistrer
+                </button>
+            </div>
+        </div>
+    }
+</div>

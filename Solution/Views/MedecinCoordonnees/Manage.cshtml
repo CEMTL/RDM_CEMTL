@@ -1,0 +1,486 @@
+﻿@model Solution.ViewModels.Medecins.MedecinCoordonneesManageViewModel
+
+@{
+    ViewBag.Title = "Coordonnées du médecin";
+    var canManage = User.IsInRole("Admin") || User.IsInRole("SuperUtilisateur");
+}
+
+<div class="page-header-custom">
+    <div class="row">
+        <div class="col-md-8">
+            <h2>Coordonnées du médecin</h2>
+            @if (Model != null)
+            {
+                <p style="margin:0;">
+                    <strong>@Model.Permis</strong> - @Model.NomComplet
+                    <span class="label @(Model.EstActif ? "label-success" : "label-default")" style="margin-left:10px;">
+                        @(Model.EstActif ? "Actif" : "Inactif")
+                    </span>
+                </p>
+            }
+        </div>
+        <div class="col-md-4 text-right" style="margin-top:25px;">
+            @Html.ActionLink("Retour à la liste", "Index", null, new { @class = "btn btn-default" })
+        </div>
+    </div>
+</div>
+
+@Html.Partial("~/Views/Shared/_Alerts.cshtml")
+
+@if (Model == null)
+{
+    <div class="dashboard-card">
+        <div class="alert alert-danger">
+            Impossible de charger les coordonnées du médecin.
+        </div>
+    </div>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-6">
+            <div class="dashboard-card">
+                <h3 style="margin-top:0;">Adresses</h3>
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Adresse</th>
+                            <th>Ville</th>
+                            <th>Province</th>
+                            <th>Code postal</th>
+                            <th>Principale</th>
+                            @if (canManage)
+                            {
+                                <th style="width:120px;">Action</th>
+}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Adresses.Any())
+                        {
+                            foreach (var item in Model.Adresses)
+                            {
+                                <tr>
+                                    <td>@item.AdresseLigne1</td>
+                                    <td>@item.Ville</td>
+                                    <td>@item.Province</td>
+                                    <td>@item.CodePostal</td>
+                                    <td>@(item.EstPrincipale ? "Oui" : "Non")</td>
+                                    @if (canManage)
+                                    {
+                                        <td class="nowrap">
+                                            <a href="@Url.Action("EditAdresse", new { id = item.MedecinAdresseId })" class="btn btn-warning btn-sm btn-icon-only" title="Modifier">
+                                                <i class="fa-solid fa-pen-to-square"></i>
+                                            </a>
+                                            @using (Html.BeginForm("DeleteAdresse", "MedecinCoordonnees", FormMethod.Post, new { style = "display:inline;" }))
+                                            {
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="medecinId" value="@Model.MedecinId" />
+                                                <input type="hidden" name="medecinAdresseId" value="@item.MedecinAdresseId" />
+                                                <button type="submit" class="btn btn-danger btn-sm btn-icon-only" title="Supprimer">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </button>
+                                            }
+                                        </td>
+                                    }
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="@(canManage ? 6 : 5)" class="text-center text-muted">Aucune adresse.</td></tr>
+                        }
+                    </tbody>
+                </table>
+
+                @if (canManage)
+                {
+                    using (Html.BeginForm("AddAdresse", "MedecinCoordonnees", FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="MedecinId" value="@Model.MedecinId" />
+
+                        <div class="row">
+                            <div class="col-md-12 form-group">
+                                <input type="text" name="AdresseLigne1" class="form-control" placeholder="Adresse" />
+                            </div>
+                            <div class="col-md-4 form-group">
+                                <input type="text" name="Ville" class="form-control" placeholder="Ville" />
+                            </div>
+                            <div class="col-md-4 form-group">
+                                <input type="text" name="Province" class="form-control" placeholder="Province" />
+                            </div>
+                            <div class="col-md-4 form-group">
+                                <input type="text" name="CodePostal" class="form-control" placeholder="Code postal" />
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label class="checkbox-inline">
+                                    <input type="checkbox" name="EstPrincipale" value="true" /> Principale
+                                </label>
+                            </div>
+                            <div class="col-md-6 form-group text-right">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fa-solid fa-plus"></i> Ajouter
+                                </button>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="dashboard-card">
+                <h3 style="margin-top:0;">Téléphones</h3>
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Numéro</th>
+                            <th>Rang</th>
+                            <th>Principal</th>
+                            @if (canManage)
+                            {
+                                <th style="width:120px;">Action</th>
+}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Telephones.Any())
+                        {
+                            foreach (var item in Model.Telephones)
+                            {
+                                <tr>
+                                    <td>@item.TypeTelephone</td>
+                                    <td>@item.NumeroTelephone</td>
+                                    <td>@item.RangSource</td>
+                                    <td>@(item.EstPrincipal ? "Oui" : "Non")</td>
+                                    @if (canManage)
+                                    {
+                                        <td class="nowrap">
+                                            <a href="@Url.Action("EditTelephone", new { id = item.MedecinTelephoneId })" class="btn btn-warning btn-sm btn-icon-only" title="Modifier">
+                                                <i class="fa-solid fa-pen-to-square"></i>
+                                            </a>
+                                            @using (Html.BeginForm("DeleteTelephone", "MedecinCoordonnees", FormMethod.Post, new { style = "display:inline;" }))
+                                            {
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="medecinId" value="@Model.MedecinId" />
+                                                <input type="hidden" name="medecinTelephoneId" value="@item.MedecinTelephoneId" />
+                                                <button type="submit" class="btn btn-danger btn-sm btn-icon-only" title="Supprimer">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </button>
+                                            }
+                                        </td>
+                                    }
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="@(canManage ? 5 : 4)" class="text-center text-muted">Aucun téléphone.</td></tr>
+                        }
+                    </tbody>
+                </table>
+
+                @if (canManage)
+                {
+                    using (Html.BeginForm("AddTelephone", "MedecinCoordonnees", FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="MedecinId" value="@Model.MedecinId" />
+
+                        <div class="row">
+                            <div class="col-md-4 form-group">
+                                <input type="text" name="TypeTelephone" class="form-control" placeholder="Type" />
+                            </div>
+                            <div class="col-md-4 form-group">
+                                <input type="text" name="NumeroTelephone" class="form-control" placeholder="Numéro" />
+                            </div>
+                            <div class="col-md-4 form-group">
+                                <input type="number" name="RangSource" class="form-control" placeholder="Rang" />
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label class="checkbox-inline">
+                                    <input type="checkbox" name="EstPrincipal" value="true" /> Principal
+                                </label>
+                            </div>
+                            <div class="col-md-6 form-group text-right">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fa-solid fa-plus"></i> Ajouter
+                                </button>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="dashboard-card">
+                <h3 style="margin-top:0;">Courriels</h3>
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Adresse</th>
+                            <th>Rang</th>
+                            <th>Principal</th>
+                            @if (canManage)
+                            {
+                                <th style="width:120px;">Action</th>
+}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Courriels.Any())
+                        {
+                            foreach (var item in Model.Courriels)
+                            {
+                                <tr>
+                                    <td>@item.TypeCourriel</td>
+                                    <td>@item.AdresseCourriel</td>
+                                    <td>@item.RangSource</td>
+                                    <td>@(item.EstPrincipal ? "Oui" : "Non")</td>
+                                    @if (canManage)
+                                    {
+                                        <td class="nowrap">
+                                            <a href="@Url.Action("EditCourriel", new { id = item.MedecinCourrielId })" class="btn btn-warning btn-sm btn-icon-only" title="Modifier">
+                                                <i class="fa-solid fa-pen-to-square"></i>
+                                            </a>
+                                            @using (Html.BeginForm("DeleteCourriel", "MedecinCoordonnees", FormMethod.Post, new { style = "display:inline;" }))
+                                            {
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="medecinId" value="@Model.MedecinId" />
+                                                <input type="hidden" name="medecinCourrielId" value="@item.MedecinCourrielId" />
+                                                <button type="submit" class="btn btn-danger btn-sm btn-icon-only" title="Supprimer">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </button>
+                                            }
+                                        </td>
+                                    }
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="@(canManage ? 5 : 4)" class="text-center text-muted">Aucun courriel.</td></tr>
+                        }
+                    </tbody>
+                </table>
+
+                @if (canManage)
+                {
+                    using (Html.BeginForm("AddCourriel", "MedecinCoordonnees", FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="MedecinId" value="@Model.MedecinId" />
+
+                        <div class="row">
+                            <div class="col-md-4 form-group">
+                                <input type="text" name="TypeCourriel" class="form-control" placeholder="Type" />
+                            </div>
+                            <div class="col-md-5 form-group">
+                                <input type="text" name="AdresseCourriel" class="form-control" placeholder="Adresse courriel" />
+                            </div>
+                            <div class="col-md-3 form-group">
+                                <input type="number" name="RangSource" class="form-control" placeholder="Rang" />
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label class="checkbox-inline">
+                                    <input type="checkbox" name="EstPrincipal" value="true" /> Principal
+                                </label>
+                            </div>
+                            <div class="col-md-6 form-group text-right">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fa-solid fa-plus"></i> Ajouter
+                                </button>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="dashboard-card">
+                <h3 style="margin-top:0;">Installations</h3>
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Installation</th>
+                            <th>Rang</th>
+                            <th>Début</th>
+                            <th>Fin</th>
+                            <th>Principale</th>
+                            @if (canManage)
+                            {
+                                <th style="width:120px;">Action</th>
+}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Installations.Any())
+                        {
+                            foreach (var item in Model.Installations)
+                            {
+                                <tr>
+                                    <td>@item.NomInstallation</td>
+                                    <td>@item.RangInstallation</td>
+                                    <td>@(item.DateDebut.HasValue ? item.DateDebut.Value.ToString("yyyy-MM-dd") : "")</td>
+                                    <td>@(item.DateFin.HasValue ? item.DateFin.Value.ToString("yyyy-MM-dd") : "")</td>
+                                    <td>@(item.EstPrincipale ? "Oui" : "Non")</td>
+                                    @if (canManage)
+                                    {
+                                        <td class="nowrap">
+                                            <a href="@Url.Action("EditInstallation", new { id = item.MedecinInstallationId })" class="btn btn-warning btn-sm btn-icon-only" title="Modifier">
+                                                <i class="fa-solid fa-pen-to-square"></i>
+                                            </a>
+                                            @using (Html.BeginForm("DeleteInstallation", "MedecinCoordonnees", FormMethod.Post, new { style = "display:inline;" }))
+                                            {
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="medecinId" value="@Model.MedecinId" />
+                                                <input type="hidden" name="medecinInstallationId" value="@item.MedecinInstallationId" />
+                                                <button type="submit" class="btn btn-danger btn-sm btn-icon-only" title="Supprimer">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </button>
+                                            }
+                                        </td>
+                                    }
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="@(canManage ? 6 : 5)" class="text-center text-muted">Aucune installation.</td></tr>
+                        }
+                    </tbody>
+                </table>
+
+                @if (canManage)
+                {
+                    using (Html.BeginForm("AddInstallation", "MedecinCoordonnees", FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="MedecinId" value="@Model.MedecinId" />
+
+                        <div class="row">
+                            <div class="col-md-6 form-group">
+                                @Html.DropDownList("InstallationId", Model.InstallationsDisponibles, "-- Sélectionner --", new { @class = "form-control" })
+                            </div>
+                            <div class="col-md-2 form-group">
+                                <input type="number" name="RangInstallation" class="form-control" min="1" placeholder="Rang" value="1" />
+                            </div>
+                            <div class="col-md-2 form-group">
+                                <input type="date" name="DateDebut" class="form-control" />
+                            </div>
+                            <div class="col-md-2 form-group">
+                                <input type="date" name="DateFin" class="form-control" />
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label class="checkbox-inline">
+                                    <input type="checkbox" name="EstPrincipale" value="true" /> Principale
+                                </label>
+                            </div>
+                            <div class="col-md-6 form-group text-right">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fa-solid fa-plus"></i> Ajouter
+                                </button>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-card">
+        <h3 style="margin-top:0;">Départements</h3>
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Unité</th>
+                    <th>Type</th>
+                    <th>Rang</th>
+                    <th>Rôle</th>
+                    <th>Début</th>
+                    <th>Fin</th>
+                    @if (canManage)
+                    {
+                        <th style="width:120px;">Action</th>
+}
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Unites.Any())
+                {
+                    foreach (var item in Model.Unites)
+                    {
+                        <tr>
+                            <td>@item.LibelleUnite</td>
+                            <td>@item.TypeUnite</td>
+                            <td>@item.RangSource</td>
+                            <td>@item.RoleOrganisationnel</td>
+                            <td>@(item.DateDebut.HasValue ? item.DateDebut.Value.ToString("yyyy-MM-dd") : "")</td>
+                            <td>@(item.DateFin.HasValue ? item.DateFin.Value.ToString("yyyy-MM-dd") : "")</td>
+                            @if (canManage)
+                            {
+                                <td class="nowrap">
+                                    <a href="@Url.Action("EditUnite", new { id = item.MedecinUniteOrganisationnelleId })" class="btn btn-warning btn-sm btn-icon-only" title="Modifier">
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                    </a>
+                                    @using (Html.BeginForm("DeleteUnite", "MedecinCoordonnees", FormMethod.Post, new { style = "display:inline;" }))
+                                    {
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="medecinId" value="@Model.MedecinId" />
+                                        <input type="hidden" name="medecinUniteOrganisationnelleId" value="@item.MedecinUniteOrganisationnelleId" />
+                                        <button type="submit" class="btn btn-danger btn-sm btn-icon-only" title="Supprimer">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    }
+                                </td>
+                            }
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr><td colspan="@(canManage ? 7 : 6)" class="text-center text-muted">Aucune unité organisationnelle.</td></tr>
+                }
+            </tbody>
+        </table>
+
+        @if (canManage)
+        {
+            using (Html.BeginForm("AddUnite", "MedecinCoordonnees", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="MedecinId" value="@Model.MedecinId" />
+
+                <div class="row">
+                    <div class="col-md-4 form-group">
+                        @Html.DropDownList("UniteOrganisationnelleId", Model.UnitesDisponibles, "-- Sélectionner --", new { @class = "form-control" })
+                    </div>
+                    <div class="col-md-2 form-group">
+                        <input type="number" name="RangSource" class="form-control" placeholder="Rang" />
+                    </div>
+                    <div class="col-md-2 form-group">
+                        <input type="text" name="RoleOrganisationnel" class="form-control" placeholder="Rôle" />
+                    </div>
+                    <div class="col-md-2 form-group">
+                        <input type="date" name="DateDebut" class="form-control" />
+                    </div>
+                    <div class="col-md-2 form-group">
+                        <input type="date" name="DateFin" class="form-control" />
+                    </div>
+                    <div class="col-md-12 form-group text-right">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa-solid fa-plus"></i> Ajouter
+                        </button>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+}

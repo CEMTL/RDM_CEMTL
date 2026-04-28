@@ -1,0 +1,504 @@
+﻿@{
+    var appTitle = "Registre des médecins CEMTL";
+    var currentController = ViewContext.RouteData.Values["controller"] != null
+        ? ViewContext.RouteData.Values["controller"].ToString()
+        : string.Empty;
+
+    Func<string, string> isActive = ctrl =>
+        string.Equals(currentController, ctrl, System.StringComparison.OrdinalIgnoreCase)
+            ? "active"
+            : string.Empty;
+
+    var canSeeAdministration =
+        Request.IsAuthenticated &&
+        (User.IsInRole("Admin") || User.IsInRole("SuperUtilisateur"));
+
+    var isHomeOpen =
+        string.Equals(currentController, "Home", System.StringComparison.OrdinalIgnoreCase);
+
+    var isRegistreOpen =
+        string.Equals(currentController, "Medecins", System.StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(currentController, "NominationsAdministratives", System.StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(currentController, "EntentesFDC", System.StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(currentController, "FitTests", System.StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(currentController, "DossiersPrivilege", System.StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(currentController, "DossiersPrivilegeDecision", System.StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(currentController, "MedecinPrivileges", System.StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(currentController, "PrivilegeReferences", System.StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(currentController, "Nominations", System.StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(currentController, "NominationAdministratives", System.StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(currentController, "CotisationsAnnuelles", System.StringComparison.OrdinalIgnoreCase);
+
+    var isStructureOpen =
+        string.Equals(currentController, "Installations", System.StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(currentController, "UnitesOrganisationnelles", System.StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(currentController, "Comites", System.StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(currentController, "MedecinsComites", System.StringComparison.OrdinalIgnoreCase);
+
+    var isReferentielsOpen =
+        string.Equals(currentController, "TitresMedecin", System.StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(currentController, "TypesPermis", System.StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(currentController, "StatutsMedecin", System.StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(currentController, "CategoriesPratique", System.StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(currentController, "Genres", System.StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(currentController, "CodesCotisation", System.StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(currentController, "TypesPaiement", System.StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(currentController, "TypesInstanceDecision", System.StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(currentController, "InstancesDecision", System.StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(currentController, "JournalImports", System.StringComparison.OrdinalIgnoreCase);
+
+    var isAdministrationOpen =
+        string.Equals(currentController, "Users", System.StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(currentController, "Roles", System.StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(currentController, "AuditLogs", System.StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(currentController, "Parametres", System.StringComparison.OrdinalIgnoreCase);
+}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewBag.Title - @appTitle</title>
+
+    <!-- Styles de base -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap.min.css" />
+    <link rel="stylesheet" href="~/Content/registre-medecins.css" />
+
+    <!-- Uniquement le décalage des sous-menus -->
+    <style>
+        /* Décalage global des sous-menus */
+        .sidebar-nav {
+            padding-left: 35px !important;
+            margin-top: 4px;
+        }
+
+            /* Liens des sous-menus : un peu plus petits */
+            .sidebar-nav > li > a {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                padding: 8px 12px 8px 16px !important;
+                border-radius: 8px;
+                font-size: 12.5px;
+                line-height: 1.2;
+            }
+
+                /* Icônes des sous-menus */
+                .sidebar-nav > li > a .nav-item-icon {
+                    width: 16px;
+                    text-align: center;
+                    margin-right: 3px;
+                    margin-left: 0 !important;
+                    font-size: 12px;
+                }
+
+        /* Correction de la pagination DataTables (évite les conflits de clic) */
+        .dataTables_wrapper .dataTables_paginate .paginate_button,
+        .dataTables_wrapper .pagination > li > a,
+        .dataTables_wrapper .pagination > li > span {
+            cursor: pointer !important;
+            pointer-events: auto !important;
+        }
+
+        .user-panel {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            flex: 0 0 auto;
+            font-size: 30px;
+        }
+
+        .user-meta-inline {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .user-role {
+            margin: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .logout-link {
+            margin: 0;
+            display: flex;
+            align-items: center;
+        }
+
+            .logout-link .btn {
+                margin: 0;
+                padding: 0;
+                line-height: 1.2;
+            }
+    </style>
+
+    @RenderSection("Styles", required: false)
+</head>
+<body>
+
+    <div class="app-shell" id="appShell">
+        <aside class="sidebar" id="appSidebar">
+            <div class="sidebar-topbar">
+                <div class="brand-block">
+                    <div class="brand-icon">
+                        <i class="fa-solid fa-user-doctor"></i>
+                    </div>
+                    <div class="brand-copy">
+                        <div class="brand-title">Registre CEMTL</div>
+                        <div class="brand-subtitle">Gestion des médecins</div>
+                    </div>
+                </div>
+
+                <button type="button"
+                        class="sidebar-toggle"
+                        id="sidebarToggle"
+                        title="Réduire le menu"
+                        aria-label="Réduire le menu">
+                    <i class="fa-solid fa-angles-left"></i>
+                </button>
+            </div>
+
+            @if (Request.IsAuthenticated)
+            {
+                <div class="user-panel">
+                    <div class="user-avatar">
+                        <i class="fa-regular fa-circle-user"></i>
+                    </div>
+
+                    <div class="user-meta user-meta-inline">
+                        <div class="user-role">
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <span class="label label-danger">Admin</span>
+                            }
+                            else if (User.IsInRole("SuperUtilisateur"))
+                            {
+                                <span class="label label-warning">SuperUtilisateur</span>
+                            }
+                            else
+                            {
+                                <span class="label label-default">Utilisateur</span>
+                            }
+                        </div>
+
+                        <div class="logout-link">
+                            <a href="@Url.Action("Logout", "Account")" class="btn btn-link btn-sm">
+                                <i class="fa-solid fa-sign-out-alt"></i> Déconnexion
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <nav class="menu-groups">
+                <!-- Accueil -->
+                <div class="nav-group menu-home @(isHomeOpen ? "is-open" : "")">
+                    <button type="button"
+                            class="nav-group-toggle"
+                            aria-expanded="@(isHomeOpen ? "true" : "false")">
+                        <span>
+                            <i class="fa-solid fa-house nav-group-icon"></i>
+                            <span class="nav-text">Accueil</span>
+                        </span>
+                        <i class="fa-solid fa-chevron-down nav-chevron"></i>
+                    </button>
+                    <ul class="sidebar-nav">
+                        <li class="@isActive("Home")">
+                            <a href="@Url.Action("Index", "Home")">
+                                <i class="fa-solid fa-chart-line nav-item-icon"></i>
+                                <span class="nav-text">Tableau de bord</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Registre -->
+                <div class="nav-group menu-registre @(isRegistreOpen ? "is-open" : "")">
+                    <button type="button"
+                            class="nav-group-toggle"
+                            aria-expanded="@(isRegistreOpen ? "true" : "false")">
+                        <span>
+                            <i class="fa-solid fa-address-card nav-group-icon"></i>
+                            <span class="nav-text">Registre</span>
+                        </span>
+                        <i class="fa-solid fa-chevron-down nav-chevron"></i>
+                    </button>
+                    <ul class="sidebar-nav">
+                        <li class="@isActive("Medecins")">
+                            <a href="@Url.Action("Index", "Medecins")">
+                                <i class="fa-solid fa-user-doctor nav-item-icon"></i>
+                                <span class="nav-text">Médecins</span>
+                            </a>
+                        </li>
+                        <li class="@isActive("NominationsAdministratives")">
+                            <a href="@Url.Action("Index", "NominationsAdministratives")">
+                                <i class="fa-solid fa-briefcase nav-item-icon"></i>
+                                <span class="nav-text">Nominations</span>
+                            </a>
+                        </li>
+                        <li class="@isActive("EntentesFDC")">
+                            <a href="@Url.Action("Index", "EntentesFDC")">
+                                <i class="fa-solid fa-file-signature nav-item-icon"></i>
+                                <span class="nav-text">Ententes FDC</span>
+                            </a>
+                        </li>
+                        <li class="@isActive("FitTests")">
+                            <a href="@Url.Action("Index", "FitTests")">
+                                <i class="fa-solid fa-shield-virus nav-item-icon"></i>
+                                <span class="nav-text">Fit tests</span>
+                            </a>
+                        </li>
+                        @*<li class="@isActive("DossiersPrivilege")">
+                        <a href="@Url.Action("Index", "DossiersPrivilege")">
+                            <i class="fa-solid fa-scale-balanced nav-item-icon"></i>
+                            <span class="nav-text">Privilèges</span>
+                        </a>
+                    </li>
+                    <li class="@isActive("DossiersPrivilegeDecision")">
+                        <a href="@Url.Action("Index", "DossiersPrivilegeDecision")">
+                            <i class="fa-solid fa-gavel nav-item-icon"></i>
+                            <span class="nav-text">Décisions privilèges</span>
+                        </a>
+                    </li>*@
+
+                        <li class="@isActive("MedecinPrivileges")">
+                            <a href="@Url.Action("Index", "MedecinPrivileges")">
+                                <i class="fa-solid fa-gavel nav-item-icon"></i>
+                                <span class="nav-text">Privilèges</span>
+                            </a>
+                        </li>
+
+
+
+
+                        <li class="@isActive("CotisationsAnnuelles")">
+                            <a href="@Url.Action("Index", "CotisationsAnnuelles")">
+                                <i class="fa-solid fa-receipt nav-item-icon"></i>
+                                <span class="nav-text">Cotisations</span>
+                            </a>
+                        </li>
+
+
+                        @*<li class="@isActive("NominationAdministratives")">
+                        <a href="@Url.Action("Index", "NominationAdministratives")">
+                            <i class="fa-solid fa-receipt nav-item-icon"></i>
+                            <span class="nav-text">Nominations administratives</span>
+                        </a>
+                    </li>*@
+
+                    </ul>
+                </div>
+
+                <!-- Structure -->
+                <div class="nav-group menu-structure @(isStructureOpen ? "is-open" : "")">
+                    <button type="button"
+                            class="nav-group-toggle"
+                            aria-expanded="@(isStructureOpen ? "true" : "false")">
+                        <span>
+                            <i class="fa-solid fa-sitemap nav-group-icon"></i>
+                            <span class="nav-text">Structure</span>
+                        </span>
+                        <i class="fa-solid fa-chevron-down nav-chevron"></i>
+                    </button>
+                    <ul class="sidebar-nav">
+                        <li class="@isActive("Installations")">
+                            <a href="@Url.Action("Index", "Installations")">
+                                <i class="fa-solid fa-hospital nav-item-icon"></i>
+                                <span class="nav-text">Installations</span>
+                            </a>
+                        </li>
+                        <li class="@isActive("UnitesOrganisationnelles")">
+                            <a href="@Url.Action("Index", "UnitesOrganisationnelles")">
+                                <i class="fa-solid fa-diagram-project nav-item-icon"></i>
+                                <span class="nav-text">Départements</span>
+                            </a>
+                        </li>
+                        <li class="@isActive("Comites")">
+                            <a href="@Url.Action("Index", "Comites")">
+                                <i class="fa-solid fa-people-group nav-item-icon"></i>
+                                <span class="nav-text">Comités</span>
+                            </a>
+                        </li>
+                        <li class="@isActive("MedecinsComites")">
+                            <a href="@Url.Action("Index", "MedecinsComites")">
+                                <i class="fa-solid fa-user-group nav-item-icon"></i>
+                                <span class="nav-text">Affectations comités</span>
+                            </a>
+                        </li>
+                        <li class="@isActive("MedecinCoordonnees")">
+                            <a href="@Url.Action("Index", "MedecinCoordonnees")">
+                                <i class="fa-solid fa-user-group nav-item-icon"></i>
+                                <span class="nav-text">Coordonnées des médecins</span>
+                            </a>
+                        </li>
+
+
+                    </ul>
+                </div>
+
+                <!-- Référentiels -->
+                <div class="nav-group compact-group menu-referentiels @(isReferentielsOpen ? "is-open" : "")">
+                    <button type="button"
+                            class="nav-group-toggle"
+                            aria-expanded="@(isReferentielsOpen ? "true" : "false")">
+                        <span>
+                            <i class="fa-solid fa-layer-group nav-group-icon"></i>
+                            <span class="nav-text">Référentiels</span>
+                        </span>
+                        <i class="fa-solid fa-chevron-down nav-chevron"></i>
+                    </button>
+                    <ul class="sidebar-nav compact">
+                        <li class="@isActive("TitresMedecin")"><a href="@Url.Action("Index", "TitresMedecin")"><i class="fa-solid fa-tag nav-item-icon"></i> Titres médecin</a></li>
+                        <li class="@isActive("TypesPermis")"><a href="@Url.Action("Index", "TypesPermis")"><i class="fa-solid fa-id-badge nav-item-icon"></i> Permis médecin</a></li>
+                        <li class="@isActive("StatutsMedecin")"><a href="@Url.Action("Index", "StatutsMedecin")"><i class="fa-solid fa-signal nav-item-icon"></i> Statuts médecin</a></li>
+                        <li class="@isActive("CategoriesPratique")"><a href="@Url.Action("Index", "CategoriesPratique")"><i class="fa-solid fa-stethoscope nav-item-icon"></i> Catégories</a></li>
+                        <li class="@isActive("Genres")"><a href="@Url.Action("Index", "Genres")"><i class="fa-solid fa-venus-mars nav-item-icon"></i> Genres</a></li>
+                        <li class="@isActive("CodesCotisation")"><a href="@Url.Action("Index", "CodesCotisation")"><i class="fa-solid fa-barcode nav-item-icon"></i> Cotisations</a></li>
+                        <li class="@isActive("TypesPaiement")"><a href="@Url.Action("Index", "TypesPaiement")"><i class="fa-solid fa-credit-card nav-item-icon"></i> Paiements</a></li>
+                        @*<li class="@isActive("TypesInstanceDecision")"><a href="@Url.Action("Index", "TypesInstanceDecision")"><i class="fa-solid fa-sliders nav-item-icon"></i> Types décision</a></li>
+                    <li class="@isActive("InstancesDecision")"><a href="@Url.Action("Index", "InstancesDecision")"><i class="fa-solid fa-list-check nav-item-icon"></i> Instances décision</a></li>*@
+                        <li class="@isActive("PrivilegeReferences")"><a href="@Url.Action("Index", "PrivilegeReferences")"><i class="fa-solid fa-scale-balanced nav-item-icon"></i><span class="nav-text">Privilèges</span></a></li>
+                        <li class="@isActive("Nominations")"><a href="@Url.Action("Index", "Nominations")"><i class="fa-solid fa-receipt nav-item-icon"></i><span class="nav-text">Nominations</span></a></li>
+                        @*<li class="@isActive("JournalImports")"><a href="@Url.Action("Index", "JournalImports")"><i class="fa-solid fa-file-import nav-item-icon"></i> Journal d'import</a></li>*@
+                    </ul>
+                </div>
+
+                @if (canSeeAdministration)
+                {
+                    <div class="nav-group menu-administration @(isAdministrationOpen ? "is-open" : "")">
+                        <button type="button"
+                                class="nav-group-toggle"
+                                aria-expanded="@(isAdministrationOpen ? "true" : "false")">
+                            <span>
+                                <i class="fa-solid fa-user-shield nav-group-icon"></i>
+                                <span class="nav-text">Administration</span>
+                            </span>
+                            <i class="fa-solid fa-chevron-down nav-chevron"></i>
+                        </button>
+                        <ul class="sidebar-nav">
+                            <li class="@isActive("Users")"><a href="@Url.Action("Index", "Users")"><i class="fa-solid fa-users nav-item-icon"></i> Utilisateurs</a></li>
+                            <li class="@isActive("Roles")"><a href="@Url.Action("Index", "Roles")"><i class="fa-solid fa-user-gear nav-item-icon"></i> Rôles</a></li>
+                            <li class="@isActive("AuditLogs")"><a href="@Url.Action("Index", "AuditLogs")"><i class="fa-solid fa-clock-rotate-left nav-item-icon"></i> Journal d'audit</a></li>
+                            <li class="@isActive("Parametres")"><a href="@Url.Action("Index", "Parametres")"><i class="fa-solid fa-gears nav-item-icon"></i> Paramètres</a></li>
+                        </ul>
+                    </div>
+                }
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="topbar">
+                <div>
+                    <h1>@(ViewBag.Title ?? appTitle)</h1>
+                    <p class="topbar-subtitle">
+                        Registre centralisé des médecins du CIUSSS de l'Est-de-l'Île-de-Montréal
+                    </p>
+                </div>
+
+                <div class="topbar-actions">
+                    <button type="button"
+                            class="sidebar-toggle mobile-toggle"
+                            id="sidebarMobileToggle"
+                            title="Ouvrir ou fermer le menu"
+                            aria-label="Ouvrir ou fermer le menu">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+
+                    @if (Request.IsAuthenticated)
+                    {
+                        <span class="text-muted topbar-user">
+                            <i class="fa-regular fa-circle-user"></i> @User.Identity.Name
+                        </span>
+
+                        @*<a href="@Url.Action("Logout", "Account")"
+               class="btn btn-default btn-sm"
+               style="margin-left:10px; background-color: aliceblue:red">
+                <i class="fa-solid fa-sign-out-alt"></i> Déconnexion
+            </a>*@
+
+                        using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-link">Déconnexion</button>
+                        }
+                    }
+                </div>
+            </div>
+
+            @RenderBody()
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap.min.js"></script>
+
+    <script>
+        (function () {
+            var body = document.body;
+            var toggle = document.getElementById('sidebarToggle');
+            var mobileToggle = document.getElementById('sidebarMobileToggle');
+            var storageKey = 'registre-cemtl-sidebar-collapsed';
+
+            function setCollapsed(collapsed) {
+                if (collapsed) {
+                    body.classList.add('sidebar-collapsed');
+                    localStorage.setItem(storageKey, '1');
+                } else {
+                    body.classList.remove('sidebar-collapsed');
+                    localStorage.setItem(storageKey, '0');
+                }
+            }
+
+            if (localStorage.getItem(storageKey) === '1') {
+                body.classList.add('sidebar-collapsed');
+            }
+
+            if (toggle) {
+                toggle.addEventListener('click', function () {
+                    setCollapsed(!body.classList.contains('sidebar-collapsed'));
+                });
+            }
+
+            if (mobileToggle) {
+                mobileToggle.addEventListener('click', function () {
+                    body.classList.toggle('sidebar-open');
+                });
+            }
+
+            Array.prototype.forEach.call(document.querySelectorAll('.nav-group-toggle'), function (button) {
+                button.addEventListener('click', function () {
+                    if (body.classList.contains('sidebar-collapsed')) {
+                        setCollapsed(false);
+                    }
+
+                    var clickedGroup = button.parentElement;
+                    var isAlreadyOpen = clickedGroup.classList.contains('is-open');
+
+                    Array.prototype.forEach.call(document.querySelectorAll('.nav-group'), function (group) {
+                        group.classList.remove('is-open');
+                        var groupButton = group.querySelector('.nav-group-toggle');
+                        if (groupButton) groupButton.setAttribute('aria-expanded', 'false');
+                    });
+
+                    if (!isAlreadyOpen) {
+                        clickedGroup.classList.add('is-open');
+                        button.setAttribute('aria-expanded', 'true');
+                    }
+                });
+            });
+        })();
+    </script>
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

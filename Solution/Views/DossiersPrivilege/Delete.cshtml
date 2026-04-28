@@ -1,0 +1,45 @@
+﻿@model Solution.ViewModels.DossiersPrivilege.DossierPrivilegeDetailsViewModel
+@{
+    ViewBag.Title = "Supprimer DossierPrivilege";
+}
+
+<div class="page-header-custom">
+    <h2>Supprimer DossierPrivilege</h2>
+</div>
+
+<div class="dashboard-card">
+    <p>Confirmez-vous la suppression de cet enregistrement ?</p>
+    <dl class="dl-horizontal">
+        <dt>Médecin</dt>
+        <dd>@Model.MedecinLibelle</dd>
+        <dt>Engagement FDC</dt>
+        <dd>@Model.EngagementFDC</dd>
+        <dt>Date adhésion FDC</dt>
+        <dd>@(Model.DateAdhesionFDC.HasValue ? Model.DateAdhesionFDC.Value.ToString("yyyy-MM-dd") : "-")</dd>
+        <dt>Date fin FDC</dt>
+        <dd>@(Model.DateFinFDC.HasValue ? Model.DateFinFDC.Value.ToString("yyyy-MM-dd") : "-")</dd>
+        <dt>Date début pratique</dt>
+        <dd>@(Model.DateDebutPratique.HasValue ? Model.DateDebutPratique.Value.ToString("yyyy-MM-dd") : "-")</dd>
+        <dt>Date fin pratique</dt>
+        <dd>@(Model.DateFinPratique.HasValue ? Model.DateFinPratique.Value.ToString("yyyy-MM-dd") : "-")</dd>
+        <dt>PEM visé</dt>
+        <dd>@Model.PEMVise</dd>
+        <dt>PEM ailleurs</dt>
+        <dd>@Model.PEMAilleurs</dd>
+        <dt>RLS</dt>
+        <dd>@Model.RLS</dd>
+        <dt>Privilèges</dt>
+        <dd>@Model.PrivilegesTexte</dd>
+        <dt>Résolution</dt>
+        <dd>@Model.NumeroResolution</dd>
+        <dt>Actif</dt>
+        <dd>@(Model.EstDossierActif ? "Oui" : "Non")</dd>
+    </dl>
+
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+        <button type="submit" class="btn btn-danger btn-icon-only" title="Supprimer"><i class="fa-solid fa-trash"></i></button>
+        <a href="@Url.Action("Index")" class="btn btn-default btn-icon-only" title="Annuler"><i class="fa-solid fa-xmark"></i></a>
+    }
+</div>

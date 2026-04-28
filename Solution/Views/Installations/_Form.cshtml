@@ -1,0 +1,18 @@
+﻿@model Solution.ViewModels.Installations.InstallationFormViewModel
+
+<div class="dashboard-card">
+    <div class="form-group">
+        @Html.LabelFor(m => m.NomInstallation)
+        @Html.TextBoxFor(m => m.NomInstallation, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.NomInstallation, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.CodeInstallation)
+        @Html.TextBoxFor(m => m.CodeInstallation, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.CodeInstallation, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        <div class="checkbox"><label>@Html.CheckBoxFor(m => m.EstActif) Actif</label></div>
+        @Html.ValidationMessageFor(m => m.EstActif, "", new { @class = "text-danger" })
+    </div>
+</div>

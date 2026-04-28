@@ -1,0 +1,167 @@
+﻿@model IEnumerable<Solution.ViewModels.Medecins.MedecinListViewModel>
+
+@{
+    ViewBag.Title = "Médecins";
+}
+
+@Html.Partial("~/Views/Shared/_Alerts.cshtml")
+
+<div class="dashboard-card filters-bar">
+    @using (Html.BeginForm("Index", "Medecins", FormMethod.Get, new { id = "formRechercheMedecins" }))
+    {
+        <div class="row">
+            <div class="col-md-6">
+                <input type="text"
+                       name="search"
+                       value="@ViewBag.Search"
+                       class="form-control"
+                       placeholder="Recherche par nom, prénom, permis, NAM..." />
+            </div>
+
+            <div class="col-md-2">
+                <label class="checkbox-inline" style="margin-top:7px;">
+                    <input type="checkbox"
+                           name="actifsSeulement"
+                           value="true"
+                           @(ViewBag.ActifsSeulement != null && (bool)ViewBag.ActifsSeulement ? "checked=\"checked\"" : "") />
+                    Actifs seulement
+                </label>
+            </div>
+
+            <div class="col-md-4 text-right">
+                <button type="submit" class="btn btn-default">
+                    <i class="fa-solid fa-magnifying-glass"></i> Rechercher
+                </button>
+
+                @if (User.IsInRole("Admin") || User.IsInRole("SuperUtilisateur"))
+                {
+                    @Html.ActionLink("Nouveau", "Create", null, new { @class = "btn btn-primary" })
+                }
+            </div>
+        </div>
+    }
+</div>
+
+<div class="dashboard-card">
+    <table id="tableMedecins" class="table table-bordered table-striped table-hover registre-table">
+        <thead>
+            <tr>
+                <th>Permis</th>
+                <th>Médecin</th>
+                <th>Type permis</th>
+                <th>Statut</th>
+                <th>Catégorie</th>
+                <th>Téléphone</th>
+                <th>Courriel</th>
+                <th>Installation</th>
+                <th>Nomination</th>
+                <th>Actif</th>
+                <th class="nowrap" style="width:170px;">Actions</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<div id="medecinDetailsModal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" style="width:95%; max-width:1400px;">
+        <div class="modal-content" id="medecinDetailsModalContent">
+            <div class="modal-body text-center" style="padding:40px;">
+                <i class="fa fa-spinner fa-spin fa-2x"></i>
+                <div>Chargement...</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+        $(function () {
+            var table = $("#tableMedecins").DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: '@Url.Action("GetMedecins", "Medecins")',
+                    type: "POST",
+                    data: function (d) {
+                        d.searchTop = $('input[name="search"]').val();
+                        d.actifsSeulement = $('input[name="actifsSeulement"]').is(':checked');
+                    }
+                },
+                pageLength: 10,
+                lengthMenu: [[5, 10, 25, 50, 100], [5, 10, 25, 50, 100]],
+                paging: true,
+                ordering: true,
+                info: true,
+                autoWidth: false,
+                pagingType: "simple_numbers",
+                order: [[1, 'asc']],
+                language: {
+                    processing: "Traitement en cours...",
+                    search: "Rechercher :",
+                    lengthMenu: "Afficher _MENU_ éléments",
+                    info: "Affichage de l'élément _START_ à _END_ sur _TOTAL_ éléments",
+                    infoEmpty: "Affichage de l'élément 0 à 0 sur 0 élément",
+                    infoFiltered: "(filtré de _MAX_ éléments au total)",
+                    loadingRecords: "Chargement en cours...",
+                    zeroRecords: "Aucun élément à afficher",
+                    emptyTable: "Aucune donnée disponible dans le tableau",
+                    paginate: {
+                        first: "Premier",
+                        previous: "Précédent",
+                        next: "Suivant",
+                        last: "Dernier"
+                    }
+                },
+                columns: [
+                    { data: "Permis", name: "Permis" },
+                    { data: "NomComplet", name: "NomComplet" },
+                    { data: "TypePermis", name: "TypePermis" },
+                    { data: "StatutMedecin", name: "StatutMedecin" },
+                    { data: "CategoriePratique", name: "CategoriePratique" },
+                    { data: "TelephonePrincipal", name: "TelephonePrincipal" },
+                    { data: "CourrielPrincipal", name: "CourrielPrincipal" },
+                    { data: "InstallationPrincipale", name: "InstallationPrincipale" },
+                    { data: "NominationActive", name: "NominationActive" },
+                    { data: "EstActif", name: "EstActif" },
+                    {
+                        data: "MedecinId",
+                        render: function (data, type, row) {
+                            var actions = '<button type="button" class="btn btn-info btn-sm btn-icon-only js-open-details" data-id="' + data + '" title="Détails"><i class="fa-solid fa-circle-info"></i></button>';
+                            @if (User.IsInRole("Admin") || User.IsInRole("SuperUtilisateur"))
+                            {
+                                <text>
+                                    actions += ' <a href="@Url.Action("Edit", "Medecins")?id=' + data + '" class="btn btn-warning btn-sm btn-icon-only" title="Modifier"><i class="fa-solid fa-pen-to-square"></i></a>';
+                                    actions += ' <a href="@Url.Action("Delete", "Medecins")?id=' + data + '" class="btn btn-danger btn-sm btn-icon-only" title="Supprimer"><i class="fa-solid fa-trash"></i></a>';
+                                </text>
+                            }
+                            return actions;
+                        },
+                        orderable: false,
+                        searchable: false
+                    }
+                ]
+            });
+
+            $("#formRechercheMedecins").on("submit", function (e) {
+                e.preventDefault();
+                table.ajax.reload();
+            });
+
+            $(document).on("click", ".js-open-details", function () {
+                var id = $(this).data("id");
+                var url = '@Url.Action("DetailsModal", "Medecins")' + '?id=' + id;
+
+                $("#medecinDetailsModal").modal("show");
+                $("#medecinDetailsModalContent").html(
+                    '<div class="modal-body text-center" style="padding:40px;">' +
+                    '<i class="fa fa-spinner fa-spin fa-2x"></i>' +
+                    '<div>Chargement...</div>' +
+                    '</div>'
+                );
+
+                $("#medecinDetailsModalContent").load(url);
+            });
+        });
+    </script>
+}

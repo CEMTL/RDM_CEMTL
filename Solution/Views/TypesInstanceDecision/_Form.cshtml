@@ -1,0 +1,14 @@
+﻿@model Solution.ViewModels.TypesInstanceDecision.TypeInstanceDecisionFormViewModel
+
+<div class="dashboard-card">
+    <div class="form-group">
+        @Html.LabelFor(m => m.CodeType)
+        @Html.TextBoxFor(m => m.CodeType, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.CodeType, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.Libelle)
+        @Html.TextBoxFor(m => m.Libelle, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Libelle, "", new { @class = "text-danger" })
+    </div>
+</div>

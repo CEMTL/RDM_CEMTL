@@ -1,0 +1,48 @@
+﻿@model Solution.ViewModels.RoleDeleteViewModel
+@{ ViewBag.Title = "Supprimer le rôle"; }
+
+<div class="page-header">
+    <h2>Supprimer le rôle</h2>
+</div>
+
+<div class="panel panel-danger" style="max-width:520px">
+    <div class="panel-heading">
+        <strong>Confirmer la suppression</strong>
+    </div>
+    <div class="panel-body">
+
+        <dl class="dl-horizontal">
+            <dt>Nom du rôle</dt>
+            <dd><strong>@Model.Name</strong></dd>
+
+            <dt>Utilisateurs assignés <small class="text-muted"></small></dt>
+            <dd>
+                @if (Model.NbUtilisateurs > 0)
+                {
+    <span class="text-danger">
+        <span class="glyphicon glyphicon-warning-sign"></span>
+        @Model.NbUtilisateurs utilisateur(s) — la suppression est bloquée.
+    </span> }
+                else
+                {
+    <span class="text-success">Aucun</span>}
+            </dd>
+        </dl>
+
+        @if (Model.NbUtilisateurs > 0)
+        {
+<div class="alert alert-warning">
+    Retirez ce rôle de tous les utilisateurs avant de le supprimer.
+</div>}
+
+        @using (Html.BeginForm("Delete", "Roles", new { id = Model.Id }, FormMethod.Post))
+        {
+@Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-danger"
+                        @(Model.NbUtilisateurs > 0 ? "disabled" : "")>
+                    <span class="glyphicon glyphicon-trash"></span> Supprimer
+                </button>
+                                @Html.ActionLink("Annuler", "Index", null, new { @class = "btn btn-default" })}
+
+    </div>
+</div>

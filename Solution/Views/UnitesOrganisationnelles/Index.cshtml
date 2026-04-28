@@ -1,0 +1,110 @@
+﻿@model IEnumerable<Solution.ViewModels.UnitesOrganisationnelles.UniteOrganisationnelleListViewModel>
+@{
+    ViewBag.Title = "Départements";
+    var canManage = User.IsInRole("Admin") || User.IsInRole("SuperUtilisateur");
+}
+
+
+
+@Html.Partial("~/Views/Shared/_Alerts.cshtml")
+
+<div class="dashboard-card filters-bar">
+    @using (Html.BeginForm("Index", "UnitesOrganisationnelles", FormMethod.Get, new { id = "formRechercheUnitesOrganisationnelles" }))
+    {
+        <div class="row">
+            <div class="col-md-8">
+                <input type="text"
+                       name="search"
+                       value="@Request.QueryString["search"]"
+                       class="form-control"
+                       placeholder="Recherche..." />
+            </div>
+            <div class="col-md-4 text-right">
+                <button type="submit" class="btn btn-default">
+                    <i class="fa-solid fa-magnifying-glass"></i> Rechercher
+                </button>
+                @if (canManage)
+                {
+                    @Html.ActionLink("Nouveau", "Create", null, new { @class = "btn btn-primary" })
+                }
+            </div>
+        </div>
+    }
+</div>
+
+<div class="dashboard-card">
+    <table id="tableUnitesOrganisationnelles" class="table table-bordered table-striped table-hover registre-table">
+        <thead>
+            <tr>
+                <th>Libellé</th>
+                <th>Type</th>
+                <th>Département parent</th>
+                <th>Actif</th>
+                <th class="nowrap" style="width:140px;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Libelle</td>
+                    <td>@item.TypeUnite</td>
+                    <td>@item.UniteParentLibelle</td>
+                    <td>@(item.EstActif ? "Oui" : "Non")</td>
+                    <td class="table-actions nowrap">
+                        <a href="@Url.Action("Details", new { id = item.UniteOrganisationnelleId })" class="btn btn-info btn-sm btn-icon-only" title="Détails">
+                            <i class="fa-solid fa-circle-info"></i>
+                        </a>
+                        @if (canManage)
+                        {
+                            <a href="@Url.Action("Edit", new { id = item.UniteOrganisationnelleId })" class="btn btn-warning btn-sm btn-icon-only" title="Modifier">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </a>
+                            <a href="@Url.Action("Delete", new { id = item.UniteOrganisationnelleId })" class="btn btn-danger btn-sm btn-icon-only" title="Supprimer">
+                                <i class="fa-solid fa-trash"></i>
+                            </a>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts{
+    <script>
+        $(function () {
+            $("#tableUnitesOrganisationnelles").DataTable({
+                pageLength: 10,
+                lengthMenu: [[5, 10, 25, 50, 100], [5, 10, 25, 50, 100]],
+                paging: true,
+                ordering: true,
+                info: true,
+                searching: true,
+                autoWidth: false,
+                pagingType: "simple_numbers",
+                order: [[0, "asc"]],
+                columnDefs: [
+                    { orderable: false, searchable: false, targets: 4 }
+                ],
+                language: {
+                    processing: "Traitement en cours...",
+                    search: "Rechercher :",
+                    lengthMenu: "Afficher _MENU_ éléments",
+                    info: "Affichage de l'élément _START_ à _END_ sur _TOTAL_ éléments",
+                    infoEmpty: "Affichage de l'élément 0 à 0 sur 0 élément",
+                    infoFiltered: "(filtré de _MAX_ éléments au total)",
+                    loadingRecords: "Chargement en cours...",
+                    zeroRecords: "Aucun élément à afficher",
+                    emptyTable: "Aucune donnée disponible dans le tableau",
+                    paginate: {
+                        first: "Premier",
+                        previous: "Précédent",
+                        next: "Suivant",
+                        last: "Dernier"
+                    }
+                }
+            });
+        });
+    </script>
+}

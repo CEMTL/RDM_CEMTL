@@ -1,0 +1,28 @@
+﻿@model Solution.ViewModels.Privileges.MedecinPrivilegeDetailsViewModel
+
+@{
+    ViewBag.Title = "Supprimer un privilège";
+}
+
+<div class="page-header-custom">
+    <h2>Supprimer un privilège</h2>
+</div>
+
+<div class="alert alert-danger">
+    <strong>Attention :</strong> cette suppression est définitive.
+</div>
+
+<div class="dashboard-card">
+    <p><strong>@Model.MedecinNomComplet</strong></p>
+    <p>@Model.CodePrivilege - @Model.PrivilegeLibelle</p>
+    <p>Période : @(Model.DateDebut.HasValue ? Model.DateDebut.Value.ToString("yyyy-MM-dd") : "") à @(Model.DateFin.HasValue ? Model.DateFin.Value.ToString("yyyy-MM-dd") : "")</p>
+</div>
+
+@using (Html.BeginForm("Delete", "MedecinPrivileges", new { id = Model.MedecinPrivilegeId }, FormMethod.Post, null))
+{
+    @Html.AntiForgeryToken()
+    <div class="dashboard-card">
+        <button type="submit" class="btn btn-danger">Supprimer</button>
+        @Html.ActionLink("Annuler", "Index", null, new { @class = "btn btn-default" })
+    </div>
+}

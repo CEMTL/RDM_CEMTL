@@ -1,0 +1,30 @@
+﻿@model Solution.ViewModels.MedecinsAdresses.MedecinAdresseDetailsViewModel
+@{
+    ViewBag.Title = "Détails MedecinAdresse";
+}
+
+<div class="page-header-custom">
+    <h2>Détails MedecinAdresse</h2>
+</div>
+
+<div class="dashboard-card">
+    <dl class="dl-horizontal">
+        <dt>Médecin</dt>
+        <dd>@Model.MedecinLibelle</dd>
+        <dt>Adresse</dt>
+        <dd>@Model.AdresseLigne1</dd>
+        <dt>Ville</dt>
+        <dd>@Model.Ville</dd>
+        <dt>Province</dt>
+        <dd>@Model.Province</dd>
+        <dt>Code postal</dt>
+        <dd>@Model.CodePostal</dd>
+        <dt>Principale</dt>
+        <dd>@(Model.EstPrincipale ? "Oui" : "Non")</dd>
+    </dl>
+</div>
+
+<div class="dashboard-card actions-card">
+    <a href="@Url.Action("Edit", new { id = Model.MedecinAdresseId })" class="btn btn-warning btn-icon-only" title="Modifier"><i class="fa-solid fa-pen-to-square"></i></a>
+    <a href="@Url.Action("Index")" class="btn btn-default btn-icon-only" title="Retour"><i class="fa-solid fa-arrow-left"></i></a>
+</div>

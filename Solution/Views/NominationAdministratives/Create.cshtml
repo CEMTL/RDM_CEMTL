@@ -1,0 +1,26 @@
+﻿@model Solution.ViewModels.Nominations.NominationAdministrativeFormViewModel
+
+@{
+    ViewBag.Title = "Nouvelle nomination administrative";
+}
+
+<div class="page-header-custom">
+    <h2>Nouvelle nomination administrative</h2>
+</div>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "Veuillez corriger les erreurs.", new { @class = "alert alert-danger" })
+
+    @Html.Partial("_Form", Model)
+
+    <div class="dashboard-card">
+        <button type="submit" class="btn btn-success">Enregistrer</button>
+        @Html.ActionLink("Retour", "Index", null, new { @class = "btn btn-default" })
+    </div>
+}
+
+@section Scripts {
+    @Html.Partial("_ValidationScriptsPartial")
+}

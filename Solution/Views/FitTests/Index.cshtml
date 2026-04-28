@@ -1,0 +1,133 @@
+﻿@{
+    ViewBag.Title = "Fit tests";
+}
+
+
+@Html.Partial("~/Views/Shared/_Alerts.cshtml")
+
+<div class="dashboard-card filters-bar">
+    @using (Html.BeginForm("Index", "FitTests", FormMethod.Get, new { id = "searchTopForm", onsubmit = "return false;" }))
+    {
+        <div class="row">
+            <div class="col-md-8">
+                <input type="text"
+                       id="searchTop"
+                       name="search"
+                       value="@ViewBag.Search"
+                       class="form-control"
+                       placeholder="Recherche par médecin, résultat ou commentaire..." />
+            </div>
+
+            <div class="col-md-4 text-right">
+                <button type="button" id="btnSearchTop" class="btn btn-default">
+                    <i class="fa-solid fa-magnifying-glass"></i> Rechercher
+                </button>
+
+                <button type="button" id="btnResetTop" class="btn btn-default">
+                    <i class="fa-solid fa-rotate-left"></i> Réinitialiser
+                </button>
+
+                @if (User.IsInRole("Admin") || User.IsInRole("SuperUtilisateur"))
+                {
+                    @Html.ActionLink("Nouveau", "Create", null, new { @class = "btn btn-primary" })
+                }
+            </div>
+        </div>
+    }
+</div>
+
+<div class="dashboard-card">
+    <table id="tableFitTests" class="table table-bordered table-striped table-hover registre-table">
+        <thead>
+            <tr>
+                <th>Médecin</th>
+                <th>Résultat</th>
+                <th>Date fit test</th>
+                <th>Actif</th>
+                <th class="nowrap" style="width:140px;">Actions</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+@section Scripts{
+    <script>
+        $(function () {
+            var table = $("#tableFitTests").DataTable({
+                processing: true,
+                serverSide: true,
+                filter: true,
+                orderMulti: false,
+                pageLength: 10,
+                autoWidth: false,
+                ajax: {
+                    url: '@Url.Action("GetFitTests", "FitTests")',
+                    type: 'POST',
+                    data: function (d) {
+                        d.searchTop = $("#searchTop").val();
+                    }
+                },
+                columns: [
+                    { data: "MedecinLibelle", name: "MedecinLibelle" },
+                    { data: "Resultat", name: "Resultat" },
+                    { data: "DateFitTest", name: "DateFitTest" },
+                    { data: "EstActif", name: "EstActif" },
+                    {
+                        data: "FitTestId",
+                        orderable: false,
+                        searchable: false,
+                        render: function (data) {
+                            var detailsUrl = '@Url.Action("Details", "FitTests")/' + data;
+                            var editUrl = '@Url.Action("Edit", "FitTests")/' + data;
+                            var deleteUrl = '@Url.Action("Delete", "FitTests")/' + data;
+
+                            var html = '<a href="' + detailsUrl + '" class="btn btn-info btn-sm btn-icon-only" title="Détails"><i class="fa-solid fa-circle-info"></i></a> ';
+
+                            @if (User.IsInRole("Admin") || User.IsInRole("SuperUtilisateur"))
+                            {
+                                @:html += '<a href="' + editUrl + '" class="btn btn-warning btn-sm btn-icon-only" title="Modifier"><i class="fa-solid fa-pen-to-square"></i></a> ';
+                                @:html += '<a href="' + deleteUrl + '" class="btn btn-danger btn-sm btn-icon-only" title="Supprimer"><i class="fa-solid fa-trash"></i></a>';
+                            }
+
+                            return html;
+                        }
+                    }
+                ],
+                language: {
+                    processing: "Traitement en cours...",
+                    search: "Recherche rapide :",
+                    lengthMenu: "Afficher _MENU_ éléments",
+                    info: "Affichage de l'élément _START_ à _END_ sur _TOTAL_ éléments",
+                    infoEmpty: "Affichage de l'élément 0 à 0 sur 0 élément",
+                    infoFiltered: "(filtré de _MAX_ éléments au total)",
+                    loadingRecords: "Chargement en cours...",
+                    zeroRecords: "Aucun élément à afficher",
+                    emptyTable: "Aucune donnée disponible dans le tableau",
+                    paginate: {
+                        first: "Premier",
+                        previous: "Précédent",
+                        next: "Suivant",
+                        last: "Dernier"
+                    }
+                }
+            });
+
+            $("#btnSearchTop").on("click", function () {
+                table.ajax.reload();
+            });
+
+            $("#btnResetTop").on("click", function () {
+                $("#searchTop").val("");
+                table.search("").ajax.reload();
+            });
+
+            $("#searchTop").on("keypress", function (e) {
+                if (e.which === 13) {
+                    e.preventDefault();
+                    table.ajax.reload();
+                }
+            });
+        });
+    </script>
+}

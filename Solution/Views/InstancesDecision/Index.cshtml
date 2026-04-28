@@ -1,0 +1,58 @@
+﻿@model IEnumerable<Solution.ViewModels.InstancesDecision.InstanceDecisionListViewModel>
+@{
+    ViewBag.Title = "InstancesDecision";
+}
+
+ 
+
+@Html.Partial("~/Views/Shared/_Alerts.cshtml")
+
+<div class="dashboard-card filters-bar">
+    @using (Html.BeginForm("Index", "InstancesDecision", FormMethod.Get))
+    {
+        <div class="row">
+            <div class="col-md-8">
+                <input type="text" name="search" value="@Request.QueryString["search"]" class="form-control" placeholder="Recherche..." />
+            </div>
+            <div class="col-md-4 text-right">
+                <button type="submit" class="btn btn-default"><i class="fa-solid fa-magnifying-glass"></i> Rechercher</button>
+                @if (User.IsInRole("Admin") || User.IsInRole("SuperUtilisateur"))
+                {
+                    @Html.ActionLink("Nouveau", "Create", null, new { @class = "btn btn-primary" })
+                }
+            </div>
+        </div>
+    }
+</div>
+
+<div class="dashboard-card">
+    <table class="table table-bordered table-striped table-hover registre-table js-datatable-fr">
+        <thead>
+            <tr>
+                <th>Type instance</th>
+                <th>Code instance</th>
+                <th>Date instance</th>
+                <th>Libellé instance</th>
+                <th class="nowrap" style="width:140px;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.TypeInstanceDecisionLibelle</td>
+                <td>@item.CodeInstance</td>
+                <td>@(item.DateInstance.HasValue ? item.DateInstance.Value.ToString("yyyy-MM-dd") : "")</td>
+                <td>@item.LibelleInstance</td>
+                <td class="table-actions nowrap">
+                    <a href="@Url.Action("Details", new { id = item.InstanceDecisionId })" class="btn btn-info btn-sm btn-icon-only" title="Détails"><i class="fa-solid fa-circle-info"></i></a>
+                    @if (User.IsInRole("Admin") || User.IsInRole("SuperUtilisateur"))
+                    {
+            <a href="@Url.Action("Edit", new { id = item.InstanceDecisionId })" class="btn btn-warning btn-sm btn-icon-only" title="Modifier"><i class="fa-solid fa-pen-to-square"></i></a>
+                                <a href="@Url.Action("Delete", new { id = item.InstanceDecisionId })" class="btn btn-danger btn-sm btn-icon-only" title="Supprimer"><i class="fa-solid fa-trash"></i></a>}
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>

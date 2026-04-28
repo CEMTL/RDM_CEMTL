@@ -1,0 +1,30 @@
+﻿@model Solution.ViewModels.MedecinsComites.MedecinComiteDetailsViewModel
+@{
+    ViewBag.Title = "Détails MedecinComite";
+}
+
+<div class="page-header-custom">
+    <h2>Détails MedecinComite</h2>
+</div>
+
+<div class="dashboard-card">
+    <dl class="dl-horizontal">
+        <dt>Médecin</dt>
+        <dd>@Model.MedecinLibelle</dd>
+        <dt>Comité</dt>
+        <dd>@Model.ComiteLibelle</dd>
+        <dt>Rôle</dt>
+        <dd>@Model.RoleMembre</dd>
+        <dt>Date début</dt>
+        <dd>@(Model.DateDebut.HasValue ? Model.DateDebut.Value.ToString("yyyy-MM-dd") : "-")</dd>
+        <dt>Date fin</dt>
+        <dd>@(Model.DateFin.HasValue ? Model.DateFin.Value.ToString("yyyy-MM-dd") : "-")</dd>
+        <dt>Commentaire</dt>
+        <dd>@Model.Commentaire</dd>
+    </dl>
+</div>
+
+<div class="dashboard-card actions-card">
+    <a href="@Url.Action("Edit", new { id = Model.MedecinComiteId })" class="btn btn-warning btn-icon-only" title="Modifier"><i class="fa-solid fa-pen-to-square"></i></a>
+    <a href="@Url.Action("Index")" class="btn btn-default btn-icon-only" title="Retour"><i class="fa-solid fa-arrow-left"></i></a>
+</div>

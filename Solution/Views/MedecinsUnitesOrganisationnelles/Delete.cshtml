@@ -1,0 +1,31 @@
+﻿@model Solution.ViewModels.MedecinsUnitesOrganisationnelles.MedecinUniteOrganisationnelleDetailsViewModel
+@{
+    ViewBag.Title = "Supprimer MedecinUniteOrganisationnelle";
+}
+
+<div class="page-header-custom">
+    <h2>Supprimer MedecinUniteOrganisationnelle</h2>
+</div>
+
+<div class="dashboard-card">
+    <p>Confirmez-vous la suppression de cet enregistrement ?</p>
+    <dl class="dl-horizontal">
+        <dt>Médecin</dt>
+        <dd>@Model.MedecinLibelle</dd>
+        <dt>Département</dt>
+        <dd>@Model.UniteOrganisationnelleLibelle</dd>
+        <dt>Rôle</dt>
+        <dd>@Model.RoleOrganisationnel</dd>
+        <dt>Date début</dt>
+        <dd>@(Model.DateDebut.HasValue ? Model.DateDebut.Value.ToString("yyyy-MM-dd") : "-")</dd>
+        <dt>Date fin</dt>
+        <dd>@(Model.DateFin.HasValue ? Model.DateFin.Value.ToString("yyyy-MM-dd") : "-")</dd>
+    </dl>
+
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+        <button type="submit" class="btn btn-danger btn-icon-only" title="Supprimer"><i class="fa-solid fa-trash"></i></button>
+        <a href="@Url.Action("Index")" class="btn btn-default btn-icon-only" title="Annuler"><i class="fa-solid fa-xmark"></i></a>
+    }
+</div>

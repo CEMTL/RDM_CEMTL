@@ -1,0 +1,102 @@
+﻿@model Solution.ViewModels.FitTests.FitTestFormViewModel
+
+@{
+    ViewBag.Title = "Modifier un fit test";
+
+    var hasErrors = false;
+    foreach (var state in ViewData.ModelState.Values)
+    {
+        foreach (var err in state.Errors)
+        {
+            if (!string.IsNullOrWhiteSpace(err.ErrorMessage) || err.Exception != null)
+            {
+                hasErrors = true;
+                break;
+            }
+        }
+        if (hasErrors) { break; }
+    }
+}
+
+<div class="page-header-custom">
+    <div class="row">
+        <div class="col-md-8">
+            <h2>Modifier un fit test</h2>
+        </div>
+        <div class="col-md-4 text-right" style="margin-top:25px;">
+            @Html.ActionLink("Retour à la liste", "Index", null, new { @class = "btn btn-default" })
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-card">
+    @using (Html.BeginForm("Edit", "FitTests", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(m => m.FitTestId)
+
+        if (hasErrors)
+        {
+            <div class="alert alert-warning">
+                <strong><i class="fa fa-exclamation-triangle"></i> Le formulaire contient des erreurs.</strong>
+                <br />
+                Veuillez corriger les champs indiqués ci-dessous.
+            </div>
+
+            @Html.ValidationSummary(false, "", new { @class = "alert alert-danger" })
+        }
+
+        <div class="form-horizontal">
+            <div class="form-group">
+                @Html.LabelFor(m => m.MedecinId, new { @class = "col-md-2 control-label" })
+                <div class="col-md-6">
+                    @Html.DropDownListFor(m => m.MedecinId, Model.MedecinIdOptions, "-- Sélectionner --", new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.MedecinId, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.Resultat, new { @class = "col-md-2 control-label" })
+                <div class="col-md-6">
+                    @Html.TextBoxFor(m => m.Resultat, new { @class = "form-control", maxlength = "100", placeholder = "Résultat..." })
+                    @Html.ValidationMessageFor(m => m.Resultat, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.DateFitTest, new { @class = "col-md-2 control-label" })
+                <div class="col-md-3">
+                    @Html.TextBoxFor(m => m.DateFitTest, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+                    @Html.ValidationMessageFor(m => m.DateFitTest, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.Commentaire, new { @class = "col-md-2 control-label" })
+                <div class="col-md-6">
+                    @Html.TextAreaFor(m => m.Commentaire, 4, 50, new { @class = "form-control", placeholder = "Commentaire..." })
+                    @Html.ValidationMessageFor(m => m.Commentaire, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.EstActif, new { @class = "col-md-2 control-label" })
+                <div class="col-md-6" style="padding-top:7px;">
+                    <label class="checkbox-inline">
+                        @Html.CheckBoxFor(m => m.EstActif) Actif
+                    </label>
+                    @Html.ValidationMessageFor(m => m.EstActif, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <hr />
+
+            <div class="text-right">
+                @Html.ActionLink("Annuler", "Index", null, new { @class = "btn btn-default" })
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa-solid fa-save"></i> Enregistrer
+                </button>
+            </div>
+        </div>
+    }
+</div>

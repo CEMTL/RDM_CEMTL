@@ -1,0 +1,18 @@
+﻿@model Solution.ViewModels.StatutsMedecin.StatutMedecinFormViewModel
+
+<div class="dashboard-card">
+    <div class="form-group">
+        @Html.LabelFor(m => m.CodeStatut)
+        @Html.TextBoxFor(m => m.CodeStatut, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.CodeStatut, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.Libelle)
+        @Html.TextBoxFor(m => m.Libelle, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Libelle, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        <div class="checkbox"><label>@Html.CheckBoxFor(m => m.EstActif) Actif</label></div>
+        @Html.ValidationMessageFor(m => m.EstActif, "", new { @class = "text-danger" })
+    </div>
+</div>

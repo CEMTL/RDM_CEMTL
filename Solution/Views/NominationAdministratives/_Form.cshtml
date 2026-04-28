@@ -1,0 +1,44 @@
+﻿@model Solution.ViewModels.Nominations.NominationAdministrativeFormViewModel
+
+<div class="dashboard-card">
+    <div class="form-group">
+        @Html.LabelFor(m => m.MedecinId)
+        @Html.DropDownListFor(m => m.MedecinId, Model.MedecinOptions, "-- Sélectionner --", new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.MedecinId, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.NominationId)
+        @Html.DropDownListFor(m => m.NominationId, Model.NominationOptions, "-- Aucune --", new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.NominationId, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.LibelleNomination)
+        @Html.TextBoxFor(m => m.LibelleNomination, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.LibelleNomination, "", new { @class = "text-danger" })
+        <span class="help-block">Utilisez ce champ si vous voulez un libellé libre ou historique.</span>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.TypeNominationId)
+        @Html.DropDownListFor(m => m.TypeNominationId, Model.TypeNominationOptions, "-- Aucun --", new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.TypeNominationId, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.DateNomination)
+        @Html.TextBoxFor(m => m.DateNomination, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+        @Html.ValidationMessageFor(m => m.DateNomination, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.DateFin)
+        @Html.TextBoxFor(m => m.DateFin, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+        @Html.ValidationMessageFor(m => m.DateFin, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="checkbox">
+        <label>@Html.CheckBoxFor(m => m.EstActive) Active</label>
+    </div>
+</div>

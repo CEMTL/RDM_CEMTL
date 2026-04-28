@@ -1,0 +1,24 @@
+﻿@model Solution.ViewModels.InstancesDecision.InstanceDecisionFormViewModel
+
+<div class="dashboard-card">
+    <div class="form-group">
+        @Html.LabelFor(m => m.TypeInstanceDecisionId)
+        @Html.DropDownListFor(m => m.TypeInstanceDecisionId, Model.TypeInstanceDecisionIdOptions, "-- Sélectionner --", new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.TypeInstanceDecisionId, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.CodeInstance)
+        @Html.TextBoxFor(m => m.CodeInstance, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.CodeInstance, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.DateInstance)
+        @Html.TextBoxFor(m => m.DateInstance, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+        @Html.ValidationMessageFor(m => m.DateInstance, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.LibelleInstance)
+        @Html.TextBoxFor(m => m.LibelleInstance, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.LibelleInstance, "", new { @class = "text-danger" })
+    </div>
+</div>

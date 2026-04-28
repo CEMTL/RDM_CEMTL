@@ -1,0 +1,848 @@
+﻿@model Solution.ViewModels.Medecins.MedecinEditViewModel
+
+@{
+    ViewBag.Title = Model.MedecinId == 0 ? "Créer un médecin" : "Modifier un médecin";
+    var typeCourriel = new List<SelectListItem>
+{
+    new SelectListItem { Value = "Personnel", Text = "Personnel" },
+    new SelectListItem { Value = "Professionnel", Text = "Professionnel" },
+    new SelectListItem { Value = "Clinique", Text = "Clinique" },
+    new SelectListItem { Value = "Hospitalier", Text = "Hospitalier" },
+    new SelectListItem { Value = "Universitaire", Text = "Universitaire" },
+    new SelectListItem { Value = "Recherche", Text = "Recherche" },
+    new SelectListItem { Value = "Administratif", Text = "Administratif" },
+    new SelectListItem { Value = "Secrétariat", Text = "Secrétariat" }
+};
+
+    var typeTelephone = new List<SelectListItem>
+    {
+        new SelectListItem { Value = "Personnel", Text = "Personnel" },
+        new SelectListItem { Value = "Professionnel", Text = "Professionnel" },
+        new SelectListItem { Value = "Cellulaire", Text = "Cellulaire" },
+        new SelectListItem { Value = "Bureau", Text = "Bureau" },
+        new SelectListItem { Value = "Clinique", Text = "Clinique" },
+        new SelectListItem { Value = "Hospitalier", Text = "Hospitalier" },
+        new SelectListItem { Value = "Résidence", Text = "Résidence" },
+        new SelectListItem { Value = "Secrétariat", Text = "Secrétariat" },
+        new SelectListItem { Value = "Urgence", Text = "Urgence" },
+        new SelectListItem { Value = "Télécopieur", Text = "Télécopieur" }
+    };
+}
+
+<div class="page-header">
+    <div class="row">
+        <div class="col-md-8">
+            <h2>
+                <i class="fa fa-user-md"></i>
+                @(Model.MedecinId == 0 ? "Créer un médecin" : "Modifier un médecin")
+            </h2>
+        </div>
+        <div class="col-md-4 text-right" style="margin-top:25px;">
+            @Html.ActionLink("Retour à la liste", "Index", null, new { @class = "btn btn-default" })
+        </div>
+    </div>
+</div>
+
+@using (Html.BeginForm("Edit", "Medecins", FormMethod.Post, new { id = "formMedecinEdit" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.MedecinId)
+
+    var erreursModel = ViewData.ModelState.Values.SelectMany(v => v.Errors).ToList();
+
+    if (erreursModel.Any() || (!ViewData.ModelState.IsValid))
+    {
+        <div class="alert alert-warning">
+            <strong><i class="fa fa-exclamation-triangle"></i> Le formulaire contient des erreurs.</strong>
+            <br />
+            Veuillez corriger les champs indiqués ci-dessous.
+        </div>
+
+        @Html.ValidationSummary(false, "", new { @class = "alert alert-danger" })
+    }
+
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <strong><i class="fa fa-id-card-o"></i> Fiche médecin</strong>
+        </div>
+        <div class="panel-body">
+
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="active"><a href="#tab-general" data-toggle="tab">Général</a></li>
+                <li><a href="#tab-coordonnees" data-toggle="tab">Coordonnées</a></li>
+                <li><a href="#tab-organisation" data-toggle="tab">Organisation</a></li>
+                <li><a href="#tab-nominations" data-toggle="tab">Nominations</a></li>
+                <li><a href="#tab-commentaires" data-toggle="tab">Commentaires</a></li>
+            </ul>
+
+            <div class="tab-content" style="padding-top:20px;">
+
+                <div class="tab-pane active" id="tab-general">
+                    <div class="row">
+                        <div class="col-md-3 form-group">
+                            @Html.LabelFor(m => m.TitreId)
+                            @Html.DropDownListFor(m => m.TitreId, Model.Titres, "-- Sélectionner --", new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.TitreId, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="col-md-3 form-group">
+                            @Html.LabelFor(m => m.Permis)
+                            @Html.TextBoxFor(m => m.Permis, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Permis, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="col-md-3 form-group">
+                            @Html.LabelFor(m => m.NAM)
+                            @Html.TextBoxFor(m => m.NAM, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.NAM, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="col-md-3 form-group">
+                            <label style="display:block;">&nbsp;</label>
+                            <label class="checkbox-inline">
+                                @Html.CheckBoxFor(m => m.EstActif) @Html.DisplayNameFor(m => m.EstActif)
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 form-group">
+                            @Html.LabelFor(m => m.Nom)
+                            @Html.TextBoxFor(m => m.Nom, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Nom, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="col-md-4 form-group">
+                            @Html.LabelFor(m => m.Prenom)
+                            @Html.TextBoxFor(m => m.Prenom, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Prenom, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="col-md-4 form-group">
+                            @Html.LabelFor(m => m.GenreId)
+                            @Html.DropDownListFor(m => m.GenreId, Model.Genres, "-- Sélectionner --", new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.GenreId, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 form-group">
+                            @Html.LabelFor(m => m.TypePermisId)
+                            @Html.DropDownListFor(m => m.TypePermisId, Model.TypesPermis, "-- Sélectionner --", new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.TypePermisId, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="col-md-4 form-group">
+                            @Html.LabelFor(m => m.StatutMedecinId)
+                            @Html.DropDownListFor(m => m.StatutMedecinId, Model.StatutsMedecin, "-- Sélectionner --", new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.StatutMedecinId, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="col-md-4 form-group">
+                            @Html.LabelFor(m => m.CategoriePratiqueId)
+                            @Html.DropDownListFor(m => m.CategoriePratiqueId, Model.CategoriesPratique, "-- Sélectionner --", new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.CategoriePratiqueId, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-2 form-group">
+                            @Html.LabelFor(m => m.DateNaissance)
+                            @Html.TextBoxFor(m => m.DateNaissance, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+                            @Html.ValidationMessageFor(m => m.DateNaissance, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="col-md-3 form-group">
+                            @Html.LabelFor(m => m.DateEntreeFonction)
+                            @Html.TextBoxFor(m => m.DateEntreeFonction, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+                            @Html.ValidationMessageFor(m => m.DateEntreeFonction, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="col-md-3 form-group">
+                            @Html.LabelFor(m => m.DateDepart)
+                            @Html.TextBoxFor(m => m.DateDepart, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+                            @Html.ValidationMessageFor(m => m.DateDepart, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane" id="tab-coordonnees">
+                    <div class="panel panel-default">
+                        <div class="panel-heading clearfix">
+                            <strong>Adresses</strong>
+                            <button type="button" class="btn btn-success btn-xs pull-right" id="btnAddAdresse">
+                                <i class="fa fa-plus"></i> Ajouter
+                            </button>
+                        </div>
+                        <div class="panel-body">
+                            <table class="table table-bordered table-striped" id="tableAdresses">
+                                <thead>
+                                    <tr>
+                                        <th>Adresse</th>
+                                        <th>Ville</th>
+                                        <th>Province</th>
+                                        <th>Code postal</th>
+                                        <th>Principale</th>
+                                        <th>Retirer</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (int i = 0; i < Model.Adresses.Count; i++)
+                                    {
+                                        <tr>
+                                            @Html.HiddenFor(m => m.Adresses[i].MedecinAdresseId)
+                                            <td>
+                                                @Html.TextBoxFor(m => m.Adresses[i].AdresseLigne1, new { @class = "form-control" })
+                                                @Html.ValidationMessageFor(m => m.Adresses[i].AdresseLigne1, "", new { @class = "text-danger" })
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(m => m.Adresses[i].Ville, new { @class = "form-control" })
+                                                @Html.ValidationMessageFor(m => m.Adresses[i].Ville, "", new { @class = "text-danger" })
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(m => m.Adresses[i].Province, new { @class = "form-control" })
+                                                @Html.ValidationMessageFor(m => m.Adresses[i].Province, "", new { @class = "text-danger" })
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(m => m.Adresses[i].CodePostal, new { @class = "form-control" })
+                                                @Html.ValidationMessageFor(m => m.Adresses[i].CodePostal, "", new { @class = "text-danger" })
+                                            </td>
+                                            <td class="text-center">@Html.CheckBoxFor(m => m.Adresses[i].EstPrincipale)</td>
+                                            <td class="text-center">@Html.CheckBoxFor(m => m.Adresses[i].Supprimer, new { @class = "js-remove-flag" })</td>
+                                            <td class="text-center">
+                                                <button type="button" class="btn btn-danger btn-sm js-remove-row">
+                                                    <i class="fa fa-times"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading clearfix">
+                            <strong>Téléphones</strong>
+                            <button type="button" class="btn btn-success btn-xs pull-right" id="btnAddTelephone">
+                                <i class="fa fa-plus"></i> Ajouter
+                            </button>
+                        </div>
+                        <div class="panel-body">
+                            <table class="table table-bordered table-striped" id="tableTelephones">
+                                <thead>
+                                    <tr>
+                                        <th>Type</th>
+                                        <th>Numéro</th>
+                                        <th>Rang</th>
+                                        <th>Principal</th>
+                                        <th>Retirer</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (int i = 0; i < Model.Telephones.Count; i++)
+                                    {
+                                        <tr>
+                                            @Html.HiddenFor(m => m.Telephones[i].MedecinTelephoneId)
+                                            <td>
+                                                @Html.DropDownListFor(
+                                                     m => m.Telephones[i].TypeTelephone,
+                                                     new SelectList(Model.TypesTelephoneDisponibles, "Value", "Text", Model.Telephones[i].TypeTelephone),
+                                                     "-- Sélectionner --",
+                                                     new { @class = "form-control" })
+                                                @Html.ValidationMessageFor(m => m.Telephones[i].TypeTelephone, "", new { @class = "text-danger" })
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(m => m.Telephones[i].NumeroTelephone, new { @class = "form-control" })
+                                                @Html.ValidationMessageFor(m => m.Telephones[i].NumeroTelephone, "", new { @class = "text-danger" })
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(m => m.Telephones[i].RangSource, new { @class = "form-control" })
+                                                @Html.ValidationMessageFor(m => m.Telephones[i].RangSource, "", new { @class = "text-danger" })
+                                            </td>
+                                            <td class="text-center">@Html.CheckBoxFor(m => m.Telephones[i].EstPrincipal)</td>
+                                            <td class="text-center">@Html.CheckBoxFor(m => m.Telephones[i].Supprimer, new { @class = "js-remove-flag" })</td>
+                                            <td class="text-center"><button type="button" class="btn btn-danger btn-sm js-remove-row"><i class="fa fa-times"></i></button></td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading clearfix">
+                            <strong>Courriels</strong>
+                            <button type="button" class="btn btn-success btn-xs pull-right" id="btnAddCourriel">
+                                <i class="fa fa-plus"></i> Ajouter
+                            </button>
+                        </div>
+                        <div class="panel-body">
+                            <table class="table table-bordered table-striped" id="tableCourriels">
+                                <thead>
+                                    <tr>
+                                        <th>Type</th>
+                                        <th>Courriel</th>
+                                        <th>Rang</th>
+                                        <th>Principal</th>
+                                        <th>Retirer</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (int i = 0; i < Model.Courriels.Count; i++)
+                                    {
+                                        <tr>
+                                            @Html.HiddenFor(m => m.Courriels[i].MedecinCourrielId)
+                                            <td>
+                                                @Html.DropDownListFor(
+                                                     m => m.Courriels[i].TypeCourriel,
+                                                     new SelectList(Model.TypesCourrielDisponibles, "Value", "Text", Model.Courriels[i].TypeCourriel),
+                                                     "-- Sélectionner --",
+                                                     new { @class = "form-control" })
+                                                @Html.ValidationMessageFor(m => m.Courriels[i].TypeCourriel, "", new { @class = "text-danger" })
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(m => m.Courriels[i].AdresseCourriel, new { @class = "form-control" })
+                                                @Html.ValidationMessageFor(m => m.Courriels[i].AdresseCourriel, "", new { @class = "text-danger" })
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(m => m.Courriels[i].RangSource, new { @class = "form-control" })
+                                                @Html.ValidationMessageFor(m => m.Courriels[i].RangSource, "", new { @class = "text-danger" })
+                                            </td>
+                                            <td class="text-center">@Html.CheckBoxFor(m => m.Courriels[i].EstPrincipal)</td>
+                                            <td class="text-center">@Html.CheckBoxFor(m => m.Courriels[i].Supprimer, new { @class = "js-remove-flag" })</td>
+                                            <td class="text-center"><button type="button" class="btn btn-danger btn-sm js-remove-row"><i class="fa fa-times"></i></button></td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane" id="tab-organisation">
+                    <div class="panel panel-default">
+                        <div class="panel-heading clearfix">
+                            <strong>Installations</strong>
+                            <button type="button" class="btn btn-success btn-xs pull-right" id="btnAddInstallation">
+                                <i class="fa fa-plus"></i> Ajouter
+                            </button>
+                        </div>
+                        <div class="panel-body">
+                            <table class="table table-bordered table-striped" id="tableInstallations">
+                                <thead>
+                                    <tr>
+                                        <th>Installation</th>
+                                        <th>Rang</th>
+                                        <th>Principale</th>
+                                        <th>Date début</th>
+                                        <th>Date fin</th>
+                                        <th>Retirer</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (int i = 0; i < Model.Installations.Count; i++)
+                                    {
+                                        <tr>
+                                            @Html.HiddenFor(m => m.Installations[i].MedecinInstallationId)
+                                            <td>
+                                                @Html.DropDownListFor(
+                                                              m => m.Installations[i].InstallationId,
+                                                              new SelectList(Model.InstallationsDisponibles, "Value", "Text", Model.Installations[i].InstallationId),
+                                                              "-- Sélectionner --",
+                                                              new { @class = "form-control" })
+                                                @Html.ValidationMessageFor(m => m.Installations[i].InstallationId, "", new { @class = "text-danger" })
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(m => m.Installations[i].RangInstallation, new { @class = "form-control" })
+                                                @Html.ValidationMessageFor(m => m.Installations[i].RangInstallation, "", new { @class = "text-danger" })
+                                            </td>
+                                            <td class="text-center">@Html.CheckBoxFor(m => m.Installations[i].EstPrincipale)</td>
+                                            <td>
+                                                @Html.TextBoxFor(m => m.Installations[i].DateDebut, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+                                                @Html.ValidationMessageFor(m => m.Installations[i].DateDebut, "", new { @class = "text-danger" })
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(m => m.Installations[i].DateFin, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+                                                @Html.ValidationMessageFor(m => m.Installations[i].DateFin, "", new { @class = "text-danger" })
+                                            </td>
+                                            <td class="text-center">@Html.CheckBoxFor(m => m.Installations[i].Supprimer, new { @class = "js-remove-flag" })</td>
+                                            <td class="text-center"><button type="button" class="btn btn-danger btn-sm js-remove-row"><i class="fa fa-times"></i></button></td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading clearfix">
+                            <strong>Départements</strong>
+                            <button type="button" class="btn btn-success btn-xs pull-right" id="btnAddUnite">
+                                <i class="fa fa-plus"></i> Ajouter
+                            </button>
+                        </div>
+                        <div class="panel-body">
+                            <table class="table table-bordered table-striped" id="tableUnites">
+                                <thead>
+                                    <tr>
+                                        <th>Département</th>
+                                        <th>Rang</th>
+                                        <th>Date début</th>
+                                        <th>Date fin</th>
+                                        <th>Retirer</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (int i = 0; i < Model.UnitesOrganisationnelles.Count; i++)
+                                    {
+                                        <tr>
+                                            @Html.HiddenFor(m => m.UnitesOrganisationnelles[i].MedecinUniteOrganisationnelleId)
+                                            <td>
+                                                @Html.DropDownListFor(
+                                                              m => m.UnitesOrganisationnelles[i].UniteOrganisationnelleId,
+                                                              new SelectList(Model.UnitesOrganisationnellesDisponibles, "Value", "Text", Model.UnitesOrganisationnelles[i].UniteOrganisationnelleId),
+                                                              "-- Sélectionner --",
+                                                              new { @class = "form-control" })
+                                                @Html.ValidationMessageFor(m => m.UnitesOrganisationnelles[i].UniteOrganisationnelleId, "", new { @class = "text-danger" })
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(m => m.UnitesOrganisationnelles[i].RangSource, new { @class = "form-control" })
+                                                @Html.ValidationMessageFor(m => m.UnitesOrganisationnelles[i].RangSource, "", new { @class = "text-danger" })
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(m => m.UnitesOrganisationnelles[i].DateDebut, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+                                                @Html.ValidationMessageFor(m => m.UnitesOrganisationnelles[i].DateDebut, "", new { @class = "text-danger" })
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(m => m.UnitesOrganisationnelles[i].DateFin, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+                                                @Html.ValidationMessageFor(m => m.UnitesOrganisationnelles[i].DateFin, "", new { @class = "text-danger" })
+                                            </td>
+                                            <td class="text-center">@Html.CheckBoxFor(m => m.UnitesOrganisationnelles[i].Supprimer, new { @class = "js-remove-flag" })</td>
+                                            <td class="text-center"><button type="button" class="btn btn-danger btn-sm js-remove-row"><i class="fa fa-times"></i></button></td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane" id="tab-nominations">
+                    <div class="panel panel-default">
+                        <div class="panel-heading clearfix">
+                            <strong>Nominations administratives</strong>
+                            <button type="button" class="btn btn-success btn-xs pull-right" id="btnAddNomination">
+                                <i class="fa fa-plus"></i> Ajouter
+                            </button>
+                        </div>
+                        <div class="panel-body">
+                            <table class="table table-bordered table-striped" id="tableNominations">
+                                <thead>
+                                    <tr>
+                                        <th>Nomination (référence)</th>
+                                        <th>Type de nomination</th>
+                                        <th>Description</th>
+                                        <th>Date nomination</th>
+                                        <th>Date fin</th>
+                                        <th>Active</th>
+                                        <th>Retirer</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (int i = 0; i < Model.NominationsAdministratives.Count; i++)
+                                    {
+                                        <tr>
+                                            @Html.HiddenFor(m => m.NominationsAdministratives[i].NominationAdministrativeId)
+                                            <td>
+                                                @Html.DropDownListFor(
+                                                              m => m.NominationsAdministratives[i].NominationId,
+                                                              new SelectList(
+                                                                  Model.NominationsDisponibles,
+                                                                  "Value",
+                                                                  "Text",
+                                                                  Model.NominationsAdministratives[i].NominationId),
+                                                              "-- Sélectionner --",
+                                                              new { @class = "form-control" })
+                                                @Html.ValidationMessageFor(
+                                                              m => m.NominationsAdministratives[i].NominationId,
+                                                              "",
+                                                              new { @class = "text-danger" })
+                                            </td>
+                                            <td>
+                                                @Html.DropDownListFor(
+                                                              m => m.NominationsAdministratives[i].TypeNominationId,
+                                                              new SelectList(
+                                                                  Model.TypesNominationDisponibles,
+                                                                  "Value",
+                                                                  "Text",
+                                                                  Model.NominationsAdministratives[i].TypeNominationId),
+                                                              "-- Sélectionner --",
+                                                              new { @class = "form-control" })
+                                                @Html.ValidationMessageFor(
+                                                              m => m.NominationsAdministratives[i].TypeNominationId,
+                                                              "",
+                                                              new { @class = "text-danger" })
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(
+                                                              m => m.NominationsAdministratives[i].LibelleNomination,
+                                                              new { @class = "form-control" })
+                                                @Html.ValidationMessageFor(
+                                                              m => m.NominationsAdministratives[i].LibelleNomination,
+                                                              "",
+                                                              new { @class = "text-danger" })
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(
+                                                              m => m.NominationsAdministratives[i].DateNomination,
+                                                              "{0:yyyy-MM-dd}",
+                                                              new { @class = "form-control", type = "date" })
+                                                @Html.ValidationMessageFor(
+                                                              m => m.NominationsAdministratives[i].DateNomination,
+                                                              "",
+                                                              new { @class = "text-danger" })
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(
+                                                              m => m.NominationsAdministratives[i].DateFin,
+                                                              "{0:yyyy-MM-dd}",
+                                                              new { @class = "form-control", type = "date" })
+                                                @Html.ValidationMessageFor(
+                                                              m => m.NominationsAdministratives[i].DateFin,
+                                                              "",
+                                                              new { @class = "text-danger" })
+                                            </td>
+                                            <td class="text-center">
+                                                @Html.CheckBoxFor(m => m.NominationsAdministratives[i].EstActive)
+                                            </td>
+                                            <td class="text-center">
+                                                @Html.CheckBoxFor(
+                                                              m => m.NominationsAdministratives[i].Supprimer,
+                                                              new { @class = "js-remove-flag" })
+                                            </td>
+                                            <td class="text-center">
+                                                <button type="button" class="btn btn-danger btn-sm js-remove-row">
+                                                    <i class="fa fa-times"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane" id="tab-commentaires">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Commentaires)
+                        @Html.TextAreaFor(m => m.Commentaires, 8, 20, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.Commentaires, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-right" style="margin-bottom:30px;">
+        @Html.ActionLink("Annuler", "Index", null, new { @class = "btn btn-default" })
+        <button type="submit" class="btn btn-primary">
+            <i class="fa fa-save"></i> Enregistrer
+        </button>
+    </div>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+        var adresseIndex = @Model.Adresses.Count;
+        var telephoneIndex = @Model.Telephones.Count;
+        var courrielIndex = @Model.Courriels.Count;
+        var installationIndex = @Model.Installations.Count;
+        var uniteIndex = @Model.UnitesOrganisationnelles.Count;
+        var nominationIndex = @Model.NominationsAdministratives.Count;
+
+        var telephoneOptions = '@Html.Raw(string.Join("", Model.TypesTelephoneDisponibles.Select(x => "<option value=\"" + x.Value + "\">" + HttpUtility.HtmlEncode(x.Text) + "</option>")))';
+        var courrielOptions = '@Html.Raw(string.Join("", Model.TypesCourrielDisponibles.Select(x => "<option value=\"" + x.Value + "\">" + HttpUtility.HtmlEncode(x.Text) + "</option>")))';
+        var installationOptions = '@Html.Raw(string.Join("", Model.InstallationsDisponibles.Select(x => "<option value=\"" + x.Value + "\">" + HttpUtility.HtmlEncode(x.Text) + "</option>")))';
+        var uniteOptions = '@Html.Raw(string.Join("", Model.UnitesOrganisationnellesDisponibles.Select(x => "<option value=\"" + x.Value + "\">" + HttpUtility.HtmlEncode(x.Text) + "</option>")))';
+        var nominationOptions = '@Html.Raw(string.Join("", Model.NominationsDisponibles.Select(x => "<option value=\"" + x.Value + "\">" + HttpUtility.HtmlEncode(x.Text) + "</option>")))';
+        var typeNominationOptions = '@Html.Raw(string.Join("", Model.TypesNominationDisponibles.Select(x => "<option value=\"" + x.Value + "\">" + HttpUtility.HtmlEncode(x.Text) + "</option>")))';
+
+        function reparserValidation() {
+            var form = $("#formMedecinEdit");
+            form.removeData("validator");
+            form.removeData("unobtrusiveValidation");
+            $.validator.unobtrusive.parse(form);
+        }
+
+        function ouvrirOngletErreur() {
+            var $firstError = $(".input-validation-error, .field-validation-error").filter(":visible").first();
+
+            if ($firstError.length === 0) {
+                $firstError = $(".input-validation-error, .field-validation-error").first();
+            }
+
+            if ($firstError.length > 0) {
+                var $tabPane = $firstError.closest(".tab-pane");
+                if ($tabPane.length > 0) {
+                    $('.nav-tabs a[href="#' + $tabPane.attr("id") + '"]').tab("show");
+                }
+            }
+        }
+
+        $(function () {
+            $('.nav-tabs a').on('click', function (e) {
+                e.preventDefault();
+                $(this).tab('show');
+            });
+
+            ouvrirOngletErreur();
+        });
+
+        $(document).on("click", ".js-remove-row", function () {
+            var $row = $(this).closest("tr");
+            var hiddenId = $row.find("input[type='hidden'][name$='Id']").first().val();
+            var $flag = $row.find(".js-remove-flag");
+
+            if (hiddenId && hiddenId !== "0") {
+                $flag.prop("checked", true);
+                $row.hide();
+            } else {
+                $row.remove();
+            }
+        });
+
+        $("#btnAddTelephone").on("click", function () {
+            var html = `
+                <tr>
+                    <td style="display:none;">
+                        <input type="hidden" name="Telephones[${telephoneIndex}].MedecinTelephoneId" value="0" />
+                    </td>
+                    <td>
+                        <select class="form-control" name="Telephones[${telephoneIndex}].TypeTelephone">
+                            <option value="">-- Sélectionner --</option>
+                            ${telephoneOptions}
+                        </select>
+                    </td>
+                    <td>
+                        <input class="form-control" name="Telephones[${telephoneIndex}].NumeroTelephone" type="text" />
+                    </td>
+                    <td>
+                        <input class="form-control" name="Telephones[${telephoneIndex}].RangSource" type="text" />
+                    </td>
+                    <td class="text-center">
+                        <input name="Telephones[${telephoneIndex}].EstPrincipal" type="checkbox" value="true" />
+                        <input name="Telephones[${telephoneIndex}].EstPrincipal" type="hidden" value="false" />
+                    </td>
+                    <td class="text-center">
+                        <input class="js-remove-flag" name="Telephones[${telephoneIndex}].Supprimer" type="checkbox" value="true" />
+                        <input name="Telephones[${telephoneIndex}].Supprimer" type="hidden" value="false" />
+                    </td>
+                    <td class="text-center">
+                        <button type="button" class="btn btn-danger btn-sm js-remove-row">
+                            <i class="fa fa-times"></i>
+                        </button>
+                    </td>
+                </tr>`;
+
+            $("#tableTelephones tbody").append(html);
+            telephoneIndex++;
+            reparserValidation();
+        });
+
+        $("#btnAddCourriel").on("click", function () {
+            var html = `
+                <tr>
+                    <td style="display:none;">
+                        <input type="hidden" name="Courriels[${courrielIndex}].MedecinCourrielId" value="0" />
+                    </td>
+                    <td>
+                        <select class="form-control" name="Courriels[${courrielIndex}].TypeCourriel">
+                            <option value="">-- Sélectionner --</option>
+                            ${courrielOptions}
+                        </select>
+                    </td>
+                    <td>
+                        <input class="form-control" name="Courriels[${courrielIndex}].AdresseCourriel" type="text" />
+                    </td>
+                    <td>
+                        <input class="form-control" name="Courriels[${courrielIndex}].RangSource" type="text" />
+                    </td>
+                    <td class="text-center">
+                        <input name="Courriels[${courrielIndex}].EstPrincipal" type="checkbox" value="true" />
+                        <input name="Courriels[${courrielIndex}].EstPrincipal" type="hidden" value="false" />
+                    </td>
+                    <td class="text-center">
+                        <input class="js-remove-flag" name="Courriels[${courrielIndex}].Supprimer" type="checkbox" value="true" />
+                        <input name="Courriels[${courrielIndex}].Supprimer" type="hidden" value="false" />
+                    </td>
+                    <td class="text-center">
+                        <button type="button" class="btn btn-danger btn-sm js-remove-row">
+                            <i class="fa fa-times"></i>
+                        </button>
+                    </td>
+                </tr>`;
+
+            $("#tableCourriels tbody").append(html);
+            courrielIndex++;
+            reparserValidation();
+        });
+
+        $("#btnAddAdresse").on("click", function () {
+            var html = `
+                <tr>
+                    <td style="display:none;">
+                        <input type="hidden" name="Adresses[${adresseIndex}].MedecinAdresseId" value="0" />
+                    </td>
+                    <td><input class="form-control" name="Adresses[${adresseIndex}].AdresseLigne1" type="text" /></td>
+                    <td><input class="form-control" name="Adresses[${adresseIndex}].Ville" type="text" /></td>
+                    <td><input class="form-control" name="Adresses[${adresseIndex}].Province" type="text" /></td>
+                    <td><input class="form-control" name="Adresses[${adresseIndex}].CodePostal" type="text" /></td>
+                    <td class="text-center">
+                        <input name="Adresses[${adresseIndex}].EstPrincipale" type="checkbox" value="true" />
+                        <input name="Adresses[${adresseIndex}].EstPrincipale" type="hidden" value="false" />
+                    </td>
+                    <td class="text-center">
+                        <input class="js-remove-flag" name="Adresses[${adresseIndex}].Supprimer" type="checkbox" value="true" />
+                        <input name="Adresses[${adresseIndex}].Supprimer" type="hidden" value="false" />
+                    </td>
+                    <td class="text-center">
+                        <button type="button" class="btn btn-danger btn-sm js-remove-row">
+                            <i class="fa fa-times"></i>
+                        </button>
+                    </td>
+                </tr>`;
+
+            $("#tableAdresses tbody").append(html);
+            adresseIndex++;
+            reparserValidation();
+        });
+
+        $("#btnAddInstallation").on("click", function () {
+            var html = `
+                <tr>
+                    <td style="display:none;">
+                        <input type="hidden" name="Installations[${installationIndex}].MedecinInstallationId" value="0" />
+                    </td>
+                    <td>
+                        <select class="form-control" name="Installations[${installationIndex}].InstallationId">
+                            <option value="">-- Sélectionner --</option>
+                            ${installationOptions}
+                        </select>
+                    </td>
+                    <td>
+                        <input class="form-control" name="Installations[${installationIndex}].RangInstallation" type="text" value="1" />
+                    </td>
+                    <td class="text-center">
+                        <input name="Installations[${installationIndex}].EstPrincipale" type="checkbox" value="true" />
+                        <input name="Installations[${installationIndex}].EstPrincipale" type="hidden" value="false" />
+                    </td>
+                    <td>
+                        <input class="form-control" name="Installations[${installationIndex}].DateDebut" type="date" />
+                    </td>
+                    <td>
+                        <input class="form-control" name="Installations[${installationIndex}].DateFin" type="date" />
+                    </td>
+                    <td class="text-center">
+                        <input class="js-remove-flag" name="Installations[${installationIndex}].Supprimer" type="checkbox" value="true" />
+                        <input name="Installations[${installationIndex}].Supprimer" type="hidden" value="false" />
+                    </td>
+                    <td class="text-center">
+                        <button type="button" class="btn btn-danger btn-sm js-remove-row">
+                            <i class="fa fa-times"></i>
+                        </button>
+                    </td>
+                </tr>`;
+
+            $("#tableInstallations tbody").append(html);
+            installationIndex++;
+            reparserValidation();
+        });
+
+        $("#btnAddUnite").on("click", function () {
+            var html = `
+                <tr>
+                    <td style="display:none;">
+                        <input type="hidden" name="UnitesOrganisationnelles[${uniteIndex}].MedecinUniteOrganisationnelleId" value="0" />
+                    </td>
+                    <td>
+                        <select class="form-control" name="UnitesOrganisationnelles[${uniteIndex}].UniteOrganisationnelleId">
+                            <option value="">-- Sélectionner --</option>
+                            ${uniteOptions}
+                        </select>
+                    </td>
+                    <td>
+                        <input class="form-control" name="UnitesOrganisationnelles[${uniteIndex}].RangSource" type="text" />
+                    </td>
+                    <td>
+                        <input class="form-control" name="UnitesOrganisationnelles[${uniteIndex}].DateDebut" type="date" />
+                    </td>
+                    <td>
+                        <input class="form-control" name="UnitesOrganisationnelles[${uniteIndex}].DateFin" type="date" />
+                    </td>
+                    <td class="text-center">
+                        <input class="js-remove-flag" name="UnitesOrganisationnelles[${uniteIndex}].Supprimer" type="checkbox" value="true" />
+                        <input name="UnitesOrganisationnelles[${uniteIndex}].Supprimer" type="hidden" value="false" />
+                    </td>
+                    <td class="text-center">
+                        <button type="button" class="btn btn-danger btn-sm js-remove-row">
+                            <i class="fa fa-times"></i>
+                        </button>
+                    </td>
+                </tr>`;
+
+            $("#tableUnites tbody").append(html);
+            uniteIndex++;
+            reparserValidation();
+        });
+
+        $("#btnAddNomination").on("click", function () {
+            var html = `
+                <tr>
+                    <td style="display:none;">
+                        <input type="hidden" name="NominationsAdministratives[${nominationIndex}].NominationAdministrativeId" value="0" />
+                    </td>
+                    <td>
+                        <select class="form-control" name="NominationsAdministratives[${nominationIndex}].NominationId">
+                            <option value="">-- Sélectionner --</option>
+                            ${nominationOptions}
+                        </select>
+                    </td>
+                    <td>
+                        <select class="form-control" name="NominationsAdministratives[${nominationIndex}].TypeNominationId">
+                            <option value="">-- Sélectionner --</option>
+                            ${typeNominationOptions}
+                        </select>
+                    </td>
+                    <td>
+                        <input class="form-control" name="NominationsAdministratives[${nominationIndex}].LibelleNomination" type="text" />
+                    </td>
+                    <td>
+                        <input class="form-control" name="NominationsAdministratives[${nominationIndex}].DateNomination" type="date" />
+                    </td>
+                    <td>
+                        <input class="form-control" name="NominationsAdministratives[${nominationIndex}].DateFin" type="date" />
+                    </td>
+                    <td class="text-center">
+                        <input name="NominationsAdministratives[${nominationIndex}].EstActive" type="checkbox" value="true" />
+                        <input name="NominationsAdministratives[${nominationIndex}].EstActive" type="hidden" value="false" />
+                    </td>
+                    <td class="text-center">
+                        <input class="js-remove-flag" name="NominationsAdministratives[${nominationIndex}].Supprimer" type="checkbox" value="true" />
+                        <input name="NominationsAdministratives[${nominationIndex}].Supprimer" type="hidden" value="false" />
+                    </td>
+                    <td class="text-center">
+                        <button type="button" class="btn btn-danger btn-sm js-remove-row">
+                            <i class="fa fa-times"></i>
+                        </button>
+                    </td>
+                </tr>`;
+
+            $("#tableNominations tbody").append(html);
+            nominationIndex++;
+            reparserValidation();
+        });
+    </script>
+}

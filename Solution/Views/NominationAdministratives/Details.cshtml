@@ -1,0 +1,39 @@
+﻿@model Solution.ViewModels.Nominations.NominationAdministrativeDetailsViewModel
+
+@{
+    ViewBag.Title = "Détails de la nomination administrative";
+}
+
+<div class="page-header-custom">
+    <h2>Détails de la nomination administrative</h2>
+</div>
+
+<div class="dashboard-card">
+    <dl class="dl-horizontal">
+        <dt>Médecin</dt>
+        <dd>@Model.MedecinNomComplet</dd>
+
+        <dt>Nomination</dt>
+        <dd>@Model.LibelleNomination</dd>
+
+        <dt>Type</dt>
+        <dd>@Model.TypeNominationLibelle</dd>
+
+        <dt>Date nomination</dt>
+        <dd>@(Model.DateNomination.HasValue ? Model.DateNomination.Value.ToString("yyyy-MM-dd") : "")</dd>
+
+        <dt>Date fin</dt>
+        <dd>@(Model.DateFin.HasValue ? Model.DateFin.Value.ToString("yyyy-MM-dd") : "")</dd>
+
+        <dt>Active</dt>
+        <dd>@(Model.EstActive ? "Oui" : "Non")</dd>
+    </dl>
+</div>
+
+<div class="dashboard-card">
+    @Html.ActionLink("Retour", "Index", null, new { @class = "btn btn-default" })
+    @if (User.IsInRole("Admin") || User.IsInRole("SuperUtilisateur"))
+    {
+        @Html.ActionLink("Modifier", "Edit", new { id = Model.NominationAdministrativeId }, new { @class = "btn btn-warning" })
+    }
+</div>

@@ -1,0 +1,34 @@
+﻿@model Solution.ViewModels.MedecinsUnitesOrganisationnelles.MedecinUniteOrganisationnelleFormViewModel
+
+<div class="dashboard-card">
+    <div class="form-group">
+        @Html.LabelFor(m => m.MedecinId)
+        @Html.DropDownListFor(m => m.MedecinId, Model.MedecinIdOptions, "-- Sélectionner --", new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.MedecinId, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.UniteOrganisationnelleId)
+        @Html.DropDownListFor(m => m.UniteOrganisationnelleId, Model.UniteOrganisationnelleIdOptions, "-- Sélectionner --", new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.UniteOrganisationnelleId, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.RangSource)
+        @Html.TextBoxFor(m => m.RangSource, new { @class = "form-control", type = "number" })
+        @Html.ValidationMessageFor(m => m.RangSource, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.RoleOrganisationnel)
+        @Html.TextBoxFor(m => m.RoleOrganisationnel, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.RoleOrganisationnel, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.DateDebut)
+        @Html.TextBoxFor(m => m.DateDebut, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+        @Html.ValidationMessageFor(m => m.DateDebut, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.DateFin)
+        @Html.TextBoxFor(m => m.DateFin, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+        @Html.ValidationMessageFor(m => m.DateFin, "", new { @class = "text-danger" })
+    </div>
+</div>

@@ -1,0 +1,28 @@
+﻿@model Solution.ViewModels.MedecinsTelephones.MedecinTelephoneFormViewModel
+
+<div class="dashboard-card">
+    <div class="form-group">
+        @Html.LabelFor(m => m.MedecinId)
+        @Html.DropDownListFor(m => m.MedecinId, Model.MedecinIdOptions, "-- Sélectionner --", new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.MedecinId, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.TypeTelephone)
+        @Html.TextBoxFor(m => m.TypeTelephone, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.TypeTelephone, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.NumeroTelephone)
+        @Html.TextBoxFor(m => m.NumeroTelephone, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.NumeroTelephone, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.RangSource)
+        @Html.TextBoxFor(m => m.RangSource, new { @class = "form-control", type = "number" })
+        @Html.ValidationMessageFor(m => m.RangSource, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        <div class="checkbox"><label>@Html.CheckBoxFor(m => m.EstPrincipal) Principal</label></div>
+        @Html.ValidationMessageFor(m => m.EstPrincipal, "", new { @class = "text-danger" })
+    </div>
+</div>

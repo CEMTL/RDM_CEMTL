@@ -1,0 +1,28 @@
+﻿@model Solution.ViewModels.JournalImports.JournalImportDetailsViewModel
+@{
+    ViewBag.Title = "Détails JournalImport";
+}
+
+<div class="page-header-custom">
+    <h2>Détails JournalImport</h2>
+</div>
+
+<div class="dashboard-card">
+    <dl class="dl-horizontal">
+        <dt>Nom fichier</dt>
+        <dd>@Model.NomFichier</dd>
+        <dt>Date import</dt>
+        <dd>@Model.DateImport.ToString("yyyy-MM-dd HH:mm")</dd>
+        <dt>Lignes importées</dt>
+        <dd>@Model.LignesImportees</dd>
+        <dt>Lignes rejetées</dt>
+        <dd>@Model.LignesRejetees</dd>
+        <dt>Commentaire</dt>
+        <dd>@Model.Commentaire</dd>
+    </dl>
+</div>
+
+<div class="dashboard-card actions-card">
+    <a href="@Url.Action("Edit", new { id = Model.JournalImportId })" class="btn btn-warning btn-icon-only" title="Modifier"><i class="fa-solid fa-pen-to-square"></i></a>
+    <a href="@Url.Action("Index")" class="btn btn-default btn-icon-only" title="Retour"><i class="fa-solid fa-arrow-left"></i></a>
+</div>

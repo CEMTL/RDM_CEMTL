@@ -1,0 +1,26 @@
+﻿@model Solution.ViewModels.UnitesOrganisationnelles.UniteOrganisationnelleDetailsViewModel
+@{
+    ViewBag.Title = "Détails Département";
+}
+
+<div class="page-header-custom">
+    <h2>Détails UniteOrganisationnelle</h2>
+</div>
+
+<div class="dashboard-card">
+    <dl class="dl-horizontal">
+        <dt>Libellé</dt>
+        <dd>@Model.Libelle</dd>
+        <dt>Type</dt>
+        <dd>@Model.TypeUnite</dd>
+        <dt>Département parent</dt>
+        <dd>@Model.UniteParentLibelle</dd>
+        <dt>Actif</dt>
+        <dd>@(Model.EstActif ? "Oui" : "Non")</dd>
+    </dl>
+</div>
+
+<div class="dashboard-card actions-card">
+    <a href="@Url.Action("Edit", new { id = Model.UniteOrganisationnelleId })" class="btn btn-warning btn-icon-only" title="Modifier"><i class="fa-solid fa-pen-to-square"></i></a>
+    <a href="@Url.Action("Index")" class="btn btn-default btn-icon-only" title="Retour"><i class="fa-solid fa-arrow-left"></i></a>
+</div>

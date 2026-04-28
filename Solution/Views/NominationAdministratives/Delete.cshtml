@@ -1,0 +1,27 @@
+﻿@model Solution.ViewModels.Nominations.NominationAdministrativeDetailsViewModel
+
+@{
+    ViewBag.Title = "Supprimer la nomination administrative";
+}
+
+<div class="page-header-custom">
+    <h2>Supprimer la nomination administrative</h2>
+</div>
+
+<div class="alert alert-danger">
+    <strong>Attention :</strong> cette suppression est définitive.
+</div>
+
+<div class="dashboard-card">
+    <p><strong>@Model.MedecinNomComplet</strong></p>
+    <p>@Model.LibelleNomination</p>
+</div>
+
+@using (Html.BeginForm("Delete", "NominationsAdministratives", new { id = Model.NominationAdministrativeId }, FormMethod.Post, null))
+{
+    @Html.AntiForgeryToken()
+    <div class="dashboard-card">
+        <button type="submit" class="btn btn-danger">Supprimer</button>
+        @Html.ActionLink("Annuler", "Index", null, new { @class = "btn btn-default" })
+    </div>
+}

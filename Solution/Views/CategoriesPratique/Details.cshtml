@@ -1,0 +1,47 @@
+﻿@model Solution.ViewModels.CategoriesPratique.CategoriePratiqueDetailsViewModel
+
+@{
+    ViewBag.Title = "Détails de la catégorie pratique";
+}
+
+<div class="page-header-custom">
+    <div class="row">
+        <div class="col-md-8">
+            <h2>Détails de la catégorie pratique</h2>
+        </div>
+        <div class="col-md-4 text-right" style="margin-top:25px;">
+            @Html.ActionLink("Retour à la liste", "Index", null, new { @class = "btn btn-default" })
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-card">
+    <table class="table table-bordered table-striped">
+        <tr>
+            <th style="width:220px;">ID</th>
+            <td>@Model.CategoriePratiqueId</td>
+        </tr>
+        <tr>
+            <th>Libellé</th>
+            <td>@Model.Libelle</td>
+        </tr>
+        <tr>
+            <th>Actif</th>
+            <td>@(Model.EstActif ? "Oui" : "Non")</td>
+        </tr>
+    </table>
+
+    <div class="text-right">
+        @if (User.IsInRole("Admin") || User.IsInRole("SuperUtilisateur"))
+        {
+            <a href="@Url.Action("Edit", new { id = Model.CategoriePratiqueId })" class="btn btn-warning">
+                <i class="fa-solid fa-pen-to-square"></i> Modifier
+            </a>
+            <a href="@Url.Action("Delete", new { id = Model.CategoriePratiqueId })" class="btn btn-danger">
+                <i class="fa-solid fa-trash"></i> Supprimer
+            </a>
+        }
+
+        @Html.ActionLink("Retour", "Index", null, new { @class = "btn btn-default" })
+    </div>
+</div>

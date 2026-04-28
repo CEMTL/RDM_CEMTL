@@ -1,0 +1,24 @@
+﻿@model Solution.ViewModels.DossiersPrivilegeDecision.DossierPrivilegeDecisionFormViewModel
+@{
+    ViewBag.Title = "Modifier DossierPrivilegeDecision";
+}
+
+<div class="page-header-custom">
+    <h2>Modifier DossierPrivilegeDecision</h2>
+</div>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.DossierPrivilegeDecisionId)
+    @Html.Partial("_Form", Model)
+
+    <div class="dashboard-card">
+        <button type="submit" class="btn btn-success">Enregistrer</button>
+        @Html.ActionLink("Retour", "Index", null, new { @class = "btn btn-default" })
+    </div>
+}
+
+@section Scripts {
+    @Html.Partial("_ValidationScriptsPartial")
+}

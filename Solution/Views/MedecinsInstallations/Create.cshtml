@@ -1,0 +1,24 @@
+﻿@model Solution.ViewModels.MedecinsInstallations.MedecinInstallationFormViewModel
+@{
+    ViewBag.Title = "Créer MedecinInstallation";
+}
+
+<div class="page-header-custom">
+    <h2>Créer MedecinInstallation</h2>
+</div>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.MedecinInstallationId)
+    @Html.Partial("_Form", Model)
+
+    <div class="dashboard-card">
+        <button type="submit" class="btn btn-success">Enregistrer</button>
+        @Html.ActionLink("Retour", "Index", null, new { @class = "btn btn-default" })
+    </div>
+}
+
+@section Scripts {
+    @Html.Partial("_ValidationScriptsPartial")
+}

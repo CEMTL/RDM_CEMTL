@@ -1,0 +1,117 @@
+﻿@model Solution.ViewModels.CotisationsAnnuelles.CotisationAnnuelleFormViewModel
+
+<div class="dashboard-card">
+    <div class="form-group">
+        @Html.LabelFor(m => m.MedecinId)
+        @Html.DropDownListFor(m => m.MedecinId, Model.MedecinIdOptions, "-- Sélectionner --", new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.MedecinId, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.AnneeExercice)
+        @Html.TextBoxFor(m => m.AnneeExercice, new { @class = "form-control", type = "number" })
+        @Html.ValidationMessageFor(m => m.AnneeExercice, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.CodeCotisationId)
+        @Html.DropDownListFor(m => m.CodeCotisationId, Model.CodeCotisationIdOptions, "-- Sélectionner --", new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.CodeCotisationId, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.DescriptionSource)
+        @Html.TextBoxFor(m => m.DescriptionSource, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.DescriptionSource, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.MontantInitial)
+        @Html.TextBoxFor(m => m.MontantInitial, new { @class = "form-control", type = "number", step = "0.01" })
+        @Html.ValidationMessageFor(m => m.MontantInitial, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        <div class="checkbox">
+            <label>
+                @Html.CheckBox("ReductionAppliquee", Model.ReductionAppliquee ?? false)
+                Réduction
+            </label>
+        </div>
+        @Html.ValidationMessageFor(m => m.ReductionAppliquee, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.MotifReduction)
+        @Html.TextBoxFor(m => m.MotifReduction, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.MotifReduction, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.MontantReduction)
+        @Html.TextBoxFor(m => m.MontantReduction, new { @class = "form-control", type = "number", step = "0.01" })
+        @Html.ValidationMessageFor(m => m.MontantReduction, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        <div class="checkbox">
+            <label>
+                @Html.CheckBox("ReductionAppliquee", Model.ReductionAppliquee ?? false)
+                Réduction
+            </label>
+        </div>        
+        @Html.ValidationMessageFor(m => m.PenaliteAppliquee, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.PenaliteTexte)
+        @Html.TextAreaFor(m => m.PenaliteTexte, 4, 80, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.PenaliteTexte, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.MontantPenalite)
+        @Html.TextBoxFor(m => m.MontantPenalite, new { @class = "form-control", type = "number", step = "0.01" })
+        @Html.ValidationMessageFor(m => m.MontantPenalite, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.MontantFinal)
+        @Html.TextBoxFor(m => m.MontantFinal, new { @class = "form-control", type = "number", step = "0.01" })
+        @Html.ValidationMessageFor(m => m.MontantFinal, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.EtatCotisation)
+        @Html.TextBoxFor(m => m.EtatCotisation, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.EtatCotisation, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.MontantPaye)
+        @Html.TextBoxFor(m => m.MontantPaye, new { @class = "form-control", type = "number", step = "0.01" })
+        @Html.ValidationMessageFor(m => m.MontantPaye, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.DatePaiement)
+        @Html.TextBoxFor(m => m.DatePaiement, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+        @Html.ValidationMessageFor(m => m.DatePaiement, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.TypePaiementTexte)
+        @Html.TextAreaFor(m => m.TypePaiementTexte, 4, 80, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.TypePaiementTexte, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.TypePaiementId)
+        @Html.DropDownListFor(m => m.TypePaiementId, Model.TypePaiementIdOptions, "-- Sélectionner --", new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.TypePaiementId, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.DateDepot)
+        @Html.TextBoxFor(m => m.DateDepot, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+        @Html.ValidationMessageFor(m => m.DateDepot, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.NoDepot)
+        @Html.TextBoxFor(m => m.NoDepot, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.NoDepot, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.RecuImposition)
+        @Html.TextBoxFor(m => m.RecuImposition, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.RecuImposition, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.DateRecuImposition)
+        @Html.TextBoxFor(m => m.DateRecuImposition, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+        @Html.ValidationMessageFor(m => m.DateRecuImposition, "", new { @class = "text-danger" })
+    </div>
+</div>

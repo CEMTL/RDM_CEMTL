@@ -1,0 +1,24 @@
+﻿@model Solution.ViewModels.Comites.ComiteDetailsViewModel
+@{
+    ViewBag.Title = "Détails Comite";
+}
+
+<div class="page-header-custom">
+    <h2>Détails Comite</h2>
+</div>
+
+<div class="dashboard-card">
+    <dl class="dl-horizontal">
+        <dt>Numéro source</dt>
+        <dd>@Model.NumeroSource</dd>
+        <dt>Comité</dt>
+        <dd>@Model.NomComite</dd>
+        <dt>Actif</dt>
+        <dd>@(Model.EstActif ? "Oui" : "Non")</dd>
+    </dl>
+</div>
+
+<div class="dashboard-card actions-card">
+    <a href="@Url.Action("Edit", new { id = Model.ComiteId })" class="btn btn-warning btn-icon-only" title="Modifier"><i class="fa-solid fa-pen-to-square"></i></a>
+    <a href="@Url.Action("Index")" class="btn btn-default btn-icon-only" title="Retour"><i class="fa-solid fa-arrow-left"></i></a>
+</div>

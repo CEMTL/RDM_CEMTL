@@ -1,0 +1,24 @@
+﻿@model Solution.ViewModels.MedecinsAdresses.MedecinAdresseFormViewModel
+@{
+    ViewBag.Title = "Créer MedecinAdresse";
+}
+
+<div class="page-header-custom">
+    <h2>Créer MedecinAdresse</h2>
+</div>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.MedecinAdresseId)
+    @Html.Partial("_Form", Model)
+
+    <div class="dashboard-card">
+        <button type="submit" class="btn btn-success">Enregistrer</button>
+        @Html.ActionLink("Retour", "Index", null, new { @class = "btn btn-default" })
+    </div>
+}
+
+@section Scripts {
+    @Html.Partial("_ValidationScriptsPartial")
+}
