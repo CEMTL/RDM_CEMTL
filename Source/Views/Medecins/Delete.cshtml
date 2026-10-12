@@ -1,0 +1,95 @@
+﻿@model Solution.ViewModels.Medecins.MedecinDeleteViewModel
+
+@{
+    ViewBag.Title = "Supprimer un médecin";
+}
+
+<div class="page-header">
+    <div class="row">
+        <div class="col-md-8">
+            <h2><i class="fa-solid fa-trash"></i> Supprimer un médecin</h2>
+        </div>
+        <div class="col-md-4 text-right" style="margin-top:25px;">
+            @Html.ActionLink("Retour à la liste", "Index", null, new { @class = "btn btn-default" })
+        </div>
+    </div>
+</div>
+
+@await Html.PartialAsync("~/Views/Shared/_Alerts.cshtml")
+
+<div class="dashboard-card">
+    @if (Model.SuppressionBloquee)
+    {
+        <div class="alert alert-warning">
+            <strong><i class="fa-solid fa-triangle-exclamation"></i> Suppression impossible.</strong>
+            Ce médecin possède encore des données métier ou historiques. Elles doivent être retirées ou réaffectées avant de pouvoir supprimer le médecin.
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-danger">
+            <strong>Attention :</strong> cette action supprimera définitivement le médecin ainsi que ses coordonnées et associations techniques affichées ci-dessous.
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-md-6">
+            <table class="table table-bordered table-striped">
+                <tr><th>Permis</th><td>@Model.Permis</td></tr>
+                <tr><th>Médecin</th><td>@Model.NomComplet</td></tr>
+                <tr><th>Type permis</th><td>@Model.TypePermis</td></tr>
+                <tr><th>Statut</th><td>@Model.StatutMedecin</td></tr>
+                <tr><th>Catégorie</th><td>@Model.CategoriePratique</td></tr>
+                <tr><th>Actif</th><td>@(Model.EstActif ? "Oui" : "Non")</td></tr>
+            </table>
+        </div>
+
+        <div class="col-md-6">
+            <h4>Données supprimées avec le médecin</h4>
+            <table class="table table-bordered table-striped">
+                <tr><th>Adresses</th><td>@Model.NbAdresses</td></tr>
+                <tr><th>Téléphones</th><td>@Model.NbTelephones</td></tr>
+                <tr><th>Courriels</th><td>@Model.NbCourriels</td></tr>
+                <tr><th>Installations</th><td>@Model.NbInstallations</td></tr>
+                <tr><th>Nominations</th><td>@Model.NbNominationsAdministratives</td></tr>
+                <tr><th>Total</th><td><strong>@Model.TotalDependances</strong></td></tr>
+            </table>
+        </div>
+    </div>
+
+    @if (Model.SuppressionBloquee)
+    {
+        <div class="panel panel-warning" style="margin-top:15px;">
+            <div class="panel-heading"><strong>Données qui bloquent la suppression</strong></div>
+            <div class="panel-body" style="padding:0;">
+                <table class="table table-bordered" style="margin-bottom:0;">
+                    @if (Model.NbCotisationsAnnuelles > 0) { <tr><th>Cotisations annuelles</th><td>@Model.NbCotisationsAnnuelles</td></tr> }
+                    @if (Model.NbEntentesFDC > 0) { <tr><th>Ententes FDC</th><td>@Model.NbEntentesFDC</td></tr> }
+                    @if (Model.NbFitTests > 0) { <tr><th>Fit Tests</th><td>@Model.NbFitTests</td></tr> }
+                     @if (Model.NbComites > 0) { <tr><th>Comités</th><td>@Model.NbComites</td></tr> } 
+                    @if (Model.NbPrivileges > 0) { <tr><th>Privilèges</th><td>@Model.NbPrivileges</td></tr> }
+                    @if (Model.NbAffectationsOrganisationnelles > 0) { <tr><th>Fonctions organisationnelles</th><td>@Model.NbAffectationsOrganisationnelles</td></tr> }
+                    @if (Model.NbAffectationsCliniques > 0) { <tr><th>Affectations cliniques</th><td>@Model.NbAffectationsCliniques</td></tr> }
+                    @if (Model.NbDocuments > 0) { <tr><th>Documents actifs</th><td>@Model.NbDocuments</td></tr> }
+                    <tr class="warning"><th>Total bloquant</th><td><strong>@Model.TotalDependancesBloquantes</strong></td></tr>
+                </table>
+            </div>
+        </div>
+    }
+
+    @using (Html.BeginForm("Delete", "Medecins", null, FormMethod.Post, null, null))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(m => m.MedecinId)
+
+        <div class="text-right" style="margin-top:15px;">
+            @Html.ActionLink("Annuler", "Index", null, new { @class = "btn btn-default" })
+            @if (!Model.SuppressionBloquee)
+            {
+                <button type="submit" class="btn btn-danger">
+                    <i class="fa-solid fa-trash"></i> Confirmer la suppression
+                </button>
+            }
+        </div>
+    }
+</div>

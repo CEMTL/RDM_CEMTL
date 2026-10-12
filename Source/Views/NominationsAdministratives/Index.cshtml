@@ -1,0 +1,85 @@
+﻿@model IEnumerable<Solution.ViewModels.Nominations.NominationAdministrativeListViewModel>
+@{
+    ViewBag.Title = "Nominations administratives";
+    var canManage = ViewBag.CanManage != null && (bool)ViewBag.CanManage;
+}
+
+@await Html.PartialAsync("~/Views/Shared/_Alerts.cshtml")
+
+<div class="page-header-custom">
+    <div class="row">
+        <div class="col-md-8"><h2>Nominations administratives</h2></div>
+        <div class="col-md-4 text-right" style="margin-top:25px;">
+            @if (canManage)
+            {
+                <a href="@Url.Action("Create")" class="btn btn-success"><i class="fa-solid fa-plus"></i> Nouvelle nomination</a>
+            }
+        </div>
+    </div>
+</div>
+
+@using (Html.BeginForm("Index", "NominationsAdministratives", null, FormMethod.Get, null, new { @class = "dashboard-card" }))
+{
+    <div class="row">
+        <div class="col-md-4">
+            <label>Recherche</label>
+            <input type="text" name="search" value="@ViewBag.Search" class="form-control" placeholder="Médecin, permis, nomination, type..." />
+        </div>
+        <div class="col-md-3">
+            <label>Médecin</label>
+            @Html.DropDownList("medecinId", (SelectList)ViewBag.MedecinId, "-- Tous --", new { @class = "form-control" })
+        </div>
+        <div class="col-md-3">
+            <label>Type nomination</label>
+            @Html.DropDownList("typeNominationId", (SelectList)ViewBag.TypeNominationId, "-- Tous --", new { @class = "form-control" })
+        </div>
+        <div class="col-md-2">
+            <label>&nbsp;</label>
+            <div class="checkbox"><label>
+                @if (ViewBag.ActivesSeulement != null && (bool)ViewBag.ActivesSeulement)
+                {
+                    <input type="checkbox" name="activesSeulement" value="true" checked="checked" />
+                }
+                else
+                {
+                    <input type="checkbox" name="activesSeulement" value="true" />
+                }
+                Actives seulement
+            </label></div>
+        </div>
+    </div>
+    <div style="margin-top:15px;">
+        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-filter"></i> Filtrer</button>
+        <a href="@Url.Action("Index")" class="btn btn-default"><i class="fa-solid fa-rotate-left"></i> Réinitialiser</a>
+    </div>
+}
+
+<div class="dashboard-card">
+    <table class="table table-bordered table-striped table-hover registre-table">
+        <thead><tr><th>Médecin</th><th>Nomination</th><th>Type</th><th>Date nomination</th><th>Date fin</th><th>État</th><th style="width:140px;">Actions</th></tr></thead>
+        <tbody>
+        @foreach (var item in Model ?? Enumerable.Empty<Solution.ViewModels.Nominations.NominationAdministrativeListViewModel>())
+        {
+            <tr>
+                <td>@item.MedecinNomComplet</td>
+                <td>@item.LibelleNomination</td>
+                <td>@item.TypeNominationLibelle</td>
+                <td>@(item.DateNomination.HasValue ? item.DateNomination.Value.ToString("yyyy-MM-dd") : "")</td>
+                <td>@(item.DateFin.HasValue ? item.DateFin.Value.ToString("yyyy-MM-dd") : "")</td>
+                <td>@(item.EstActive ? "Active" : "Terminée")</td>
+                <td class="nowrap">
+                    <a href="@Url.Action("Details", new { id=item.NominationAdministrativeId })" class="btn btn-info btn-sm btn-icon-only" title="Détails"><i class="fa-solid fa-circle-info"></i></a>
+                    @if (canManage)
+                    {
+                        <a href="@Url.Action("Edit", new { id=item.NominationAdministrativeId })" class="btn btn-warning btn-sm btn-icon-only" title="Modifier"><i class="fa-solid fa-pen-to-square"></i></a>
+                        @if (item.EstActive)
+                        {
+                            <a href="@Url.Action("Delete", new { id=item.NominationAdministrativeId })" class="btn btn-danger btn-sm btn-icon-only" title="Terminer"><i class="fa-solid fa-box-archive"></i></a>
+                        }
+                    }
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>

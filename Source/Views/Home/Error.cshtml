@@ -1,0 +1,37 @@
+@{
+    ViewBag.Title = "Une erreur est survenue";
+}
+
+<div class="container" style="max-width: 850px; margin-top: 35px;">
+    <div class="dashboard-card">
+        <div class="alert alert-danger" role="alert">
+            <h4 style="margin-top:0;">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                Impossible de terminer l'opération
+            </h4>
+            <p style="margin-bottom:0;">@ViewBag.ErrorMessage</p>
+        </div>
+
+        <p class="text-muted">
+            Aucune information technique n'est affichée pour des raisons de sécurité.
+            Les détails ont été enregistrés dans les journaux de l'application.
+        </p>
+
+        @if (ViewBag.ErrorReference != null)
+        {
+            <p>
+                <strong>Référence :</strong>
+                <code>@ViewBag.ErrorReference</code>
+            </p>
+        }
+
+        <div style="margin-top:20px;">
+            <button type="button" class="btn btn-default" onclick="history.back();">
+                <i class="fa-solid fa-arrow-left"></i> Retour
+            </button>
+            <a class="btn btn-primary" href="@Url.Action("Index", "Home")">
+                <i class="fa-solid fa-house"></i> Accueil
+            </a>
+        </div>
+    </div>
+</div>

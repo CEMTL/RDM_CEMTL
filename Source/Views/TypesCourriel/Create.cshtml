@@ -1,0 +1,18 @@
+@model Solution.ViewModels.TypesCourriel.TypeCourrielFormViewModel
+@{
+    ViewBag.Title = "Créer un type de courriel";
+}
+<div class="page-header-custom"><h2>Créer un type de courriel</h2></div>
+<div class="dashboard-card">
+    @using (Html.BeginForm("Create", "TypesCourriel", null, FormMethod.Post, null, null))
+    {
+        @Html.AntiForgeryToken()
+        @await Html.PartialAsync("_Form", Model)
+        <hr />
+        <div class="text-right">
+            <a href="@Url.Action("Index")" class="btn btn-default">Annuler</a>
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-save"></i> Enregistrer</button>
+        </div>
+    }
+</div>
+@section Scripts { @await Html.PartialAsync("_ValidationScriptsPartial") }

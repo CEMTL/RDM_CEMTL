@@ -1,0 +1,32 @@
+@model IEnumerable<Solution.ViewModels.Services.ServiceListViewModel>
+@{
+    ViewBag.Title = "Services";
+    var canManage = User.IsInRole("Admin") || User.IsInRole("SuperUtilisateur");
+}
+@await Html.PartialAsync("~/Views/Shared/_Alerts.cshtml")
+<div class="page-header-custom"><h2>Services médicaux</h2></div>
+<div class="dashboard-card filters-bar">
+@using (Html.BeginForm("Index", "Services", null, FormMethod.Get, null, new { id = "formRechercheServices" }))
+{
+    <div class="row">
+        <div class="col-md-5"><input type="text" name="search" value="@Context.Request.Query["search"].ToString()" class="form-control" placeholder="Nom, code ou département" /></div>
+        <div class="col-md-3">@Html.DropDownList("departementId", (IEnumerable<SelectListItem>)ViewBag.Departements, "-- Tous les départements --", new { @class = "form-control" })</div>
+        <div class="col-md-4 text-right"><button type="submit" class="btn btn-default"><i class="fa-solid fa-magnifying-glass"></i> Rechercher</button> @if (canManage) { @Html.ActionLink("Nouveau service", "Create", new { departementId = ViewBag.DepartementId }, new { @class = "btn btn-primary" }) }</div>
+    </div>
+}
+</div>
+<div class="dashboard-card">
+<table id="tableServices" class="table table-bordered table-striped table-hover registre-table">
+<thead><tr><th>Service</th><th>Chef de service</th><th>Département</th><th>Code</th><th>Actif</th><th class="nowrap" style="width:140px;">Actions</th></tr></thead><tbody>
+@foreach (var item in Model)
+{
+    <tr><td>@item.NomService</td><td>@(item.ChefService ?? "—") @if (item.ChefServiceEstAValider) { <span class="label label-warning">À valider</span> }</td><td>@item.NomDepartement</td><td>@item.CodeService</td><td>@(item.EstActif ? "Oui" : "Non")</td><td class="table-actions nowrap">
+        <a href="@Url.Action("Details", new { id = item.ServiceId })" class="btn btn-info btn-sm btn-icon-only" title="Détails"><i class="fa-solid fa-circle-info"></i></a>
+        @if (canManage) { <a href="@Url.Action("Edit", new { id = item.ServiceId })" class="btn btn-warning btn-sm btn-icon-only" title="Modifier"><i class="fa-solid fa-pen-to-square"></i></a> <a href="@Url.Action("Delete", new { id = item.ServiceId })" class="btn btn-danger btn-sm btn-icon-only" title="Supprimer"><i class="fa-solid fa-trash"></i></a> }
+    </td></tr>
+}
+</tbody></table>
+</div>
+@section Scripts {
+<script>$(function(){ $("#tableServices").DataTable({pageLength:25,ordering:true,searching:true,autoWidth:false,order:[[2,"asc"],[0,"asc"]],columnDefs:[{orderable:false,searchable:false,targets:5}],language:{search:"Rechercher :",lengthMenu:"Afficher _MENU_ éléments",info:"Affichage de _START_ à _END_ sur _TOTAL_ éléments",infoEmpty:"Aucun élément",zeroRecords:"Aucun service trouvé",emptyTable:"Aucun service",paginate:{previous:"Précédent",next:"Suivant"}}}); });</script>
+}

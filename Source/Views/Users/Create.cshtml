@@ -1,0 +1,47 @@
+@model Solution.ViewModels.Administration.AspNetIdentityUserCreateViewModel
+@{
+    ViewData["Title"] = "Ajouter un utilisateur RDM";
+}
+<div class="page-header">
+    <h2><i class="fa fa-user-plus"></i> Ajouter un utilisateur</h2>
+    <p class="text-muted">L'administrateur autorise ici un compte Windows existant à utiliser RDM et lui attribue ses rôles applicatifs. Aucun groupe Active Directory n'est modifié. Pour un compte HMR, vous pouvez saisir hmr.hmr.qc.ca\compte; à la connexion, le compte seul est accepté.</p>
+</div>
+<form asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+    <div class="panel panel-default"><div class="panel-body">
+        <div class="form-group">
+            <label asp-for="UserName"></label> <span class="text-danger">*</span>
+            <input asp-for="UserName" class="form-control" placeholder="Ex. t1amera8000, hmr80111, 06CEMTL\t1amera8000 ou hmr.hmr.qc.ca\hmr80111" autocomplete="off" />
+            <span asp-validation-for="UserName" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Email"></label>
+            <input asp-for="Email" class="form-control" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label>Rôles RDM <span class="text-danger">*</span></label>
+            <div>
+            @foreach (var role in Model.RolesDisponibles)
+            {
+                <label style="display:block;font-weight:normal">
+                @if (role.Selected)
+                {
+                    <input type="checkbox" name="RolesSelectionnes" value="@role.Value" checked="checked" />
+                }
+                else
+                {
+                    <input type="checkbox" name="RolesSelectionnes" value="@role.Value" />
+                }
+                @role.Text
+            </label>
+            }
+            </div>
+            <span asp-validation-for="RolesSelectionnes" class="text-danger"></span>
+        </div>
+    </div></div>
+    <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> Ajouter l'accès RDM</button>
+    <a asp-action="Index" class="btn btn-default">Annuler</a>
+</form>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

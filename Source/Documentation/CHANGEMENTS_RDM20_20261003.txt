@@ -1,0 +1,36 @@
+RDM(20) - 2026-10-03
+=====================
+
+1. Tableau de bord simplifié
+----------------------------
+Le tableau de bord ne présente plus que :
+- Médecins actifs
+- Privilèges arrivant à échéance dans les 30 jours
+- Dossiers de privilèges / renouvellements en cours
+- Les 8 alertes les plus prioritaires
+
+Les indicateurs secondaires et la section d'accès rapides ont été retirés de l'accueil.
+Les autres informations demeurent accessibles dans leurs modules respectifs.
+
+2. Validation Medecins/Edit
+---------------------------
+Correction du problème où un message de validation pouvait être affiché sans cadre rouge.
+
+Modifications :
+- le formulaire utilise novalidate pour laisser jQuery Validation appliquer les classes visuelles;
+- les champs invalides sont encadrés en rouge;
+- la ligne d'un tableau contenant une erreur est mise en évidence;
+- les groupes Téléphones, Courriels, Installations, Adresses et Nominations peuvent être encadrés en rouge;
+- l'onglet contenant une erreur est signalé en rouge et ouvert automatiquement;
+- les validations « un seul téléphone/courriel/installation principal » sont visibles au niveau du groupe;
+- ces validations sont également faites côté client avant l'envoi du formulaire;
+- les téléphones/courriels partiellement remplis génèrent une erreur sur le champ concerné;
+- les dates début/fin d'installation et de nomination sont vérifiées;
+- les doublons Installation + Rang sont détectés avant l'enregistrement;
+- lorsqu'une DbUpdateException peut être reliée à Téléphones, Courriels, Installations ou Nominations,
+  l'erreur est associée au groupe concerné afin que le bon cadre rouge soit visible;
+- lorsqu'aucun champ précis ne peut être déterminé, la fiche complète est encadrée et le résumé reste visible.
+
+3. Configuration
+----------------
+appsettings.json n'a pas été modifié par cette version.

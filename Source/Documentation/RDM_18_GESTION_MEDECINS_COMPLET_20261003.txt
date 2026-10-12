@@ -1,0 +1,154 @@
+﻿RDM 18 - ÉVOLUTION DU REGISTRE DES MÉDECINS
+CIUSSS de l'Est-de-l'Île-de-Montréal
+Date : 2026-10-03
+
+OBJECTIF
+=======
+Cette version consolide le projet RDM autour d'un dossier médecin longitudinal et
+sépare clairement :
+- l'appartenance clinique d'un médecin à un département/service;
+- les responsabilités organisationnelles (chef, adjoint, secrétaire);
+- les privilèges médicaux;
+- les dossiers/renouvellements de privilèges.
+
+IMPORTANT - APPSETTINGS.JSON
+============================
+À la demande du propriétaire du projet, la chaîne de connexion et son mot de
+passe demeurent pour le moment en clair dans appsettings.json. Aucun changement
+n'a été appliqué à ce mode de configuration dans cette livraison.
+
+INSTALLATION / MISE À NIVEAU
+=============================
+1. Sauvegarder RDM_CEMTL.
+2. Exécuter :
+   Database/Scripts/RDM_20261003_evolutions_gestion_medecins.sql
+3. Recompiler la solution avec .NET 8.
+4. Déployer sous IIS.
+5. Valider le login 06CEMTL et hmr.hmr.qc.ca.
+6. Exécuter les tests de fumée décrits plus bas.
+
+PRINCIPALES ÉVOLUTIONS
+======================
+1. Dossier médecin 360
+   - Coordonnées
+   - Organisation
+   - Nominations
+   - Privilèges
+   - Cotisations
+   - Fit Tests
+   - Ententes FDC
+   - Dossiers / renouvellements
+   - Comités
+   - Documents
+   - Alertes
+
+2. Affectations cliniques
+   Nouvelle table MedecinAffectationClinique pour enregistrer l'appartenance
+   réelle du médecin à un département, un service et éventuellement une
+   installation. Cette donnée n'est plus déduite des privilèges.
+
+3. Organisation
+   AffectationOrganisationnelle demeure la source des chefs, adjoints,
+   secrétaires et responsables organisationnels.
+
+4. Services
+   L'unicité est désormais DépartementId + NomService, afin qu'un même nom de
+   service puisse exister dans plusieurs départements.
+
+5. Workflow des dossiers de privilèges
+   Statuts :
+   - Brouillon
+   - À compléter
+   - En validation
+   - En attente MSSS
+   - En attente UdeM
+   - DMSP
+   - CECMDP
+   - CA
+   - Approuvé
+   - Refusé
+   - Fermé
+
+   Le dossier possède aussi : responsable, date du statut, échéance, prochaine
+   action et motif de blocage. Les changements de statut sont historisés.
+
+6. Documents
+   Documents rattachés au médecin : type, dates, expiration, confidentialité,
+   hash SHA-256, lien métier facultatif et archivage logique.
+   Taille maximale configurée par Documents:MaxFileSizeMo.
+
+7. Alertes
+   Le tableau de bord calcule notamment :
+   - privilèges à échéance;
+   - cotisations non réglées;
+   - Fit Tests à vérifier;
+   - ententes FDC à échéance;
+   - affectations organisationnelles à valider;
+   - dossiers de privilèges en cours;
+   - documents à échéance.
+
+8. Cotisations
+   - montant final calculé côté serveur;
+   - état calculé (À payer / Partiellement payée / Payée);
+   - contrôle des montants négatifs;
+   - contrôle du paiement supérieur au montant final;
+   - motif obligatoire lorsqu'une réduction est appliquée;
+   - audit des créations/modifications/suppressions.
+
+9. Sécurité applicative
+   - commentaire médecin affiché encodé (suppression du Html.Raw métier);
+   - en-têtes de sécurité HTTP;
+   - limitation du nombre de tentatives sur le POST de connexion AD;
+   - contrôle des extensions/taille des documents;
+   - hash SHA-256 des documents.
+
+10. Suppression médecin
+    La suppression est aussi bloquée par :
+    - fonctions organisationnelles;
+    - affectations cliniques;
+    - documents actifs.
+
+11. Transaction médecin
+    La création/modification du médecin et de ses collections principales est
+    enregistrée dans une transaction EF.
+
+12. Nominations administratives
+    - un seul module NominationsAdministratives demeure;
+    - nomination de référence + type + libellé historique;
+    - retour direct au dossier du médecin;
+    - fin logique d'une nomination au lieu d'une suppression historique;
+    - audit des créations, modifications et fins.
+
+13. Comités
+    - gestion directe depuis le dossier médecin;
+    - médecin présélectionné depuis l'onglet Comités;
+    - contrôles de dates et audit des actions.
+
+14. Dépendances front-end intranet
+    Bootstrap, Font Awesome, jQuery et DataTables sont servis localement depuis
+    wwwroot. La navigation principale ne dépend plus des CDN Internet.
+
+TESTS DE FUMÉE APRÈS DÉPLOIEMENT
+================================
+- Login avec compte 06CEMTL avec et sans domaine.
+- Login avec compte HMR avec et sans domaine.
+- Login du BootstrapAdmin.
+- Ouvrir le tableau de bord.
+- Ouvrir la liste des médecins.
+- Ouvrir le dossier d'un médecin et chaque onglet.
+- Créer/modifier/terminer une affectation clinique.
+- Créer un dossier de privilèges et changer son statut.
+- Ajouter/télécharger/archiver un document.
+- Créer une cotisation et vérifier le calcul automatique.
+- Créer/modifier un privilège et vérifier Service -> Département.
+- Créer/modifier/terminer une nomination depuis le dossier médecin.
+- Ajouter/modifier une participation à un comité depuis le dossier médecin.
+- Couper l'accès Internet du poste et vérifier navigation, onglets et DataTables.
+- Vérifier le Journal d'audit.
+
+VALIDATION DE COMPILATION
+=========================
+L'environnement utilisé pour produire cette livraison ne contient pas le SDK
+.NET. Les contrôles effectués ici sont donc statiques (structure C#, références,
+accolades, fichiers/vues et cohérence EF/SQL). Il faut impérativement exécuter
+"dotnet build" ou une compilation Visual Studio avant déploiement en recette.

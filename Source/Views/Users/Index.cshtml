@@ -1,0 +1,79 @@
+@model Solution.ViewModels.Administration.AspNetIdentityUserListViewModel
+@using Solution.Security
+@{
+    ViewData["Title"] = "Gestion des utilisateurs RDM";
+}
+
+<div class="page-header d-flex justify-content-between align-items-center">
+    <div>
+        <h2><i class="fa fa-users-gear"></i> Gestion des utilisateurs RDM</h2>
+        <p class="text-muted mb-0">Cette page est réservée aux administrateurs. Active Directory valide l'identité; les accès et rôles RDM sont gérés ici dans l'application.</p>
+    </div>
+    <a asp-action="Create" class="btn btn-primary"><i class="fa fa-user-plus"></i> Ajouter un utilisateur</a>
+</div>
+
+@if (TempData["Success"] != null) { <div class="alert alert-success">@TempData["Success"]</div> }
+@if (TempData["Erreur"] != null) { <div class="alert alert-danger">@TempData["Erreur"]</div> }
+
+<div class="alert alert-info">
+    <strong>Gestion locale RDM.</strong> L'administrateur ajoute les utilisateurs, attribue ou retire leurs rôles et leurs accès directement dans RDM. Aucune écriture n'est faite dans Active Directory.
+</div>
+
+<div class="panel panel-default">
+    <div class="table-responsive">
+        <table class="table table-hover table-striped mb-0">
+            <thead><tr><th>Compte Windows</th><th>Courriel</th><th>Rôles RDM</th><th>État</th><th style="width:220px"></th></tr></thead>
+            <tbody>
+            @if (Model.Utilisateurs.Count == 0)
+            {
+                <tr><td colspan="5" class="text-center text-muted">Aucun utilisateur ASP.NET Identity trouvé.</td></tr>
+            }
+            else
+            {
+                foreach (var item in Model.Utilisateurs)
+                {
+                    var roles = item.Roles.Where(AppRoles.IsSupported).Select(AppRoles.Normalize).Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
+                    <tr>
+                        <td>
+                            <strong>@item.UserName</strong>
+                            @if (item.IsBootstrapAdmin)
+                            {
+                                <span class="label label-info" title="Compte d'amorçage protégé">BootstrapAdmin protégé</span>
+                            }
+                        </td>
+                        <td>@(string.IsNullOrWhiteSpace(item.Email) ? "—" : item.Email)</td>
+                        <td>@(roles.Length == 0 ? "Aucun rôle" : string.Join(", ", roles.Select(AppRoles.GetDisplayName)))</td>
+                        <td><span class="label @(roles.Length > 0 ? "label-success" : "label-default")">@(roles.Length > 0 ? "Autorisé" : "Sans accès")</span></td>
+                        <td class="text-nowrap">
+                            @if (item.IsBootstrapAdmin)
+                            {
+                                <span class="text-muted"><i class="fa fa-lock"></i> Rôles protégés</span>
+                            }
+                            else
+                            {
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-primary"><i class="fa fa-user-shield"></i> Rôles</a>
+                                @if (roles.Length > 0)
+                                {
+                                    <form asp-action="Disable" method="post" style="display:inline" onsubmit="return confirm('Retirer tous les accès RDM de cet utilisateur ? Le compte Active Directory ne sera pas modifié.');">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <button type="submit" class="btn btn-sm btn-danger"><i class="fa fa-user-lock"></i> Retirer accès</button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <form asp-action="Delete" method="post" style="display:inline" onsubmit="return confirm('Supprimer définitivement cet utilisateur de RDM ? Son compte Active Directory ne sera pas modifié.');">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <button type="submit" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i> Supprimer</button>
+                                    </form>
+                                }
+                            }
+                        </td>
+                    </tr>
+                }
+            }
+            </tbody>
+        </table>
+    </div>
+</div>

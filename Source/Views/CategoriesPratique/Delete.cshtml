@@ -1,0 +1,77 @@
+@model Solution.ViewModels.CategoriesPratique.CategoriePratiqueDetailsViewModel
+
+@{
+    ViewBag.Title = "Supprimer une catégorie pratique";
+}
+
+<div class="page-header-custom">
+    <div class="row">
+        <div class="col-md-8">
+            <h2>Supprimer une catégorie pratique</h2>
+        </div>
+        <div class="col-md-4 text-right" style="margin-top:25px;">
+            @Html.ActionLink("Retour à la liste", "Index", null, new { @class = "btn btn-default" })
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-card">
+    @await Html.PartialAsync("_Alerts")
+
+    @if (Model.PeutEtreSupprimee)
+    {
+        <div class="alert alert-danger">
+            <strong>Attention :</strong> cette action supprimera définitivement cette catégorie pratique.
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning">
+            <strong>Suppression impossible :</strong>
+            cette catégorie est actuellement utilisée par
+            <strong>@Model.NombreMedecinsAssocies @(Model.NombreMedecinsAssocies == 1 ? "médecin" : "médecins")</strong>.
+            Réaffectez d'abord @(Model.NombreMedecinsAssocies == 1 ? "ce médecin" : "ces médecins") à une autre catégorie avant de supprimer celle-ci.
+        </div>
+    }
+
+    <table class="table table-bordered table-striped">
+        <tr>
+            <th style="width:220px;">ID</th>
+            <td>@Model.CategoriePratiqueId</td>
+        </tr>
+        <tr>
+            <th>Libellé</th>
+            <td>@Model.Libelle</td>
+        </tr>
+        <tr>
+            <th>Actif</th>
+            <td>@(Model.EstActif ? "Oui" : "Non")</td>
+        </tr>
+        <tr>
+            <th>Médecins associés</th>
+            <td>@Model.NombreMedecinsAssocies</td>
+        </tr>
+    </table>
+
+    @using (Html.BeginForm("Delete", "CategoriesPratique", null, FormMethod.Post, null, null))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(m => m.CategoriePratiqueId)
+
+        <div class="text-right">
+            @Html.ActionLink("Annuler", "Index", null, new { @class = "btn btn-default" })
+            @if (Model.PeutEtreSupprimee)
+            {
+                <button type="submit" class="btn btn-danger">
+                    <i class="fa-solid fa-trash"></i> Confirmer la suppression
+                </button>
+            }
+            else
+            {
+                <button type="button" class="btn btn-danger" disabled title="La catégorie est utilisée par un ou plusieurs médecins.">
+                    <i class="fa-solid fa-trash"></i> Suppression impossible
+                </button>
+            }
+        </div>
+    }
+</div>

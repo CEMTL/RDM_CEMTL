@@ -1,0 +1,16 @@
+@model Solution.ViewModels.Departements.DepartementDetailsViewModel
+@{ ViewBag.Title = "Supprimer un département"; }
+@await Html.PartialAsync("~/Views/Shared/_Alerts.cshtml")
+<div class="page-header-custom"><h2>Supprimer un département</h2></div>
+<div class="dashboard-card">
+    <p>Confirmez-vous la suppression du département <strong>@Model.NomDepartement</strong> ?</p>
+    @{ var used = Model.NombreServices > 0 || Model.Affectations.Count > 0; }
+    @if (used) { <div class="alert alert-warning">Ce département contient @Model.NombreServices service(s) ou @Model.Affectations.Count affectation(s) et ne peut pas être supprimé. Il peut être désactivé.</div> }
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="id" value="@Model.DepartementId" />
+        <button type="submit" class="btn btn-danger" disabled="@(used ? "disabled" : null)">Supprimer</button>
+        <a href="@Url.Action("Index")" class="btn btn-default">Annuler</a>
+    }
+</div>

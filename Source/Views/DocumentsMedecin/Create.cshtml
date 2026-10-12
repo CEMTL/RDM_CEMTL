@@ -1,0 +1,83 @@
+@model Solution.ViewModels.DocumentsMedecin.DocumentMedecinCreateViewModel
+@{
+    ViewBag.Title = "Ajouter un document";
+    var medecins = (IEnumerable<SelectListItem>)ViewBag.Medecins;
+}
+<div class="page-header-custom">
+    <h2>Ajouter un document</h2>
+    <p class="text-muted">Le document sera conservé dans SQL Server et lié au dossier du médecin.</p>
+</div>
+<div class="dashboard-card">
+    @using (Html.BeginForm("Create", "DocumentsMedecin", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(m => m.ReturnMedecinId)
+        @Html.HiddenFor(m => m.ReturnTab)
+        @Html.HiddenFor(m => m.EntiteLiee)
+        @Html.HiddenFor(m => m.EntiteId)
+        @Html.ValidationSummary(false, "", new { @class = "alert alert-danger" })
+
+        <div class="form-group">
+            @Html.LabelFor(m => m.MedecinId, new { @class = "col-md-2 control-label" })
+            <div class="col-md-7">
+            @if (Model.ReturnMedecinId.HasValue && Model.ReturnMedecinId.Value > 0)
+            {
+                @Html.HiddenFor(m => m.MedecinId)
+                var med = medecins.FirstOrDefault(x => x.Value == Model.MedecinId.ToString());
+                <p class="form-control-static"><strong>@(med?.Text ?? Model.MedecinId.ToString())</strong></p>
+            }
+            else
+            {
+                @Html.DropDownListFor(m => m.MedecinId, medecins, "-- Sélectionner --", new { @class = "form-control" })
+            }
+            @Html.ValidationMessageFor(m => m.MedecinId, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(m => m.TypeDocument, new { @class = "col-md-2 control-label" })
+            <div class="col-md-5">
+                @Html.DropDownListFor(m => m.TypeDocument, (SelectList)ViewBag.TypesDocument, "-- Sélectionner --", new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.TypeDocument, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(m => m.Fichier, new { @class = "col-md-2 control-label" })
+            <div class="col-md-7">
+                <input type="file" name="Fichier" class="form-control" required />
+                <span class="help-block">PDF, Word, Excel, image ou texte. Taille maximale configurée dans appsettings.json.</span>
+                @Html.ValidationMessageFor(m => m.Fichier, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(m => m.DateDocument, new { @class = "col-md-2 control-label" })
+            <div class="col-md-3">@Html.TextBoxFor(m => m.DateDocument, "{0:yyyy-MM-dd}", new { type = "date", @class = "form-control" })</div>
+            @Html.LabelFor(m => m.DateExpiration, new { @class = "col-md-2 control-label" })
+            <div class="col-md-3">@Html.TextBoxFor(m => m.DateExpiration, "{0:yyyy-MM-dd}", new { type = "date", @class = "form-control" })</div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(m => m.Description, new { @class = "col-md-2 control-label" })
+            <div class="col-md-8">@Html.TextAreaFor(m => m.Description, 4, 100, new { @class = "form-control", maxlength = "500" })</div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-8"><label class="checkbox-inline">@Html.CheckBoxFor(m => m.Confidentiel) Document confidentiel</label></div>
+        </div>
+
+        <hr />
+        <div class="text-right">
+            @if (Model.ReturnMedecinId.HasValue)
+            {
+                <a class="btn btn-default" href="@Url.Action("Index","Medecins",new { openMedecin=Model.ReturnMedecinId, tab=Model.ReturnTab ?? "documents"})">Annuler</a>
+            }
+            else
+            {
+                <a class="btn btn-default" href="@Url.Action("Index")">Annuler</a>
+            }
+            <button class="btn btn-success" type="submit"><i class="fa-solid fa-upload"></i> Ajouter le document</button>
+        </div>
+    }
+</div>

@@ -1,0 +1,8 @@
+@model Solution.ViewModels.Services.ServiceDetailsViewModel
+@{ ViewBag.Title = "Supprimer un service"; var used = Model.NombrePrivileges > 0 || Model.Installations.Count > 0 || Model.Affectations.Count > 0; }
+@await Html.PartialAsync("~/Views/Shared/_Alerts.cshtml")
+<div class="page-header-custom"><h2>Supprimer un service</h2></div>
+<div class="dashboard-card"><p>Confirmez-vous la suppression du service <strong>@Model.NomService</strong> ?</p>
+@if (used) { <div class="alert alert-warning">Ce service est référencé par @Model.NombrePrivileges privilège(s), @Model.Installations.Count installation(s) ou @Model.Affectations.Count affectation(s). Il peut être désactivé, mais pas supprimé.</div> }
+@using (Html.BeginForm()) { @Html.AntiForgeryToken() <input type="hidden" name="id" value="@Model.ServiceId" /> <button type="submit" class="btn btn-danger" disabled="@(used ? "disabled" : null)">Supprimer</button> <a href="@Url.Action("Index")" class="btn btn-default">Annuler</a> }
+</div>

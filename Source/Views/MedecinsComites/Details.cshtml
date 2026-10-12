@@ -1,0 +1,31 @@
+@model Solution.ViewModels.MedecinsComites.MedecinComiteDetailsViewModel
+@{
+    ViewBag.Title = "Détails de la participation au comité";
+    var canManage = User.IsInRole("Admin") || User.IsInRole("SuperUtilisateur");
+}
+
+<div class="page-header-custom"><h2>Détails de la participation au comité</h2></div>
+<div class="dashboard-card">
+    <dl class="dl-horizontal">
+        <dt>Médecin</dt><dd>@Model.MedecinLibelle</dd>
+        <dt>Comité</dt><dd>@Model.ComiteLibelle</dd>
+        <dt>Rôle</dt><dd>@Model.RoleMembre</dd>
+        <dt>Date début</dt><dd>@(Model.DateDebut.HasValue ? Model.DateDebut.Value.ToString("yyyy-MM-dd") : "-")</dd>
+        <dt>Date fin</dt><dd>@(Model.DateFin.HasValue ? Model.DateFin.Value.ToString("yyyy-MM-dd") : "-")</dd>
+        <dt>Commentaire</dt><dd style="white-space:pre-wrap;">@Model.Commentaire</dd>
+    </dl>
+</div>
+<div class="dashboard-card actions-card">
+    @if (canManage)
+    {
+        <a href="@Url.Action("Edit", new { id = Model.MedecinComiteId, returnMedecinId = ViewBag.ReturnMedecinId, returnTab = ViewBag.ReturnTab })" class="btn btn-warning btn-icon-only" title="Modifier"><i class="fa-solid fa-pen-to-square"></i></a>
+    }
+    @if (ViewBag.ReturnMedecinId != null)
+    {
+        <a href="@Url.Action("Index", "Medecins", new { openMedecin = ViewBag.ReturnMedecinId, tab = ViewBag.ReturnTab })" class="btn btn-default btn-icon-only" title="Retour au médecin"><i class="fa-solid fa-arrow-left"></i></a>
+    }
+    else
+    {
+        <a href="@Url.Action("Index")" class="btn btn-default btn-icon-only" title="Retour"><i class="fa-solid fa-arrow-left"></i></a>
+    }
+</div>

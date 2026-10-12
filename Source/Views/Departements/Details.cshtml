@@ -1,0 +1,46 @@
+@model Solution.ViewModels.Departements.DepartementDetailsViewModel
+@{
+    ViewBag.Title = "Détails du département";
+    var canManage = User.IsInRole("Admin") || User.IsInRole("SuperUtilisateur");
+}
+<div class="page-header-custom"><h2>@Model.NomDepartement</h2></div>
+<div class="dashboard-card">
+    <dl class="dl-horizontal"><dt>Code</dt><dd>@Model.CodeDepartement</dd><dt>Chef de département</dt><dd>@(Model.ChefDepartement ?? "—")</dd><dt>À valider</dt><dd>@Model.NombreAValider</dd><dt>Actif</dt><dd>@(Model.EstActif ? "Oui" : "Non")</dd></dl>
+</div>
+<div class="dashboard-card">
+    <div class="clearfix">
+        <h3 class="pull-left">Responsables et personnes-ressources</h3>
+        @if (canManage) { <a href="@Url.Action("Create", "AffectationsOrganisationnelles", new { departementId = Model.DepartementId })" class="btn btn-primary pull-right">Nouvelle affectation</a> }
+    </div>
+    <table class="table table-bordered table-striped registre-table">
+        <thead><tr><th>Rôle</th><th>Personne</th><th>Regroupement</th><th>Site</th><th>Période</th><th>État</th><th>Actions</th></tr></thead>
+        <tbody>
+        @foreach (var item in Model.Affectations)
+        {
+            <tr>
+                <td>@item.RoleLibelle</td>
+                <td>@item.NomAffiche @if (item.EstInterim) { <span class="label label-info">Intérim</span> }</td>
+                <td>@item.RegroupementSource</td>
+                <td>@item.Site</td>
+                <td>@(item.DateDebut?.ToString("yyyy-MM-dd") ?? "—") à @(item.DateFin?.ToString("yyyy-MM-dd") ?? "—")</td>
+                <td>@(item.EstActive ? "Active" : "Inactive") @if (item.EstAValider) { <span class="label label-warning">À valider</span> }</td>
+                <td><a href="@Url.Action("Details", "AffectationsOrganisationnelles", new { id = item.AffectationOrganisationnelleId })" class="btn btn-info btn-sm btn-icon-only" title="Détails"><i class="fa-solid fa-circle-info"></i></a></td>
+            </tr>
+        }
+        @if (!Model.Affectations.Any()) { <tr><td colspan="7" class="text-muted">Aucune affectation.</td></tr> }
+        </tbody>
+    </table>
+</div>
+<div class="dashboard-card">
+    <div class="clearfix"><h3 class="pull-left">Services</h3>@if (canManage) { <a href="@Url.Action("Create", "Services", new { departementId = Model.DepartementId })" class="btn btn-primary pull-right">Nouveau service</a> }</div>
+    <table class="table table-bordered table-striped registre-table"><thead><tr><th>Service</th><th>Regroupement</th><th>Chef de service</th><th>Code</th><th>Actif</th><th>Actions</th></tr></thead><tbody>
+    @foreach (var service in Model.Services)
+    {
+        <tr><td>@service.NomService</td><td>@service.RegroupementSource</td><td>@(service.ChefService ?? "—")</td><td>@service.CodeService</td><td>@(service.EstActif ? "Oui" : "Non")</td><td><a href="@Url.Action("Details", "Services", new { id = service.ServiceId })" class="btn btn-info btn-sm btn-icon-only" title="Détails"><i class="fa-solid fa-circle-info"></i></a></td></tr>
+    }
+    </tbody></table>
+</div>
+<div class="dashboard-card actions-card">
+    @if (canManage) { <a href="@Url.Action("Edit", new { id = Model.DepartementId })" class="btn btn-warning btn-icon-only" title="Modifier"><i class="fa-solid fa-pen-to-square"></i></a> }
+    <a href="@Url.Action("Index")" class="btn btn-default btn-icon-only" title="Retour"><i class="fa-solid fa-arrow-left"></i></a>
+</div>

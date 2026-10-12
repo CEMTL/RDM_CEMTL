@@ -1,0 +1,20 @@
+@model Solution.Models.MedecinAffectationClinique
+@{
+    ViewBag.Title = "Terminer l'affectation clinique";
+}
+<div class="page-header-custom"><h2>Terminer l'affectation clinique</h2></div>
+<div class="dashboard-card">
+    <div class="alert alert-warning">
+        L'affectation sera conservée dans l'historique et marquée terminée. Elle ne sera pas supprimée physiquement.
+    </div>
+    <p><strong>@Model.Medecin?.Permis - @Model.Medecin?.Nom @Model.Medecin?.Prenom</strong></p>
+    <p>@Model.Departement?.NomDepartement / @Model.Service?.NomService</p>
+    @using (Html.BeginForm("Delete", "MedecinAffectationsCliniques", new { id = Model.MedecinAffectationCliniqueId, returnMedecinId = ViewBag.ReturnMedecinId, returnTab = ViewBag.ReturnTab }, FormMethod.Post, null, null))
+    {
+        @Html.AntiForgeryToken()
+        <div class="text-right">
+            <a class="btn btn-default" href="@Url.Action("Index")">Annuler</a>
+            <button type="submit" class="btn btn-danger"><i class="fa-solid fa-calendar-xmark"></i> Terminer l'affectation</button>
+        </div>
+    }
+</div>

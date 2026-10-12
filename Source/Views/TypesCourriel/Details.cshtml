@@ -1,0 +1,20 @@
+@model Solution.ViewModels.TypesCourriel.TypeCourrielDetailsViewModel
+@{
+    ViewBag.Title = "Détails du type de courriel";
+    var canManage = User.IsInRole("Admin") || User.IsInRole("SuperUtilisateur");
+}
+<div class="page-header-custom"><h2>Détails du type de courriel</h2></div>
+<div class="dashboard-card">
+    <table class="table table-bordered table-striped">
+        <tr><th style="width:220px;">Libellé</th><td>@Model.Libelle</td></tr>
+        <tr><th>Actif</th><td>@(Model.EstActif ? "Oui" : "Non")</td></tr>
+        <tr><th>Courriels associés</th><td>@Model.NombreUtilisations</td></tr>
+    </table>
+    <div class="text-right">
+        @if (canManage)
+        {
+            <a href="@Url.Action("Edit", new { id = Model.TypeCourrielId })" class="btn btn-warning"><i class="fa-solid fa-pen-to-square"></i> Modifier</a>
+        }
+        <a href="@Url.Action("Index")" class="btn btn-default">Retour</a>
+    </div>
+</div>

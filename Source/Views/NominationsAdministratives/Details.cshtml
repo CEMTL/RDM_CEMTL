@@ -1,0 +1,16 @@
+@model Solution.ViewModels.Nominations.NominationAdministrativeDetailsViewModel
+@{ ViewBag.Title = "Détails de la nomination administrative"; var canManage = User.IsInRole("Admin") || User.IsInRole("SuperUtilisateur"); }
+<div class="page-header-custom"><h2>Détails de la nomination administrative</h2></div>
+<div class="dashboard-card"><dl class="dl-horizontal">
+    <dt>Médecin</dt><dd>@Model.MedecinNomComplet</dd>
+    <dt>Nomination</dt><dd>@Model.LibelleNomination</dd>
+    <dt>Type</dt><dd>@Model.TypeNominationLibelle</dd>
+    <dt>Date nomination</dt><dd>@(Model.DateNomination.HasValue ? Model.DateNomination.Value.ToString("yyyy-MM-dd") : "-")</dd>
+    <dt>Date fin</dt><dd>@(Model.DateFin.HasValue ? Model.DateFin.Value.ToString("yyyy-MM-dd") : "-")</dd>
+    <dt>État</dt><dd>@(Model.EstActive ? "Active" : "Terminée")</dd>
+</dl></div>
+<div class="dashboard-card actions-card">
+    @if (canManage) { <a href="@Url.Action("Edit",new { id=Model.NominationAdministrativeId, returnMedecinId=ViewBag.ReturnMedecinId, returnTab=ViewBag.ReturnTab })" class="btn btn-warning btn-icon-only" title="Modifier"><i class="fa-solid fa-pen-to-square"></i></a> }
+    @if (ViewBag.ReturnMedecinId != null) { <a href="@Url.Action("Index","Medecins",new { openMedecin=ViewBag.ReturnMedecinId, tab=ViewBag.ReturnTab })" class="btn btn-default btn-icon-only" title="Retour"><i class="fa-solid fa-arrow-left"></i></a> }
+    else { <a href="@Url.Action("Index")" class="btn btn-default btn-icon-only" title="Retour"><i class="fa-solid fa-arrow-left"></i></a> }
+</div>

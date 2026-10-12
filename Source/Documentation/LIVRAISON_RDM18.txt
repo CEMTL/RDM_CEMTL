@@ -1,0 +1,35 @@
+﻿RDM(18) - LIVRAISON CONSOLIDÉE
+Date : 2026-10-03
+
+Contenu
+-------
+- Solution ASP.NET Core MVC .NET 8 complète.
+- Modèle EF Core basé sur Departement / Service.
+- Dossier médecin 360.
+- Affectations cliniques distinctes des responsabilités organisationnelles.
+- Privilèges, cotisations, Fit Tests, Ententes FDC, comités et nominations intégrés.
+- Workflow de dossiers/renouvellements.
+- Documents médecins et alertes.
+- Scripts SQL d'évolution et de vérification.
+- Dépendances UI locales pour fonctionnement intranet.
+
+Configuration
+-------------
+À la demande du propriétaire, la chaîne de connexion et son mot de passe restent
+actuellement en clair dans appsettings.json. Cette livraison ne modifie pas cette
+configuration.
+
+Ordre recommandé
+-----------------
+1. Sauvegarder la base RDM_CEMTL.
+2. Exécuter Database/Scripts/RDM_20261003_evolutions_gestion_medecins.sql.
+3. Compiler la solution avec Visual Studio / dotnet build (.NET 8).
+4. Déployer en recette IIS.
+5. Exécuter Database/Scripts/RDM_20261003_verification_post_deploiement.sql.
+6. Exécuter les tests de fumée du document RDM_18_GESTION_MEDECINS_COMPLET_20261003.txt.
+
+Note
+----
+Le SDK .NET n'est pas disponible dans l'environnement ayant produit l'archive.
+La livraison a subi des contrôles statiques, mais une compilation en recette est
+obligatoire avant mise en production.

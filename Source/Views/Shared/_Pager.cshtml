@@ -1,0 +1,34 @@
+@{
+    var page = ViewBag.Page != null ? (int)ViewBag.Page : 1;
+    var totalPages = ViewBag.TotalPages != null ? (int)ViewBag.TotalPages : 1;
+    var routeValues = new Microsoft.AspNetCore.Routing.RouteValueDictionary();
+    foreach (var pair in Context.Request.Query)
+    {
+        if (!string.Equals(pair.Key, "page", System.StringComparison.OrdinalIgnoreCase))
+        {
+            routeValues[pair.Key] = pair.Value.ToString();
+        }
+    }
+}
+@if (totalPages > 1)
+{
+    <nav class="text-center registre-pager-wrap">
+        <ul class="pagination registre-pager">
+            @{ routeValues["page"] = 1; }
+            <li class="@(page <= 1 ? "disabled" : "")">@Html.ActionLink("«", null, routeValues)</li>
+            @{ routeValues["page"] = page > 1 ? page - 1 : 1; }
+            <li class="@(page <= 1 ? "disabled" : "")">@Html.ActionLink("Préc.", null, routeValues)</li>
+
+            @for (var i = System.Math.Max(1, page - 2); i <= System.Math.Min(totalPages, page + 2); i++)
+            {
+                routeValues["page"] = i;
+                <li class="@(i == page ? "active" : "")">@Html.ActionLink(i.ToString(), null, routeValues)</li>
+            }
+
+            @{ routeValues["page"] = page < totalPages ? page + 1 : totalPages; }
+            <li class="@(page >= totalPages ? "disabled" : "")">@Html.ActionLink("Suiv.", null, routeValues)</li>
+            @{ routeValues["page"] = totalPages; }
+            <li class="@(page >= totalPages ? "disabled" : "")">@Html.ActionLink("»", null, routeValues)</li>
+        </ul>
+    </nav>
+}

@@ -1,0 +1,122 @@
+@model Solution.ViewModels.MedecinAffectationsCliniques.MedecinAffectationCliniqueFormViewModel
+
+@Html.HiddenFor(m => m.MedecinAffectationCliniqueId)
+@Html.HiddenFor(m => m.ReturnMedecinId)
+@Html.HiddenFor(m => m.ReturnTab)
+
+<div class="form-group">
+    @Html.LabelFor(m => m.MedecinId, new { @class = "col-md-2 control-label" })
+    <div class="col-md-7">
+        @if (Model.ReturnMedecinId.HasValue && Model.ReturnMedecinId.Value > 0)
+        {
+            @Html.HiddenFor(m => m.MedecinId)
+            var med = Model.Medecins.FirstOrDefault(x => x.Value == Model.MedecinId.ToString());
+            <p class="form-control-static"><strong>@(med?.Text ?? Model.MedecinId.ToString())</strong></p>
+        }
+        else
+        {
+            @Html.DropDownListFor(m => m.MedecinId, Model.Medecins, "-- Sélectionner --", new { @class = "form-control" })
+        }
+        @Html.ValidationMessageFor(m => m.MedecinId, "", new { @class = "text-danger" })
+    </div>
+</div>
+
+<div class="form-group">
+    @Html.LabelFor(m => m.DepartementId, new { @class = "col-md-2 control-label" })
+    <div class="col-md-5">
+        @Html.DropDownListFor(m => m.DepartementId, Model.Departements, "-- Sélectionner --", new { @class = "form-control", id = "DepartementId" })
+        @Html.ValidationMessageFor(m => m.DepartementId, "", new { @class = "text-danger" })
+    </div>
+</div>
+
+<div class="form-group">
+    @Html.LabelFor(m => m.ServiceId, new { @class = "col-md-2 control-label" })
+    <div class="col-md-5">
+        <select id="ServiceId" name="ServiceId" class="form-control">
+            <option value="">-- Sélectionner --</option>
+            @foreach (var s in Model.ServiceOptions)
+            {
+                <option value="@s.ServiceId"
+                        data-departement="@s.DepartementId"
+                        selected="@(s.ServiceId == Model.ServiceId ? "selected" : null)">
+                    @s.Libelle
+                </option>
+            }
+        </select>
+        @Html.ValidationMessageFor(m => m.ServiceId, "", new { @class = "text-danger" })
+    </div>
+</div>
+
+<div class="form-group">
+    @Html.LabelFor(m => m.InstallationId, new { @class = "col-md-2 control-label" })
+    <div class="col-md-5">
+        @Html.DropDownListFor(m => m.InstallationId, Model.Installations, "-- Aucune / toutes --", new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.InstallationId, "", new { @class = "text-danger" })
+    </div>
+</div>
+
+<div class="form-group">
+    @Html.LabelFor(m => m.TypeAffectation, new { @class = "col-md-2 control-label" })
+    <div class="col-md-5">
+        @Html.DropDownListFor(m => m.TypeAffectation,
+            new SelectList(new[] { "Clinique", "Académique", "Recherche", "Temporaire", "Autre" }, Model.TypeAffectation),
+            "-- Sélectionner --",
+            new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.TypeAffectation, "", new { @class = "text-danger" })
+    </div>
+</div>
+
+<div class="form-group">
+    @Html.LabelFor(m => m.DateDebut, new { @class = "col-md-2 control-label" })
+    <div class="col-md-3">
+        @Html.TextBoxFor(m => m.DateDebut, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+    </div>
+    @Html.LabelFor(m => m.DateFin, new { @class = "col-md-2 control-label" })
+    <div class="col-md-3">
+        @Html.TextBoxFor(m => m.DateFin, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+        @Html.ValidationMessageFor(m => m.DateFin, "", new { @class = "text-danger" })
+    </div>
+</div>
+
+<div class="form-group">
+    <div class="col-md-offset-2 col-md-8">
+        <label class="checkbox-inline">@Html.CheckBoxFor(m => m.EstPrincipale) Affectation principale</label>
+        <label class="checkbox-inline">@Html.CheckBoxFor(m => m.EstActive) Active</label>
+        @Html.ValidationMessageFor(m => m.EstPrincipale, "", new { @class = "text-danger" })
+    </div>
+</div>
+
+<div class="form-group">
+    @Html.LabelFor(m => m.Commentaire, new { @class = "col-md-2 control-label" })
+    <div class="col-md-8">
+        @Html.TextAreaFor(m => m.Commentaire, 4, 80, new { @class = "form-control", maxlength = "500" })
+        @Html.ValidationMessageFor(m => m.Commentaire, "", new { @class = "text-danger" })
+    </div>
+</div>
+
+<script>
+    (function () {
+        function filterServices() {
+            var dep = document.getElementById('DepartementId');
+            var svc = document.getElementById('ServiceId');
+            if (!dep || !svc) return;
+
+            var depId = dep.value;
+            Array.prototype.forEach.call(svc.options, function (opt) {
+                if (!opt.value) {
+                    opt.hidden = false;
+                    return;
+                }
+                var ok = !depId || opt.getAttribute('data-departement') === depId;
+                opt.hidden = !ok;
+                if (!ok && opt.selected) opt.selected = false;
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var dep = document.getElementById('DepartementId');
+            if (dep) dep.addEventListener('change', filterServices);
+            filterServices();
+        });
+    })();
+</script>

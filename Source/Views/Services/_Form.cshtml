@@ -1,0 +1,24 @@
+@model Solution.ViewModels.Services.ServiceFormViewModel
+<div class="dashboard-card">
+    <div class="form-group">
+        @Html.LabelFor(m => m.DepartementId)
+        @Html.DropDownListFor(m => m.DepartementId, Model.DepartementOptions, "-- Sans département --", new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.DepartementId, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.NomService)
+        @Html.TextBoxFor(m => m.NomService, new { @class = "form-control", maxlength = 250 })
+        @Html.ValidationMessageFor(m => m.NomService, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.CodeService)
+        @Html.TextBoxFor(m => m.CodeService, new { @class = "form-control", maxlength = 50 })
+        @Html.ValidationMessageFor(m => m.CodeService, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.RegroupementSource)
+        @Html.TextBoxFor(m => m.RegroupementSource, new { @class = "form-control", maxlength = 200, placeholder = "Ex. (Ophtalmologie-CUO)" })
+        @Html.ValidationMessageFor(m => m.RegroupementSource, "", new { @class = "text-danger" })
+    </div>
+    <div class="checkbox"><label>@Html.CheckBoxFor(m => m.EstActif) Actif</label></div>
+</div>

@@ -1,0 +1,18 @@
+@model Solution.Models.DocumentMedecin
+@{
+    ViewBag.Title = "Archiver le document";
+}
+<div class="page-header-custom"><h2>Archiver le document</h2></div>
+<div class="dashboard-card">
+    <div class="alert alert-warning">Le document restera conservé dans la base et dans l'historique, mais il ne sera plus présenté comme document actif.</div>
+    <p><strong>@Model.NomFichier</strong></p>
+    <p>@Model.TypeDocument — @Model.Medecin?.Permis - @Model.Medecin?.Nom @Model.Medecin?.Prenom</p>
+    @using (Html.BeginForm("Delete","DocumentsMedecin",new { id=Model.DocumentMedecinId, returnMedecinId=ViewBag.ReturnMedecinId, returnTab=ViewBag.ReturnTab },FormMethod.Post,null,null))
+    {
+        @Html.AntiForgeryToken()
+        <div class="text-right">
+            <a class="btn btn-default" href="@Url.Action("Index")">Annuler</a>
+            <button type="submit" class="btn btn-danger"><i class="fa-solid fa-box-archive"></i> Archiver</button>
+        </div>
+    }
+</div>

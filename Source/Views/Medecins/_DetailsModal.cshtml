@@ -1,0 +1,472 @@
+﻿@model Solution.ViewModels.Medecins.MedecinDetailsModalViewModel
+
+@functions{
+    public string F(DateTime? d)
+    {
+        return d.HasValue ? d.Value.ToString("yyyy-MM-dd") : "";
+    }
+
+    public string M(decimal? value)
+    {
+        return value.HasValue ? value.Value.ToString("N2") : "";
+    }
+}
+
+@{
+    var activeTab = ((string)ViewBag.ActiveTab ?? "coordonnees").ToLowerInvariant();
+    var privilegesActifs = Model.Privileges.Count(x => x.EstActif);
+    var fitTestsActifs = Model.FitTests.Count(x => x.EstActif);
+    var ententesActives = Model.EntentesFDC.Count(x => x.EstActive);
+}
+
+<style>
+    .medecin-details-tabs { margin-top: 2px; }
+    .medecin-details-tabs > li > a { padding: 9px 11px; font-weight: 600; }
+    .medecin-details-tabs .badge { margin-left: 4px; background: #e5e7eb; color: #475569; }
+    .medecin-details-tabs > li.active > a .badge { background: #f59e0b; color: #fff; }
+    .medecin-tab-toolbar { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin:0 0 12px; }
+    .medecin-tab-toolbar .summary { color:#64748b; font-weight:600; }
+    .medecin-tab-table th { white-space:nowrap; }
+    .medecin-tab-table td { vertical-align:middle !important; }
+    .medecin-tab-empty { padding:24px; text-align:center; color:#64748b; background:#f8fafc; border:1px dashed #cbd5e1; border-radius:10px; }
+    .medecin-details-modal .table-actions { white-space:nowrap; }
+</style>
+
+<div class="medecin-details-modal">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h3 class="modal-title">
+            <i class="fa fa-id-card-o"></i> @Model.NomComplet
+        </h3>
+    </div>
+
+    <div class="modal-body" style="max-height:80vh; overflow-y:auto;">
+        <div class="row">
+            <div class="col-md-3">
+                <table class="table table-bordered table-condensed">
+                    <tr><th>Permis</th><td>@Model.Permis</td></tr>
+                    <tr><th>Type permis</th><td>@Model.TypePermis</td></tr>
+                    <tr><th>Statut</th><td>@Model.StatutMedecin</td></tr>
+                    <tr><th>Catégorie</th><td>@Model.CategoriePratique</td></tr>
+                    <tr><th>Genre</th><td>@Model.Genre</td></tr>
+                    <tr><th>NAM</th><td>@Model.NAM</td></tr>
+                    <tr><th>Actif</th><td>@(Model.EstActif ? "Oui" : "Non")</td></tr>
+                </table>
+            </div>
+
+            <div class="col-md-9">
+                <ul class="nav nav-tabs medecin-details-tabs">
+                    <li class="@(activeTab == "coordonnees" ? "active" : "")"><a href="#d-coordonnees" data-toggle="tab">Coordonnées</a></li>
+                    <li class="@(activeTab == "organisation" ? "active" : "")"><a href="#d-organisation" data-toggle="tab">Organisation</a></li>
+                    <li class="@(activeTab == "nominations" ? "active" : "")"><a href="#d-nominations" data-toggle="tab">Nominations <span class="badge">@Model.NominationsAdministratives.Count</span></a></li>
+                    <li class="@(activeTab == "privileges" ? "active" : "")"><a href="#d-privileges" data-toggle="tab">Privilèges <span class="badge">@Model.Privileges.Count</span></a></li>
+                    <li class="@(activeTab == "cotisations" ? "active" : "")"><a href="#d-cotisations" data-toggle="tab">Cotisations <span class="badge">@Model.Cotisations.Count</span></a></li>
+                    <li class="@(activeTab == "fittests" ? "active" : "")"><a href="#d-fittests" data-toggle="tab">Fit Tests <span class="badge">@Model.FitTests.Count</span></a></li>
+                    <li class="@(activeTab == "ententes" ? "active" : "")"><a href="#d-ententes" data-toggle="tab">Ententes FDC <span class="badge">@Model.EntentesFDC.Count</span></a></li>
+                    <li class="@(activeTab == "comites" ? "active" : "")"><a href="#d-comites" data-toggle="tab">Comités <span class="badge">@Model.Comites.Count</span></a></li>
+                    <li class="@(activeTab == "documents" ? "active" : "")"><a href="#d-documents" data-toggle="tab">Documents <span class="badge">@Model.Documents.Count(x => x.EstActif)</span></a></li>
+                    <li class="@(activeTab == "alertes" ? "active" : "")"><a href="#d-alertes" data-toggle="tab">Alertes <span class="badge" style="@(Model.Alertes.Any() ? "background:#dc3545;color:white;" : "")">@Model.Alertes.Count</span></a></li>
+                </ul>
+
+                <div class="tab-content" style="padding-top:15px;">
+                    <div class="tab-pane @(activeTab == "coordonnees" ? "active" : "")" id="d-coordonnees">
+                        <h4>Adresses</h4>
+                        <div class="table-responsive">
+                            <table class="table table-striped table-condensed">
+                                <thead><tr><th>Adresse</th><th>Ville</th><th>Province</th><th>CP</th><th>Principale</th></tr></thead>
+                                <tbody>
+                                    @foreach (var item in Model.Adresses)
+                                    {
+                                        <tr>
+                                            <td>@item.AdresseLigne1</td>
+                                            <td>@item.Ville</td>
+                                            <td>@item.Province</td>
+                                            <td>@item.CodePostal</td>
+                                            <td>@(item.EstPrincipale ? "Oui" : "")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h4>Téléphones</h4>
+                        <div class="table-responsive">
+                            <table class="table table-striped table-condensed">
+                                <thead><tr><th>Type</th><th>Numéro</th><th>Principal</th></tr></thead>
+                                <tbody>
+                                    @foreach (var item in Model.Telephones)
+                                    {
+                                        <tr>
+                                            <td>@item.TypeTelephone</td>
+                                            <td>@item.NumeroTelephone</td>
+                                            <td>@(item.EstPrincipal ? "Oui" : "")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h4>Courriels</h4>
+                        <div class="table-responsive">
+                            <table class="table table-striped table-condensed">
+                                <thead><tr><th>Type</th><th>Adresse</th><th>Principal</th></tr></thead>
+                                <tbody>
+                                    @foreach (var item in Model.Courriels)
+                                    {
+                                        <tr>
+                                            <td>@item.TypeCourriel</td>
+                                            <td>@item.AdresseCourriel</td>
+                                            <td>@(item.EstPrincipal ? "Oui" : "")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane @(activeTab == "organisation" ? "active" : "")" id="d-organisation">
+                        <h4>Installations</h4>
+                        <div class="table-responsive">
+                            <table class="table table-striped table-condensed">
+                                <thead><tr><th>Installation</th><th>Code</th><th>Début</th><th>Fin</th><th>Principale</th></tr></thead>
+                                <tbody>
+                                    @foreach (var item in Model.Installations)
+                                    {
+                                        <tr>
+                                            <td>@item.NomInstallation</td>
+                                            <td>@item.CodeInstallation</td>
+                                            <td>@F(item.DateDebut)</td>
+                                            <td>@F(item.DateFin)</td>
+                                            <td>@(item.EstPrincipale ? "Oui" : "")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="medecin-tab-toolbar" style="margin-top:18px;">
+                            <h4 style="margin:0;">Affectations cliniques</h4>
+                        </div>
+                        @if (Model.AffectationsCliniques.Any())
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-striped table-condensed table-bordered">
+                                    <thead><tr><th>Département</th><th>Service</th><th>Installation</th><th>Type</th><th>Période</th><th>Principal</th><th>État</th></tr></thead>
+                                    <tbody>
+                                    @foreach (var item in Model.AffectationsCliniques)
+                                    {
+                                        <tr>
+                                            <td>@item.Departement</td>
+                                            <td>@item.Service</td>
+                                            <td>@item.Installation</td>
+                                            <td>@item.TypeAffectation</td>
+                                            <td>@F(item.DateDebut) à @F(item.DateFin)</td>
+                                            <td>@(item.EstPrincipale ? "Oui" : "")</td>
+                                            <td>@(item.EstActive ? "Active" : "Terminée")</td>
+                                        </tr>
+                                    }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="medecin-tab-empty">Aucune affectation clinique. L'appartenance au service ne doit pas être déduite uniquement des privilèges.</div>
+                        }
+
+                        <div class="medecin-tab-toolbar" style="margin-top:18px;">
+                            <h4 style="margin:0;">Fonctions organisationnelles</h4>
+                        </div>
+                        @if (Model.AffectationsOrganisationnelles.Any())
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-striped table-condensed">
+                                    <thead><tr><th>Rôle</th><th>Département</th><th>Service</th><th>Regroupement</th><th>Période</th><th>État</th></tr></thead>
+                                    <tbody>
+                                    @foreach (var item in Model.AffectationsOrganisationnelles)
+                                    {
+                                        <tr>
+                                            <td>@item.Role</td>
+                                            <td>@item.Departement</td>
+                                            <td>@item.Service</td>
+                                            <td>@item.Regroupement</td>
+                                            <td>@F(item.DateDebut) à @F(item.DateFin)</td>
+                                            <td>@(item.EstActive ? "Active" : "Inactive") @if (item.EstAValider) { <span class="label label-warning">À valider</span> }</td>
+                                        </tr>
+                                    }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="medecin-tab-empty">Aucune fonction organisationnelle liée à ce médecin.</div>
+                        }
+                    </div>
+
+                    <div class="tab-pane @(activeTab == "nominations" ? "active" : "")" id="d-nominations">
+                        <div class="medecin-tab-toolbar">
+                            <div class="summary">@Model.NominationsAdministratives.Count nomination(s)</div>
+                        </div>
+                        @if (Model.NominationsAdministratives.Any())
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-striped medecin-tab-table">
+                                    <thead><tr><th>Nomination</th><th>Date nomination</th><th>Date fin</th><th>Active</th></tr></thead>
+                                    <tbody>
+                                        @foreach (var item in Model.NominationsAdministratives)
+                                        {
+                                            <tr>
+                                                <td>@item.LibelleNomination</td>
+                                                <td>@F(item.DateNomination)</td>
+                                                <td>@F(item.DateFin)</td>
+                                                <td>@(item.EstActive ? "Oui" : "Non")</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="medecin-tab-empty">Aucune nomination pour ce médecin.</div>
+                        }
+                    </div>
+
+                    <div class="tab-pane @(activeTab == "privileges" ? "active" : "")" id="d-privileges">
+                        <div class="medecin-tab-toolbar">
+                            <div class="summary">@Model.Privileges.Count privilège(s), dont @privilegesActifs actif(s)</div>
+                        </div>
+
+                        @if (Model.Privileges.Any())
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-striped table-hover medecin-tab-table">
+                                    <thead>
+                                        <tr><th>Privilège</th><th>Installation</th><th>Département</th><th>Service</th><th>Début</th><th>Fin</th><th>État</th><th>Actif</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Model.Privileges)
+                                        {
+                                            <tr>
+                                                <td><strong>@item.CodePrivilege</strong>@(string.IsNullOrWhiteSpace(item.CodePrivilege) ? "" : " - ")@item.PrivilegeLibelle</td>
+                                                <td>@item.InstallationLibelle</td>
+                                                <td>@item.DepartementLibelle</td>
+                                                <td>@item.ServiceLibelle</td>
+                                                <td>@F(item.DateDebut)</td>
+                                                <td>@F(item.DateFin)</td>
+                                                <td>@item.Etat</td>
+                                                <td>@(item.EstActif ? "Oui" : "Non")</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="medecin-tab-empty">Aucun privilège pour ce médecin.</div>
+                        }
+                    </div>
+
+                    <div class="tab-pane @(activeTab == "cotisations" ? "active" : "")" id="d-cotisations">
+                        <div class="medecin-tab-toolbar">
+                            <div class="summary">@Model.Cotisations.Count cotisation(s)</div>
+                        </div>
+
+                        @if (Model.Cotisations.Any())
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-striped table-hover medecin-tab-table">
+                                    <thead>
+                                        <tr><th>Année</th><th>Code</th><th>Montant initial</th><th>Montant final</th><th>Payé</th><th>État</th><th>Date paiement</th><th>Type paiement</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Model.Cotisations)
+                                        {
+                                            <tr>
+                                                <td>@item.AnneeExercice</td>
+                                                <td>@item.CodeCotisation</td>
+                                                <td>@M(item.MontantInitial)</td>
+                                                <td>@M(item.MontantFinal)</td>
+                                                <td>@M(item.MontantPaye)</td>
+                                                <td>@item.EtatCotisation</td>
+                                                <td>@F(item.DatePaiement)</td>
+                                                <td>@item.TypePaiement</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="medecin-tab-empty">Aucune cotisation pour ce médecin.</div>
+                        }
+                    </div>
+
+                    <div class="tab-pane @(activeTab == "fittests" ? "active" : "")" id="d-fittests">
+                        <div class="medecin-tab-toolbar">
+                            <div class="summary">@Model.FitTests.Count Fit Test(s), dont @fitTestsActifs actif(s)</div>
+                        </div>
+
+                        @if (Model.FitTests.Any())
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-striped table-hover medecin-tab-table">
+                                    <thead><tr><th>Date</th><th>Résultat</th><th>Commentaire</th><th>Actif</th></tr></thead>
+                                    <tbody>
+                                        @foreach (var item in Model.FitTests)
+                                        {
+                                            <tr>
+                                                <td>@F(item.DateFitTest)</td>
+                                                <td>@item.Resultat</td>
+                                                <td>@item.Commentaire</td>
+                                                <td>@(item.EstActif ? "Oui" : "Non")</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="medecin-tab-empty">Aucun Fit Test pour ce médecin.</div>
+                        }
+                    </div>
+
+                    <div class="tab-pane @(activeTab == "ententes" ? "active" : "")" id="d-ententes">
+                        <div class="medecin-tab-toolbar">
+                            <div class="summary">@Model.EntentesFDC.Count entente(s), dont @ententesActives active(s)</div>
+                        </div>
+
+                        @if (Model.EntentesFDC.Any())
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-striped table-hover medecin-tab-table">
+                                    <thead><tr><th>Type entente</th><th>Date adhésion</th><th>Date fin</th><th>PEM visé</th><th>Active</th></tr></thead>
+                                    <tbody>
+                                        @foreach (var item in Model.EntentesFDC)
+                                        {
+                                            <tr>
+                                                <td>@item.TypeEntenteFDC</td>
+                                                <td>@F(item.DateAdhesion)</td>
+                                                <td>@F(item.DateFin)</td>
+                                                <td>@item.PEMVise</td>
+                                                <td>@(item.EstActive ? "Oui" : "Non")</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="medecin-tab-empty">Aucune entente FDC pour ce médecin.</div>
+                        }
+                    </div>
+
+                    <div class="tab-pane @(activeTab == "comites" ? "active" : "")" id="d-comites">
+                        <div class="medecin-tab-toolbar">
+                            <div class="summary">@Model.Comites.Count participation(s)</div>
+                        </div>
+                        @if(Model.Comites.Any())
+                        {
+                            <table class="table table-bordered table-striped">
+                                <thead><tr><th>Comité</th><th>Rôle</th><th>Début</th><th>Fin</th><th>Commentaire</th></tr></thead>
+                                <tbody>
+                                @foreach(var item in Model.Comites)
+                                {
+                                    <tr>
+                                        <td>@item.Comite</td><td>@item.RoleMembre</td><td>@F(item.DateDebut)</td><td>@F(item.DateFin)</td><td>@item.Commentaire</td>
+                                    </tr>
+                                }
+                                </tbody>
+                            </table>
+                        }
+                        else
+                        {
+                            <div class="medecin-tab-empty">Aucune participation à un comité.</div>
+                        }
+                    </div>
+
+                    <div class="tab-pane @(activeTab == "documents" ? "active" : "")" id="d-documents">
+                        <div class="medecin-tab-toolbar">
+                            <div class="summary">@Model.Documents.Count(x => x.EstActif) document(s) actif(s)</div>
+                        </div>
+                        @if(Model.Documents.Any())
+                        {
+                            <table class="table table-bordered table-striped">
+                                <thead><tr><th>Type</th><th>Fichier</th><th>Date</th><th>Expiration</th><th>Confidentiel</th><th>État</th><th>Actions</th></tr></thead>
+                                <tbody>
+                                @foreach(var item in Model.Documents)
+                                {
+                                    <tr>
+                                        <td>@item.TypeDocument</td>
+                                        <td>@item.NomFichier</td>
+                                        <td>@F(item.DateDocument)</td>
+                                        <td>@F(item.DateExpiration)</td>
+                                        <td>@(item.Confidentiel ? "Oui" : "")</td>
+                                        <td>@(item.EstActif ? "Actif" : "Archivé")</td>
+                                        <td class="nowrap">
+                                            @if(item.EstActif)
+                                            {
+                                                <a href="@Url.Action("Download","DocumentsMedecin",new { id=item.DocumentMedecinId})" class="btn btn-primary btn-sm btn-icon-only" title="Télécharger"><i class="fa-solid fa-download"></i></a>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                                </tbody>
+                            </table>
+                        }
+                        else
+                        {
+                            <div class="medecin-tab-empty">Aucun document.</div>
+                        }
+                    </div>
+
+                    <div class="tab-pane @(activeTab == "alertes" ? "active" : "")" id="d-alertes">
+                        @if(Model.Alertes.Any())
+                        {
+                            <table class="table table-bordered table-striped">
+                                <thead><tr><th>Catégorie</th><th>Niveau</th><th>Message</th><th>Échéance</th><th>Action</th></tr></thead>
+                                <tbody>
+                                @foreach(var item in Model.Alertes)
+                                {
+                                    <tr class="@(item.Niveau == "danger" ? "danger" : item.Niveau == "warning" ? "warning" : "")">
+                                        <td>@item.Categorie</td>
+                                        <td>@item.Niveau</td>
+                                        <td>@item.Message</td>
+                                        <td>@F(item.DateEcheance)</td>
+                                        <td>
+                                            @if(!string.IsNullOrWhiteSpace(item.Controller) && !string.IsNullOrWhiteSpace(item.Action))
+                                            {
+                                                <a href="@Url.Action(item.Action,item.Controller,new { id=item.Id, returnMedecinId=Model.MedecinId })" class="btn btn-default btn-xs">Ouvrir</a>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                                </tbody>
+                            </table>
+                        }
+                        else
+                        {
+                            <div class="alert alert-success">Aucune alerte calculée pour ce médecin.</div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(Model.Commentaires))
+        {
+            <hr />
+            <h4>Commentaires</h4>
+            <div class="well" style="white-space:pre-wrap">@Model.Commentaires</div>
+        }
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
+    </div>
+</div>

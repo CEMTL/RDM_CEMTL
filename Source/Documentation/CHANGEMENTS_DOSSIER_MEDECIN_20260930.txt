@@ -1,0 +1,41 @@
+RDM - Dossier médecin centralisé (RDM 13)
+Date : 2026-09-30
+
+Objectif
+--------
+Centraliser dans le détail d'un médecin les principaux volets métier qui étaient auparavant
+consultables uniquement dans leurs modules globaux.
+
+Nouveaux onglets du détail médecin
+----------------------------------
+- Coordonnées (existant)
+- Organisation (existant)
+- Nominations (existant)
+- Privilèges (nouveau)
+- Cotisations (nouveau)
+- Fit Tests (nouveau)
+- Ententes FDC (nouveau)
+
+Comportement
+------------
+- Chaque onglet affiche uniquement les données du médecin courant.
+- Le titre de l'onglet affiche le nombre d'éléments.
+- Les utilisateurs en lecture peuvent consulter les détails.
+- Admin et SuperUtilisateur disposent des boutons Ajouter / Modifier / Supprimer.
+- Les actions utilisent les contrôleurs métier existants : aucune logique métier n'est dupliquée.
+- Lors d'une création depuis le dossier du médecin, le médecin est présélectionné et verrouillé
+  dans le formulaire afin d'éviter une affectation accidentelle à un autre médecin.
+- Après Créer / Modifier / Supprimer, RDM revient automatiquement au même médecin et au même
+  onglet dans la fenêtre de détail.
+- Les écrans globaux Privilèges, Cotisations, Fit Tests et Ententes FDC restent disponibles.
+
+Architecture / performance
+--------------------------
+Les quatre nouvelles collections sont chargées via des requêtes EF Core distinctes dans
+MedecinsController.DetailsModal. Ce choix évite d'ajouter plusieurs Include de collections au
+même graphe et limite le risque de produit cartésien lorsque le dossier contient beaucoup de
+coordonnées et de données métier.
+
+Base de données
+---------------
+Aucune modification du schéma SQL et aucune migration ne sont requises.

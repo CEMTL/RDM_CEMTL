@@ -1,0 +1,52 @@
+@model Solution.ViewModels.Medecins.MedecinCourrielFormViewModel
+@{
+    ViewBag.Title = "Modifier un courriel";
+}
+
+<div class="page-header-custom">
+    <h2>Modifier un courriel</h2>
+    <p class="text-muted">@Model.Permis — @Model.NomComplet</p>
+</div>
+
+<div class="dashboard-card">
+    @using (Html.BeginForm("EditCourriel", "MedecinCoordonnees", null, FormMethod.Post, null, null))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(m => m.MedecinCourrielId)
+        @Html.HiddenFor(m => m.MedecinId)
+        @Html.ValidationSummary(false, "Veuillez corriger les erreurs indiquées.", new { @class = "alert alert-danger" })
+
+        <div class="form-horizontal">
+            <div class="form-group">
+                @Html.LabelFor(m => m.TypeCourriel, new { @class = "col-md-3 control-label" })
+                <div class="col-md-6">
+                    @Html.DropDownListFor(m => m.TypeCourriel, Model.TypeCourrielOptions, "-- Sélectionner --", new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.TypeCourriel, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.AdresseCourriel, new { @class = "col-md-3 control-label" })
+                <div class="col-md-6">
+                    @Html.TextBoxFor(m => m.AdresseCourriel, new { @class = "form-control", type = "email" })
+                    @Html.ValidationMessageFor(m => m.AdresseCourriel, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.RangSource, new { @class = "col-md-3 control-label" })
+                <div class="col-md-3">@Html.TextBoxFor(m => m.RangSource, new { @class = "form-control", type = "number", min = "0", max = "255" })</div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-offset-3 col-md-6">
+                    <label class="checkbox-inline">@Html.CheckBoxFor(m => m.EstPrincipal) Principal</label>
+                </div>
+            </div>
+        </div>
+        <hr />
+        <div class="text-right">
+            <a href="@Url.Action("Manage", new { id = Model.MedecinId })" class="btn btn-default">Annuler</a>
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-save"></i> Enregistrer</button>
+        </div>
+    }
+</div>
+
+@section Scripts { @await Html.PartialAsync("_ValidationScriptsPartial") }

@@ -1,0 +1,593 @@
+/*
+    RDM_CEMTL - Référentiels organisationnels
+    Département / Service / Installation
+
+    Source des valeurs :
+      - Departements.xlsx
+      - Services.xlsx
+      - Installations.xlsx
+
+    Modèle :
+      Département 1 ---- N Service
+      Installation N --- N Service (via dbo.InstallationService)
+
+    IMPORTANT :
+      Les fichiers Excel fournis contiennent des listes, mais pas les relations
+      Installation <-> Service. La table dbo.InstallationService est donc créée,
+      mais elle n'est pas préremplie afin de ne pas inventer des affectations.
+
+      Les correspondances Département -> Service ci-dessous sont préremplies
+      uniquement lorsqu'elles sont suffisamment évidentes. Les services laissés
+      sans département sont listés à la fin du script pour validation métier.
+*/
+
+USE [RDM_CEMTL];
+GO
+
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+GO
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    /* ================================================================
+       1. INSTALLATION
+       La table existe déjà dans RDM. Elle n'est créée que si absente.
+       ================================================================ */
+
+    IF OBJECT_ID(N'dbo.Installation', N'U') IS NULL
+    BEGIN
+        CREATE TABLE dbo.Installation
+        (
+            InstallationId   INT IDENTITY(1,1) NOT NULL
+                CONSTRAINT PK_Installation PRIMARY KEY,
+            NomInstallation  NVARCHAR(200) NOT NULL,
+            CodeInstallation NVARCHAR(50) NULL,
+            EstActif         BIT NOT NULL
+                CONSTRAINT DF_Installation_EstActif DEFAULT (1)
+        );
+
+        CREATE UNIQUE INDEX UX_Installation_NomInstallation
+            ON dbo.Installation(NomInstallation);
+    END;
+
+    -- Compatibilité avec une table Installation existante plus ancienne.
+    IF COL_LENGTH('dbo.Installation', 'CodeInstallation') IS NULL
+        ALTER TABLE dbo.Installation ADD CodeInstallation NVARCHAR(50) NULL;
+
+    IF COL_LENGTH('dbo.Installation', 'EstActif') IS NULL
+        ALTER TABLE dbo.Installation
+            ADD EstActif BIT NOT NULL
+                CONSTRAINT DF_Installation_EstActif_Compat DEFAULT (1);
+
+    /* ================================================================
+       2. DEPARTEMENT
+       ================================================================ */
+
+    IF OBJECT_ID(N'dbo.Departement', N'U') IS NULL
+    BEGIN
+        CREATE TABLE dbo.Departement
+        (
+            DepartementId   INT IDENTITY(1,1) NOT NULL
+                CONSTRAINT PK_Departement PRIMARY KEY,
+            NomDepartement  NVARCHAR(200) NOT NULL,
+            CodeDepartement NVARCHAR(50) NULL,
+            EstActif        BIT NOT NULL
+                CONSTRAINT DF_Departement_EstActif DEFAULT (1)
+        );
+
+        CREATE UNIQUE INDEX UX_Departement_NomDepartement
+            ON dbo.Departement(NomDepartement);
+    END;
+
+    /* ================================================================
+       3. SERVICE
+       Un service est rattaché à un département.
+       DepartementId reste NULL tant qu'une correspondance doit être
+       validée par le métier.
+       ================================================================ */
+
+    IF OBJECT_ID(N'dbo.Service', N'U') IS NULL
+    BEGIN
+        CREATE TABLE dbo.Service
+        (
+            ServiceId      INT IDENTITY(1,1) NOT NULL
+                CONSTRAINT PK_Service PRIMARY KEY,
+            DepartementId  INT NULL,
+            NomService     NVARCHAR(250) NOT NULL,
+            CodeService    NVARCHAR(50) NULL,
+            EstActif       BIT NOT NULL
+                CONSTRAINT DF_Service_EstActif DEFAULT (1),
+
+            CONSTRAINT FK_Service_Departement
+                FOREIGN KEY (DepartementId)
+                REFERENCES dbo.Departement(DepartementId)
+                ON DELETE NO ACTION
+        );
+
+        CREATE UNIQUE INDEX UX_Service_NomService
+            ON dbo.Service(NomService);
+
+        CREATE INDEX IX_Service_DepartementId
+            ON dbo.Service(DepartementId);
+    END;
+
+    /* ================================================================
+       4. TABLE TECHNIQUE INSTALLATION <-> SERVICE
+       Nécessaire parce qu'un service peut être offert dans plusieurs
+       installations, et une installation offre plusieurs services.
+       ================================================================ */
+
+    IF OBJECT_ID(N'dbo.InstallationService', N'U') IS NULL
+    BEGIN
+        CREATE TABLE dbo.InstallationService
+        (
+            InstallationServiceId INT IDENTITY(1,1) NOT NULL
+                CONSTRAINT PK_InstallationService PRIMARY KEY,
+            InstallationId INT NOT NULL,
+            ServiceId      INT NOT NULL,
+            DateDebut      DATE NULL,
+            DateFin        DATE NULL,
+            EstActif       BIT NOT NULL
+                CONSTRAINT DF_InstallationService_EstActif DEFAULT (1),
+
+            CONSTRAINT FK_InstallationService_Installation
+                FOREIGN KEY (InstallationId)
+                REFERENCES dbo.Installation(InstallationId)
+                ON DELETE NO ACTION,
+
+            CONSTRAINT FK_InstallationService_Service
+                FOREIGN KEY (ServiceId)
+                REFERENCES dbo.Service(ServiceId)
+                ON DELETE NO ACTION,
+
+            CONSTRAINT CK_InstallationService_Dates
+                CHECK (DateFin IS NULL OR DateDebut IS NULL OR DateFin >= DateDebut)
+        );
+
+        CREATE INDEX IX_InstallationService_InstallationId
+            ON dbo.InstallationService(InstallationId);
+
+        CREATE INDEX IX_InstallationService_ServiceId
+            ON dbo.InstallationService(ServiceId);
+
+        CREATE UNIQUE INDEX UX_InstallationService_Actif
+            ON dbo.InstallationService(InstallationId, ServiceId)
+            WHERE EstActif = 1;
+    END;
+
+    /* ================================================================
+       5. INSERT / MISE À JOUR DES DÉPARTEMENTS
+       ================================================================ */
+
+    ;WITH SourceDepartement(NomDepartement) AS
+    (
+        SELECT v.NomDepartement
+        FROM (VALUES
+        (N'Anesthésiologie'),
+        (N'Chirurgie'),
+        (N'Imagerie médicale'),
+        (N'Médecine d''urgence'),
+        (N'Médecine générale'),
+        (N'Médecine spécialisée'),
+        (N'Obstétrique-Gynécologique'),
+        (N'Pédiatrie'),
+        (N'Pharmacie'),
+        (N'Psychiatrie'),
+        (N'Sages-Femmes')
+        ) v(NomDepartement)
+    )
+    INSERT INTO dbo.Departement (NomDepartement, EstActif)
+    SELECT s.NomDepartement, 1
+    FROM SourceDepartement s
+    WHERE NOT EXISTS
+    (
+        SELECT 1
+        FROM dbo.Departement d
+        WHERE d.NomDepartement = s.NomDepartement
+    );
+
+    ;WITH SourceDepartement(NomDepartement) AS
+    (
+        SELECT v.NomDepartement
+        FROM (VALUES
+        (N'Anesthésiologie'),
+        (N'Chirurgie'),
+        (N'Imagerie médicale'),
+        (N'Médecine d''urgence'),
+        (N'Médecine générale'),
+        (N'Médecine spécialisée'),
+        (N'Obstétrique-Gynécologique'),
+        (N'Pédiatrie'),
+        (N'Pharmacie'),
+        (N'Psychiatrie'),
+        (N'Sages-Femmes')
+        ) v(NomDepartement)
+    )
+    UPDATE d
+       SET d.EstActif = 1
+    FROM dbo.Departement d
+    INNER JOIN SourceDepartement s
+        ON s.NomDepartement = d.NomDepartement;
+
+    /* ================================================================
+       6. INSERT / MISE À JOUR DES INSTALLATIONS
+       ================================================================ */
+
+    ;WITH SourceInstallation(NomInstallation) AS
+    (
+        SELECT v.NomInstallation
+        FROM (VALUES
+        (N'CHSLD Benjamin-Victor-Rousselot'),
+        (N'CHSLD Dante'),
+        (N'CHSLD de Saint-Michel'),
+        (N'CHSLD Éloria-Lepage'),
+        (N'CHSLD François-Séguenot'),
+        (N'CHSLD J.-Henri Charbonneau'),
+        (N'CHSLD Jean-Hubert-Biermans'),
+        (N'CHSLD Jeanne-Le Ber'),
+        (N'CHSLD Joseph-François-Perrault'),
+        (N'CHSLD Judith-Jasmin'),
+        (N'CHSLD Marie-Rollet'),
+        (N'CHSLD Nicolet'),
+        (N'CHSLD Pierre-Joseph-Triest'),
+        (N'CHSLD Polonais Marie-Curie-Sklodowska'),
+        (N'CHSLD Robert-Cliche'),
+        (N'CLSC de l''Est-de-Montréal'),
+        (N'CLSC de Mercier-Est'),
+        (N'CLSC de Rivière-des-Prairies'),
+        (N'CLSC de Rosemont'),
+        (N'CLSC de Saint-Léonard'),
+        (N'CLSC de Saint-Michel'),
+        (N'CLSC et GMF-U de Hochelaga-Maisonneuve'),
+        (N'GMF-U Maisonneuve-Rosemont'),
+        (N'Hôpital Maisonneuve-Rosemont'),
+        (N'Hôpital Santa Cabrini'),
+        (N'Institut universitaire en santé mentale de Montréal'),
+        (N'Le Phare, Enfants et familles'),
+        (N'Maison Anne-Courtemanche')
+        ) v(NomInstallation)
+    )
+    INSERT INTO dbo.Installation
+        (NomInstallation, CodeInstallation, EstActif)
+    SELECT
+        s.NomInstallation,
+        NULL,
+        1
+    FROM SourceInstallation s
+    WHERE NOT EXISTS
+    (
+        SELECT 1
+        FROM dbo.Installation i
+        WHERE i.NomInstallation = s.NomInstallation
+    );
+
+    ;WITH SourceInstallation(NomInstallation) AS
+    (
+        SELECT v.NomInstallation
+        FROM (VALUES
+        (N'CHSLD Benjamin-Victor-Rousselot'),
+        (N'CHSLD Dante'),
+        (N'CHSLD de Saint-Michel'),
+        (N'CHSLD Éloria-Lepage'),
+        (N'CHSLD François-Séguenot'),
+        (N'CHSLD J.-Henri Charbonneau'),
+        (N'CHSLD Jean-Hubert-Biermans'),
+        (N'CHSLD Jeanne-Le Ber'),
+        (N'CHSLD Joseph-François-Perrault'),
+        (N'CHSLD Judith-Jasmin'),
+        (N'CHSLD Marie-Rollet'),
+        (N'CHSLD Nicolet'),
+        (N'CHSLD Pierre-Joseph-Triest'),
+        (N'CHSLD Polonais Marie-Curie-Sklodowska'),
+        (N'CHSLD Robert-Cliche'),
+        (N'CLSC de l''Est-de-Montréal'),
+        (N'CLSC de Mercier-Est'),
+        (N'CLSC de Rivière-des-Prairies'),
+        (N'CLSC de Rosemont'),
+        (N'CLSC de Saint-Léonard'),
+        (N'CLSC de Saint-Michel'),
+        (N'CLSC et GMF-U de Hochelaga-Maisonneuve'),
+        (N'GMF-U Maisonneuve-Rosemont'),
+        (N'Hôpital Maisonneuve-Rosemont'),
+        (N'Hôpital Santa Cabrini'),
+        (N'Institut universitaire en santé mentale de Montréal'),
+        (N'Le Phare, Enfants et familles'),
+        (N'Maison Anne-Courtemanche')
+        ) v(NomInstallation)
+    )
+    UPDATE i
+       SET i.EstActif = 1
+    FROM dbo.Installation i
+    INNER JOIN SourceInstallation s
+        ON s.NomInstallation = i.NomInstallation;
+
+    /* ================================================================
+       7. INSERT DES SERVICES ET ASSOCIATION AU DÉPARTEMENT
+       ================================================================ */
+
+    ;WITH SourceService(NomService, NomDepartement) AS
+    (
+        SELECT v.NomService, v.NomDepartement
+        FROM (VALUES
+        (N'Allergologie et immunologie', N'Médecine spécialisée'),
+        (N'Biochimie', NULL),
+        (N'Cardiologie', N'Médecine spécialisée'),
+        (N'Chirurgie dentaire', N'Chirurgie'),
+        (N'Chirurgie générale', N'Chirurgie'),
+        (N'Chirurgie orthopédique', N'Chirurgie'),
+        (N'Chirurgie plastique', N'Chirurgie'),
+        (N'Chirurgie thoracique', N'Chirurgie'),
+        (N'Chirurgie vasculaire', N'Chirurgie'),
+        (N'Clinique de la douleur', N'Anesthésiologie'),
+        (N'CONNEC-T', N'Psychiatrie'),
+        (N'Consultation-liaison', N'Psychiatrie'),
+        (N'Dermatologie', N'Médecine spécialisée'),
+        (N'Électro-convulsivothérapie', N'Psychiatrie'),
+        (N'Endocrinologie', N'Médecine spécialisée'),
+        (N'Gastro-entérologie', N'Médecine spécialisée'),
+        (N'Gériatrie spécialisée', N'Médecine spécialisée'),
+        (N'Gérontopsychiatrie', N'Psychiatrie'),
+        (N'Gynécologie', N'Obstétrique-Gynécologique'),
+        (N'Gynécologie-oncologique', N'Obstétrique-Gynécologique'),
+        (N'Hématologie-laboratoire', NULL),
+        (N'Hémato-oncologie', N'Médecine spécialisée'),
+        (N'Maladies infectieuses et microbiologie médicale', N'Médecine spécialisée'),
+        (N'Médecine générale', N'Médecine générale'),
+        (N'Médecine familiale', N'Médecine générale'),
+        (N'Médecine interne', N'Médecine spécialisée'),
+        (N'Médecine nucléaire', N'Imagerie médicale'),
+        (N'Néonatalogie', N'Pédiatrie'),
+        (N'Néphrologie', N'Médecine spécialisée'),
+        (N'Neurochirurgie', N'Chirurgie'),
+        (N'Neurologie', N'Médecine spécialisée'),
+        (N'Obstétrique', N'Obstétrique-Gynécologique'),
+        (N'Obstétrique et périnatalité', N'Obstétrique-Gynécologique'),
+        (N'Ophtalmologie', N'Chirurgie'),
+        (N'Oto-Rhino-Laryngologie', N'Chirurgie'),
+        (N'Pathologies chirurgicales', N'Chirurgie'),
+        (N'Pédiatrie ambulatoire', N'Pédiatrie'),
+        (N'Pédiatrie interne', N'Pédiatrie'),
+        (N'Pneumologie', N'Médecine spécialisée'),
+        (N'Programme de psychiatrie neurodéveloppementale adulte', N'Psychiatrie'),
+        (N'Psychiatrie légale', N'Psychiatrie'),
+        (N'Radiologie diagnostique', N'Imagerie médicale'),
+        (N'Radio-oncologie', NULL),
+        (N'Rhumatologie', N'Médecine spécialisée'),
+        (N'Services hospitaliers', NULL),
+        (N'Soins intensifs', NULL),
+        (N'Soins palliatifs', NULL),
+        (N'Toxicomanie et maladies psychiatriques', N'Psychiatrie'),
+        (N'Troubles anxieux et de l''humeur', N'Psychiatrie'),
+        (N'Troubles psychotiques', N'Psychiatrie'),
+        (N'Troubles relationnels et de la personnalité', N'Psychiatrie'),
+        (N'Urgences psychiatriques', N'Psychiatrie'),
+        (N'Urologie', N'Chirurgie'),
+        (N'Diagnostic moléculaire', NULL)
+        ) v(NomService, NomDepartement)
+    )
+    INSERT INTO dbo.Service
+        (DepartementId, NomService, CodeService, EstActif)
+    SELECT
+        d.DepartementId,
+        s.NomService,
+        NULL,
+        1
+    FROM SourceService s
+    LEFT JOIN dbo.Departement d
+        ON d.NomDepartement = s.NomDepartement
+    WHERE NOT EXISTS
+    (
+        SELECT 1
+        FROM dbo.Service x
+        WHERE x.NomService = s.NomService
+    );
+
+    /*
+        Si le service existe déjà, le script ne remplace pas un département
+        déjà renseigné. Il complète uniquement DepartementId lorsqu'il est NULL.
+    */
+    ;WITH SourceService(NomService, NomDepartement) AS
+    (
+        SELECT v.NomService, v.NomDepartement
+        FROM (VALUES
+        (N'Allergologie et immunologie', N'Médecine spécialisée'),
+        (N'Biochimie', NULL),
+        (N'Cardiologie', N'Médecine spécialisée'),
+        (N'Chirurgie dentaire', N'Chirurgie'),
+        (N'Chirurgie générale', N'Chirurgie'),
+        (N'Chirurgie orthopédique', N'Chirurgie'),
+        (N'Chirurgie plastique', N'Chirurgie'),
+        (N'Chirurgie thoracique', N'Chirurgie'),
+        (N'Chirurgie vasculaire', N'Chirurgie'),
+        (N'Clinique de la douleur', N'Anesthésiologie'),
+        (N'CONNEC-T', N'Psychiatrie'),
+        (N'Consultation-liaison', N'Psychiatrie'),
+        (N'Dermatologie', N'Médecine spécialisée'),
+        (N'Électro-convulsivothérapie', N'Psychiatrie'),
+        (N'Endocrinologie', N'Médecine spécialisée'),
+        (N'Gastro-entérologie', N'Médecine spécialisée'),
+        (N'Gériatrie spécialisée', N'Médecine spécialisée'),
+        (N'Gérontopsychiatrie', N'Psychiatrie'),
+        (N'Gynécologie', N'Obstétrique-Gynécologique'),
+        (N'Gynécologie-oncologique', N'Obstétrique-Gynécologique'),
+        (N'Hématologie-laboratoire', NULL),
+        (N'Hémato-oncologie', N'Médecine spécialisée'),
+        (N'Maladies infectieuses et microbiologie médicale', N'Médecine spécialisée'),
+        (N'Médecine générale', N'Médecine générale'),
+        (N'Médecine familiale', N'Médecine générale'),
+        (N'Médecine interne', N'Médecine spécialisée'),
+        (N'Médecine nucléaire', N'Imagerie médicale'),
+        (N'Néonatalogie', N'Pédiatrie'),
+        (N'Néphrologie', N'Médecine spécialisée'),
+        (N'Neurochirurgie', N'Chirurgie'),
+        (N'Neurologie', N'Médecine spécialisée'),
+        (N'Obstétrique', N'Obstétrique-Gynécologique'),
+        (N'Obstétrique et périnatalité', N'Obstétrique-Gynécologique'),
+        (N'Ophtalmologie', N'Chirurgie'),
+        (N'Oto-Rhino-Laryngologie', N'Chirurgie'),
+        (N'Pathologies chirurgicales', N'Chirurgie'),
+        (N'Pédiatrie ambulatoire', N'Pédiatrie'),
+        (N'Pédiatrie interne', N'Pédiatrie'),
+        (N'Pneumologie', N'Médecine spécialisée'),
+        (N'Programme de psychiatrie neurodéveloppementale adulte', N'Psychiatrie'),
+        (N'Psychiatrie légale', N'Psychiatrie'),
+        (N'Radiologie diagnostique', N'Imagerie médicale'),
+        (N'Radio-oncologie', NULL),
+        (N'Rhumatologie', N'Médecine spécialisée'),
+        (N'Services hospitaliers', NULL),
+        (N'Soins intensifs', NULL),
+        (N'Soins palliatifs', NULL),
+        (N'Toxicomanie et maladies psychiatriques', N'Psychiatrie'),
+        (N'Troubles anxieux et de l''humeur', N'Psychiatrie'),
+        (N'Troubles psychotiques', N'Psychiatrie'),
+        (N'Troubles relationnels et de la personnalité', N'Psychiatrie'),
+        (N'Urgences psychiatriques', N'Psychiatrie'),
+        (N'Urologie', N'Chirurgie'),
+        (N'Diagnostic moléculaire', NULL)
+        ) v(NomService, NomDepartement)
+    )
+    UPDATE srv
+       SET srv.DepartementId = dep.DepartementId,
+           srv.EstActif = 1
+    FROM dbo.Service srv
+    INNER JOIN SourceService src
+        ON src.NomService = srv.NomService
+    INNER JOIN dbo.Departement dep
+        ON dep.NomDepartement = src.NomDepartement
+    WHERE srv.DepartementId IS NULL
+      AND src.NomDepartement IS NOT NULL;
+
+    /*
+        Tous les services du fichier sont réactivés s'ils existaient déjà.
+        Cela ne change pas leur département existant.
+    */
+    ;WITH SourceService(NomService) AS
+    (
+        SELECT v.NomService
+        FROM (VALUES
+        (N'Allergologie et immunologie'),
+        (N'Biochimie'),
+        (N'Cardiologie'),
+        (N'Chirurgie dentaire'),
+        (N'Chirurgie générale'),
+        (N'Chirurgie orthopédique'),
+        (N'Chirurgie plastique'),
+        (N'Chirurgie thoracique'),
+        (N'Chirurgie vasculaire'),
+        (N'Clinique de la douleur'),
+        (N'CONNEC-T'),
+        (N'Consultation-liaison'),
+        (N'Dermatologie'),
+        (N'Électro-convulsivothérapie'),
+        (N'Endocrinologie'),
+        (N'Gastro-entérologie'),
+        (N'Gériatrie spécialisée'),
+        (N'Gérontopsychiatrie'),
+        (N'Gynécologie'),
+        (N'Gynécologie-oncologique'),
+        (N'Hématologie-laboratoire'),
+        (N'Hémato-oncologie'),
+        (N'Maladies infectieuses et microbiologie médicale'),
+        (N'Médecine générale'),
+        (N'Médecine familiale'),
+        (N'Médecine interne'),
+        (N'Médecine nucléaire'),
+        (N'Néonatalogie'),
+        (N'Néphrologie'),
+        (N'Neurochirurgie'),
+        (N'Neurologie'),
+        (N'Obstétrique'),
+        (N'Obstétrique et périnatalité'),
+        (N'Ophtalmologie'),
+        (N'Oto-Rhino-Laryngologie'),
+        (N'Pathologies chirurgicales'),
+        (N'Pédiatrie ambulatoire'),
+        (N'Pédiatrie interne'),
+        (N'Pneumologie'),
+        (N'Programme de psychiatrie neurodéveloppementale adulte'),
+        (N'Psychiatrie légale'),
+        (N'Radiologie diagnostique'),
+        (N'Radio-oncologie'),
+        (N'Rhumatologie'),
+        (N'Services hospitaliers'),
+        (N'Soins intensifs'),
+        (N'Soins palliatifs'),
+        (N'Toxicomanie et maladies psychiatriques'),
+        (N'Troubles anxieux et de l''humeur'),
+        (N'Troubles psychotiques'),
+        (N'Troubles relationnels et de la personnalité'),
+        (N'Urgences psychiatriques'),
+        (N'Urologie'),
+        (N'Diagnostic moléculaire')
+        ) v(NomService)
+    )
+    UPDATE srv
+       SET srv.EstActif = 1
+    FROM dbo.Service srv
+    INNER JOIN SourceService src
+        ON src.NomService = srv.NomService;
+
+    COMMIT TRANSACTION;
+END TRY
+BEGIN CATCH
+    IF @@TRANCOUNT > 0
+        ROLLBACK TRANSACTION;
+
+    THROW;
+END CATCH;
+GO
+
+/* ================================================================
+   8. CONTRÔLES APRÈS EXÉCUTION
+   ================================================================ */
+
+SELECT
+    (SELECT COUNT(*) FROM dbo.Departement) AS NbDepartements,
+    (SELECT COUNT(*) FROM dbo.Installation) AS NbInstallations,
+    (SELECT COUNT(*) FROM dbo.Service) AS NbServices,
+    (SELECT COUNT(*) FROM dbo.InstallationService WHERE EstActif = 1)
+        AS NbLiensInstallationServiceActifs;
+GO
+
+/*
+    Services volontairement laissés sans département parce que les trois
+    fichiers source ne donnent pas la correspondance organisationnelle.
+    Ils doivent être validés avec le métier avant attribution.
+*/
+SELECT
+    s.ServiceId,
+    s.NomService,
+    s.DepartementId
+FROM dbo.Service s
+WHERE s.DepartementId IS NULL
+ORDER BY s.NomService;
+GO
+
+/*
+    APRÈS VALIDATION MÉTIER, exemple d'affectation d'un service à une
+    installation :
+
+    INSERT INTO dbo.InstallationService
+        (InstallationId, ServiceId, DateDebut, DateFin, EstActif)
+    SELECT
+        i.InstallationId,
+        s.ServiceId,
+        CAST(GETDATE() AS date),
+        NULL,
+        1
+    FROM dbo.Installation i
+    CROSS JOIN dbo.Service s
+    WHERE i.NomInstallation = N'Hôpital Maisonneuve-Rosemont'
+      AND s.NomService = N'Cardiologie'
+      AND NOT EXISTS
+      (
+          SELECT 1
+          FROM dbo.InstallationService x
+          WHERE x.InstallationId = i.InstallationId
+            AND x.ServiceId = s.ServiceId
+            AND x.EstActif = 1
+      );
+*/
+Commit

@@ -1,0 +1,17 @@
+@model Solution.ViewModels.Departements.DepartementFormViewModel
+
+<div class="dashboard-card">
+    <div class="form-group">
+        @Html.LabelFor(m => m.NomDepartement)
+        @Html.TextBoxFor(m => m.NomDepartement, new { @class = "form-control", maxlength = 200 })
+        @Html.ValidationMessageFor(m => m.NomDepartement, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.CodeDepartement)
+        @Html.TextBoxFor(m => m.CodeDepartement, new { @class = "form-control", maxlength = 50 })
+        @Html.ValidationMessageFor(m => m.CodeDepartement, "", new { @class = "text-danger" })
+    </div>
+    <div class="checkbox">
+        <label>@Html.CheckBoxFor(m => m.EstActif) Actif</label>
+    </div>
+</div>

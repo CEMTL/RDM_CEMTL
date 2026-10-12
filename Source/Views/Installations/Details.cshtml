@@ -1,0 +1,37 @@
+@model Solution.ViewModels.Installations.InstallationDetailsViewModel
+@{
+    ViewBag.Title = "Détails Installation";
+}
+
+<div class="page-header-custom">
+    <h2>Détails Installation</h2>
+</div>
+
+<div class="dashboard-card">
+    <dl class="dl-horizontal">
+        <dt>Installation</dt>
+        <dd>@Model.NomInstallation</dd>
+        <dt>Code</dt>
+        <dd>@Model.CodeInstallation</dd>
+        <dt>Actif</dt>
+        <dd>@(Model.EstActif ? "Oui" : "Non")</dd>
+    </dl>
+</div>
+
+<div class="dashboard-card">
+    <h3>Services</h3>
+    <table class="table table-bordered table-striped registre-table">
+        <thead><tr><th>Département</th><th>Service</th><th>Date début</th><th>Date fin</th><th>Actif</th></tr></thead>
+        <tbody>
+        @foreach (var item in Model.Services)
+        {
+            <tr><td>@item.NomDepartement</td><td>@item.NomService</td><td>@(item.DateDebut?.ToString("yyyy-MM-dd"))</td><td>@(item.DateFin?.ToString("yyyy-MM-dd"))</td><td>@(item.EstActif ? "Oui" : "Non")</td></tr>
+        }
+        </tbody>
+    </table>
+</div>
+
+<div class="dashboard-card actions-card">
+    <a href="@Url.Action("Edit", new { id = Model.InstallationId })" class="btn btn-warning btn-icon-only" title="Modifier"><i class="fa-solid fa-pen-to-square"></i></a>
+    <a href="@Url.Action("Index")" class="btn btn-default btn-icon-only" title="Retour"><i class="fa-solid fa-arrow-left"></i></a>
+</div>
