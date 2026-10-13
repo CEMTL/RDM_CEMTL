@@ -13,6 +13,7 @@ using Microsoft.Extensions.Logging;
 using System.Text.RegularExpressions;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.Data.SqlClient;
+using Solution.Helpers;
 
 namespace Solution.Controllers
 {
@@ -70,12 +71,10 @@ namespace Solution.Controllers
         [HttpPost]
         public ActionResult GetMedecins(string searchTop, bool? actifsSeulement)
         {
-            int draw = Convert.ToInt32(Request.Form["draw"].FirstOrDefault());
-            int start = Convert.ToInt32(Request.Form["start"].FirstOrDefault());
-            int length = Convert.ToInt32(Request.Form["length"].FirstOrDefault());
-
-            if (length <= 0)
-                length = 10;
+            var dataTableRequest = DataTableRequest.FromForm(Request.Form);
+            int draw = dataTableRequest.Draw;
+            int start = dataTableRequest.Start;
+            int length = dataTableRequest.Length;
 
             // Le champ de recherche principal est celui affiché au-dessus du tableau.
             // On conserve aussi la prise en charge de search[value] au cas où DataTables
@@ -272,7 +271,6 @@ namespace Solution.Controllers
                 nouveau.Adresses.Add(new MedecinAdresseEditItemViewModel());
                 nouveau.Telephones.Add(new MedecinTelephoneEditItemViewModel());
                 nouveau.Courriels.Add(new MedecinCourrielEditItemViewModel());
-                nouveau.Installations.Add(new MedecinInstallationEditItemViewModel { RangInstallation = 1 });
                 nouveau.NominationsAdministratives.Add(new NominationAdministrativeEditItemViewModel());
 
                 ChargerListesEdit(nouveau);
@@ -428,11 +426,6 @@ namespace Solution.Controllers
                     etapeEnregistrement = "Courriels";
                     cleEtape = "Courriels";
                     SynchroniserCourriels(transactionDb, entity, model);
-                    transactionDb.SaveChanges();
-
-                    etapeEnregistrement = "Installations";
-                    cleEtape = "Installations";
-                    SynchroniserInstallations(transactionDb, entity, model);
                     transactionDb.SaveChanges();
 
                     etapeEnregistrement = "Nominations administratives";

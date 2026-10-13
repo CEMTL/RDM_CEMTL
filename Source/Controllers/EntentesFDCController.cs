@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Solution.Models;
 using Solution.ViewModels.EntentesFDC;
 using Solution.Services;
+using Solution.Helpers;
 
 namespace Solution.Controllers
 {
@@ -46,9 +47,10 @@ namespace Solution.Controllers
         [HttpPost]
         public ActionResult GetEntentesFDC(string searchTop)
         {
-            int draw = Convert.ToInt32(Request.Form["draw"].FirstOrDefault());
-            int start = Convert.ToInt32(Request.Form["start"].FirstOrDefault());
-            int length = Convert.ToInt32(Request.Form["length"].FirstOrDefault());
+            var dataTableRequest = DataTableRequest.FromForm(Request.Form);
+            int draw = dataTableRequest.Draw;
+            int start = dataTableRequest.Start;
+            int length = dataTableRequest.Length;
 
             string dataTableSearch = Request.Form["search[value]"].FirstOrDefault();
             string termeRecherche = !string.IsNullOrWhiteSpace(searchTop)

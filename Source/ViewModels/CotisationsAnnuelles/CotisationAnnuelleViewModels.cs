@@ -123,4 +123,30 @@ namespace Solution.ViewModels.CotisationsAnnuelles
         public string CodeCotisationLibelle1 { get; set; }
         public string TypePaiementLibelle1 { get; set; }
     }
+
+    /// <summary>
+    /// Données figées à partir de la cotisation pour produire un reçu de paiement
+    /// imprimable. Aucun renseignement clinique n'est inclus dans le document.
+    /// </summary>
+    public class CotisationRecuViewModel
+    {
+        public int CotisationAnnuelleId { get; set; }
+        public string NumeroRecu { get; set; }
+        public short AnneeExercice { get; set; }
+        public string MedecinNomComplet { get; set; }
+        public string NumeroPermis { get; set; }
+        public string CodeCotisation { get; set; }
+        public string Description { get; set; }
+        public decimal MontantFinal { get; set; }
+        public decimal MontantPaye { get; set; }
+        public decimal Solde { get; set; }
+        public DateTime DatePaiement { get; set; }
+        public string TypePaiement { get; set; }
+        public DateTime? DateDepot { get; set; }
+        public string NumeroDepot { get; set; }
+        public string ReferenceRecuImposition { get; set; }
+        public DateTime? DateRecuImposition { get; set; }
+        public DateTime DateImpression { get; set; }
+        public string ImprimePar { get; set; }
+    }
 }

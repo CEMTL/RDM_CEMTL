@@ -122,18 +122,9 @@ namespace Solution.Services
         {
             try
             {
-                var request = _httpContext?.Request;
-                if (request == null)
-                    return null;
-
-                var forwarded = request.Headers["X-Forwarded-For"].FirstOrDefault();
-                if (!string.IsNullOrWhiteSpace(forwarded))
-                {
-                    var firstIp = forwarded.Split(',').FirstOrDefault();
-                    if (!string.IsNullOrWhiteSpace(firstIp))
-                        return firstIp.Trim();
-                }
-
+                // Ne jamais lire X-Forwarded-For directement : cet en-tête peut être
+                // fourni par le client et fausser la piste d'audit. IIS/ASP.NET Core
+                // normalise l'adresse du client dans Connection.RemoteIpAddress.
                 return _httpContext.Connection.RemoteIpAddress?.ToString();
             }
             catch

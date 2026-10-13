@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Server.IIS;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using System.Globalization;
 using System.Threading.RateLimiting;
 using Microsoft.EntityFrameworkCore;
@@ -47,6 +49,17 @@ if (string.IsNullOrWhiteSpace(connectionString))
 }
 
 var useActiveDirectory = authOptions.UseActiveDirectory;
+
+if (!useActiveDirectory &&
+    !builder.Environment.IsDevelopment() &&
+    !authOptions.AllowLocalAdminOutsideDevelopment)
+{
+    throw new InvalidOperationException(
+        "Le mode Authentication:UseActiveDirectory=false accorde les droits administrateur à toutes les requêtes. " +
+        "Il est interdit hors Development, sauf activation explicite de " +
+        "Authentication:AllowLocalAdminOutsideDevelopment pour une intervention contrôlée.");
+}
+
 var authenticationScheme = useActiveDirectory
     ? CookieAuthenticationDefaults.AuthenticationScheme
     : LocalAdminAuthenticationHandler.SchemeName;
@@ -72,7 +85,7 @@ builder.Services.AddSession(options =>
 
 builder.Services.AddLocalization();
 
-builder.Services
+var mvcBuilder = builder.Services
     .AddControllersWithViews(options =>
     {
         options.ModelBinderProviders.Insert(0, new FlexibleDecimalModelBinderProvider());
@@ -109,8 +122,14 @@ builder.Services
     {
         options.JsonSerializerOptions.PropertyNamingPolicy = null;
         options.JsonSerializerOptions.DictionaryKeyPolicy = null;
-    })
-    .AddRazorRuntimeCompilation();
+    });
+
+// La compilation dynamique des vues est utile pendant le développement, mais
+// elle est inutilement coûteuse et élargit la surface d'exécution en production.
+if (builder.Environment.IsDevelopment())
+{
+    mvcBuilder.AddRazorRuntimeCompilation();
+}
 
 builder.Services.AddDbContext<HopitalMedecinsDbEntities>(options =>
     options.UseLazyLoadingProxies()
@@ -120,6 +139,10 @@ builder.Services.AddScoped<IActiveDirectoryAuthenticationService, ActiveDirector
 builder.Services.AddScoped<IAspNetIdentityAuthorizationService, AspNetIdentityAuthorizationService>();
 builder.Services.AddScoped<IMedecinAlerteService, MedecinAlerteService>();
 builder.Services.AddScoped<IAdminExportDocumentService, AdminExportDocumentService>();
+builder.Services
+    .AddHealthChecks()
+    .AddCheck("application", () => HealthCheckResult.Healthy(), tags: new[] { "live" })
+    .AddCheck<DatabaseHealthCheck>("database", tags: new[] { "ready" });
 
 // Protection du formulaire d'authentification AD contre les rafales de tentatives.
 builder.Services.AddRateLimiter(options =>
@@ -219,6 +242,8 @@ app.Use(async (context, next) =>
     context.Response.Headers["X-Frame-Options"] = "SAMEORIGIN";
     context.Response.Headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
     context.Response.Headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()";
+    context.Response.Headers["Content-Security-Policy"] =
+        "base-uri 'self'; form-action 'self'; frame-ancestors 'self'; object-src 'none'";
     await next();
 });
 
@@ -251,7 +276,38 @@ app.UseRouting();
 app.UseSession();
 app.UseRateLimiter();
 app.UseAuthentication();
+
+// Les pages authentifiées contiennent des renseignements professionnels et parfois
+// des documents confidentiels. Elles ne doivent pas rester dans un cache partagé
+// ou dans l'historique hors connexion d'un poste de travail.
+app.Use(async (context, next) =>
+{
+    context.Response.OnStarting(() =>
+    {
+        if (context.User.Identity?.IsAuthenticated == true)
+        {
+            context.Response.Headers.CacheControl = "no-store, max-age=0";
+            context.Response.Headers.Pragma = "no-cache";
+            context.Response.Headers.Expires = "0";
+        }
+
+        return Task.CompletedTask;
+    });
+
+    await next();
+});
+
 app.UseAuthorization();
+
+app.MapHealthChecks("/health/live", new HealthCheckOptions
+{
+    Predicate = registration => registration.Tags.Contains("live")
+}).AllowAnonymous();
+
+app.MapHealthChecks("/health/ready", new HealthCheckOptions
+{
+    Predicate = registration => registration.Tags.Contains("ready")
+}).AllowAnonymous();
 
 app.MapControllerRoute(
     name: "default",

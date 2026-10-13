@@ -1,0 +1,28 @@
+# Visual Studio / .NET
+.vs/
+bin/
+obj/
+TestResults/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Secrets and machine-local configuration
+appsettings.Local.json
+appsettings.*.local.json
+secrets.json
+*.pfx
+*.snk
+
+# Logs and generated exports
+logs/
+*.log
+artifacts/
+publish/
+
+# Operating systems and editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

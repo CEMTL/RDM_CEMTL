@@ -102,6 +102,10 @@
                                                 <td>@item.TypePaiement</td>
                                                 <td class="table-actions nowrap">
                                                     <a href="@Url.Action("Details", "CotisationsAnnuelles", new { id = item.CotisationAnnuelleId, returnMedecinId = Model.MedecinId, returnTab = "cotisations" })" class="btn btn-info btn-sm btn-icon-only" title="Détails"><i class="fa-solid fa-circle-info"></i></a>
+                                                    @if (item.MontantPaye.GetValueOrDefault() > 0m && item.DatePaiement.HasValue)
+                                                    {
+                                                        <a href="@Url.Action("Recu", "CotisationsAnnuelles", new { id = item.CotisationAnnuelleId, returnMedecinId = Model.MedecinId, returnTab = "cotisations" })" class="btn btn-success btn-sm btn-icon-only" title="Imprimer le reçu" aria-label="Imprimer le reçu" target="_blank" rel="noopener"><i class="fa-solid fa-print"></i></a>
+                                                    }
                                                     @if (canManage)
                                                     {
                                                         <a href="@Url.Action("Edit", "CotisationsAnnuelles", new { id = item.CotisationAnnuelleId, returnMedecinId = Model.MedecinId, returnTab = "cotisations" })" class="btn btn-warning btn-sm btn-icon-only" title="Modifier"><i class="fa-solid fa-pen-to-square"></i></a>

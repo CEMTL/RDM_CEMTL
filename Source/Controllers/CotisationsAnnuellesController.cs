@@ -149,6 +149,66 @@ namespace Solution.Controllers
             return View(vm);
         }
 
+        [HttpGet]
+        public ActionResult Recu(int? id, int? returnMedecinId = null, string returnTab = null)
+        {
+            PreparerRetour(returnMedecinId, returnTab);
+            if (!id.HasValue)
+                return BadRequest();
+
+            var entity = db.CotisationAnnuelle
+                .AsNoTracking()
+                .Include(x => x.Medecin)
+                .Include(x => x.CodeCotisation)
+                .Include(x => x.TypePaiement)
+                .FirstOrDefault(x => x.CotisationAnnuelleId == id.Value);
+
+            if (entity == null)
+                return NotFound();
+
+            if (entity.MontantPaye.GetValueOrDefault() <= 0m || !entity.DatePaiement.HasValue)
+            {
+                TempData["Error"] = "Un reçu peut être imprimé seulement lorsqu'un paiement positif et sa date sont enregistrés.";
+                return RedirectToAction(nameof(Details), new
+                {
+                    id = entity.CotisationAnnuelleId,
+                    returnMedecinId,
+                    returnTab
+                });
+            }
+
+            var montantFinal = entity.MontantFinal.GetValueOrDefault();
+            var montantPaye = entity.MontantPaye.GetValueOrDefault();
+            var medecin = entity.Medecin;
+
+            var model = new CotisationRecuViewModel
+            {
+                CotisationAnnuelleId = entity.CotisationAnnuelleId,
+                NumeroRecu = $"COT-{entity.AnneeExercice}-{entity.CotisationAnnuelleId:D6}",
+                AnneeExercice = entity.AnneeExercice,
+                MedecinNomComplet = medecin == null
+                    ? string.Empty
+                    : string.Join(" ", new[] { medecin.Prenom, medecin.Nom }
+                        .Where(x => !string.IsNullOrWhiteSpace(x))),
+                NumeroPermis = medecin?.Permis,
+                CodeCotisation = entity.CodeCotisation?.CodeCotisation1,
+                Description = entity.DescriptionSource,
+                MontantFinal = montantFinal,
+                MontantPaye = montantPaye,
+                Solde = Math.Max(0m, montantFinal - montantPaye),
+                DatePaiement = entity.DatePaiement.Value,
+                TypePaiement = entity.TypePaiement?.Libelle ?? entity.TypePaiementTexte,
+                DateDepot = entity.DateDepot,
+                NumeroDepot = entity.NoDepot,
+                ReferenceRecuImposition = entity.RecuImposition,
+                DateRecuImposition = entity.DateRecuImposition,
+                DateImpression = DateTime.Now,
+                ImprimePar = User?.Identity?.Name
+            };
+
+            return View(model);
+        }
+
         [Authorize(Roles = "Admin,SuperUtilisateur")]
         public ActionResult Create(int? medecinId = null, int? returnMedecinId = null, string returnTab = null)
         {
