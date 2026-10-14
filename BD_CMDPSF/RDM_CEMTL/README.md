@@ -17,7 +17,7 @@ La chaîne de connexion utilisée par l'application se trouve dans
 être remplacée localement avec les secrets utilisateur :
 
 ```powershell
-dotnet user-secrets set "ConnectionStrings:RdmConnection" "Server=SERVEUR;Database=RDM_CEMTL;Integrated Security=True;Encrypt=True;TrustServerCertificate=True;MultipleActiveResultSets=True"
+dotnet user-secrets set "ConnectionStrings:RdmConnection" "Server=SERVEUR;Database=bd_cmdpsf;Integrated Security=True;Encrypt=True;TrustServerCertificate=True;MultipleActiveResultSets=True"
 dotnet user-secrets set "Authentication:BootstrapAdmin" "DOMAINE\\compte-admin"
 ```
 
@@ -40,7 +40,7 @@ dotnet run
 
 L'application utilise la culture `fr-CA`. Les pages métier exigent une identité
 ayant un rôle `Admin`, `SuperUtilisateur` ou `Utilisateur` dans les tables
-ASP.NET Identity de la base RDM.
+ASP.NET Identity de la base bd_cmdpsf.
 
 ## Vérifications opérationnelles
 
@@ -72,3 +72,67 @@ Consultez `Documentation/` et `Database/Scripts/` avant chaque livraison. Exécu
 les scripts sur une copie de la base, validez leurs résultats de contrôle, puis
 effectuez une sauvegarde avant le déploiement de production. Les notes historiques
 détaillées demeurent dans `README.txt`.
+
+## Migration vers BD_CMDPSF (octobre 2026)
+
+Cette édition cible **bd_cmdpsf**, créée à partir de
+`Database/bd_cmdpsf_CREATION.sql`. Le script SQL fourni définit
+**`dbo.Professionnel`** (pas `dbo.Professionnelle` ni `dbo.Medecin`).
+
+Les anciennes classes C# `Medecin`, `MedecinAdresse`, `StatutMedecin`,
+`DocumentMedecin`, etc. restent en place pour préserver les contrôleurs,
+les formulaires, les noms de paramètres et les URL existants.
+Leurs correspondances **Entity Framework Core** sont configurées dans
+`Models/HopitalMedecinsDbEntities.cs` pour cibler les tables réelles
+`Professionnel`, `ProfessionnelAdresse`, `StatutProfessionnel`,
+`DocumentProfessionnel`, etc. et les colonnes `ProfessionnelId`,
+`StatutProfessionnelId`, `DocumentProfessionnelId`.
+
+Le filtre « StatutMedecinId » utilisé dans l'interface se traduit donc en SQL
+par `StatutProfessionnelId`. Les compteurs et les liens du tableau de bord
+(comprenant les médecins spécialistes et omnipraticiens) continuent de
+fonctionner en incluant tous les statuts. Les professions sont établies
+à partir de `ref.Profession.CodeProfession`.
+
+**Important :** la création de la base ne copie aucune donnée métier de
+RDM_CEMTL; elle ne remplit que les professions de référence. Migrer
+les données historiques séparément, après sauvegarde et vérification
+des clés étrangères. Ne pas exécuter directement les anciens scripts
+`Database/Scripts/RDM_*` contre bd_cmdpsf; ils sont conservés pour référence
+historique.
+
+Vérifications préalables recommandées :
+
+```sql
+USE bd_cmdpsf;
+SELECT COUNT(*) AS NombreProfessionnels FROM dbo.Professionnel;
+SELECT CodeProfession, Libelle FROM ref.Profession;
+SELECT COUNT(*) AS NombreStatuts FROM ref.StatutProfessionnel;
+```
+
+Pour vérifier les objets SQL attendus, exécuter en lecture seule
+`Database/VALIDATION_BD_CMDPSF.sql`. Une base créée à partir du script
+peut être vide : les indicateurs de l'accueil peuvent donc valoir zéro.
+
+Sous IIS, configurer `ConnectionStrings__RdmConnection` selon les
+identifiants et politiques de l'organisation et s'assurer que les tables
+`AspNetUsers`, `AspNetRoles`, `AspNetUserRoles` sont correctement alimentées.
+
+### Correctif du 14 octobre 2026 : colonnes de clés primaires
+
+Pour la base `bd_cmdpsf`, Entity Framework Core mappe également les
+**sept clés primaires** renommées de `Medecin*Id` vers `Professionnel*Id` :
+
+- MedecinAdresseId → ProfessionnelAdresseId
+- MedecinAffectationCliniqueId → ProfessionnelAffectationCliniqueId
+- MedecinComiteId → ProfessionnelComiteId
+- MedecinCourrielId → ProfessionnelCourrielId
+- MedecinInstallationId → ProfessionnelInstallationId
+- MedecinPrivilegeId → ProfessionnelPrivilegeId
+- MedecinTelephoneId → ProfessionnelTelephoneId
+
+Ce correctif est exclusivement applicatif (Fluent API dans
+`Models/HopitalMedecinsDbEntities.cs`) ; **aucune commande ALTER TABLE**
+n'est nécessaire. Les propriétés C#, les actions MVC et les liens existants
+ne changent pas. Voir `Database/VALIDATION_BD_CMDPSF.sql` pour contrôler
+les colonnes physiques attendues dans votre base.

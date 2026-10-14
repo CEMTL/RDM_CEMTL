@@ -92,7 +92,7 @@ public sealed class AccountController : Controller
 
         if (localUser == null)
         {
-            model.ErrorMessage = "Votre compte Windows est valide, mais aucun accès CMDPSF n'est configuré dans AspNetUsers.";
+            model.ErrorMessage = "Votre compte Windows est valide, mais aucun accès RDM n'est configuré dans AspNetUsers.";
             return View(model);
         }
 
@@ -103,7 +103,7 @@ public sealed class AccountController : Controller
 
         if (roles.Length == 0)
         {
-            model.ErrorMessage = "Votre compte Windows est valide, mais aucun rôle CMDPSF n'est configuré dans AspNetUserRoles.";
+            model.ErrorMessage = "Votre compte Windows est valide, mais aucun rôle RDM n'est configuré dans AspNetUserRoles.";
             return View(model);
         }
 

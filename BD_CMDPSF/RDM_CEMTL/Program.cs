@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authentication;
+﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -54,15 +54,6 @@ if (string.IsNullOrWhiteSpace(connectionString))
 {
     throw new InvalidOperationException(
         "La chaîne ConnectionStrings:RdmConnection est absente. Configurez-la dans appsettings.json, les secrets utilisateur ou une variable d'environnement.");
-}
-
-// Cette version ne doit jamais revenir implicitement sur la base historique.
-var sqlConnectionInfo = new Microsoft.Data.SqlClient.SqlConnectionStringBuilder(connectionString);
-if (!string.Equals(sqlConnectionInfo.InitialCatalog, "bd_cmdpsf", StringComparison.OrdinalIgnoreCase))
-{
-    throw new InvalidOperationException(
-        "La connexion SQL doit pointer vers bd_cmdpsf (ConnectionStrings:RdmConnection / Initial Catalog). " +
-        "Base actuellement configurée : " + (sqlConnectionInfo.InitialCatalog ?? "(absente)"));
 }
 
 var useActiveDirectory = authOptions.UseActiveDirectory;

@@ -51,16 +51,22 @@ namespace Solution.Services
 
             string nomUtilisateur = _httpContext?.User?.Identity?.Name;
 
-            // Le schéma RDM_CEMTL actuel ne contient pas de table dbo.UtilisateurMetier.
-            // AuditLog.UtilisateurId est nullable et les utilisateurs applicatifs sont
-            // gérés par ASP.NET Identity avec un identifiant texte. On conserve donc
-            // l'identité Windows/AD dans NomUtilisateur et on laisse UtilisateurId à NULL.
-            // Cela évite qu'un enregistrement métier échoue uniquement à cause de l'audit.
+            // bd_cmdpsf contient dbo.UtilisateurMetier, mais l'identité applicative
+            // est fournie par ASP.NET Identity (identifiant texte) / Active Directory.
+            // AuditLog.UtilisateurId est nullable : ne pas tenter une liaison
+            // implicite entre deux référentiels d'identités distincts.
             int? utilisateurId = null;
 
             var log = new AuditLog
             {
-                TableName = tableName,
+                // Journaliser le nom réel des tables SQL même si les anciennes
+                // classes C# et écrans portent toujours les noms Medecin*.
+                TableName = tableName == "StatutMedecin" ? "StatutProfessionnel"
+                    : tableName == "TitreMedecin" ? "TitreProfessionnel"
+                    : tableName == "DocumentMedecin" ? "DocumentProfessionnel"
+                    : tableName != null && tableName.StartsWith("Medecin", StringComparison.Ordinal)
+                        ? "Professionnel" + tableName.Substring("Medecin".Length)
+                        : tableName,
                 RecordId = recordId,
                 Action = action,
                 OldValues = oldJson,

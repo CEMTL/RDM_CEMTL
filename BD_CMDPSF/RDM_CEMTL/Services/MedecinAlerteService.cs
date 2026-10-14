@@ -43,7 +43,7 @@ namespace Solution.Services
             var today = DateTime.Today;
             var fitMois = Math.Max(1, configuration.GetValue<int?>("Alertes:FitTestValiditeMois") ?? 12);
             var limite = Math.Max(1, maxAlertes);
-            var cacheKey = $"rdm-tableau-bord-v2-{today:yyyyMMdd}-{fitMois}-{limite}";
+            var cacheKey = $"rdm-tableau-bord-effectifs-v3-{today:yyyyMMdd}-{fitMois}-{limite}";
 
             return cache.GetOrCreate(cacheKey, entry =>
             {
@@ -64,19 +64,25 @@ namespace Solution.Services
             var d90 = today.AddDays(90);
             var fitLimite = today.AddMonths(-fitMois);
 
-            var medecins = db.Medecin.AsNoTracking()
-                .GroupBy(_ => 1)
+            // Agrégation SQL sans aucun filtre sur l'activité ni sur le statut :
+            // chaque professionnel contribue exactement une fois à sa profession,
+            // et les médecins sont répartis via leur catégorie de pratique.
+            var effectifs = db.Medecin.AsNoTracking()
+                .GroupBy(m => new
+                {
+                    CodeProfession = m.Profession != null ? m.Profession.CodeProfession : "MEDECIN",
+                    CategoriePratique = m.CategoriePratique != null ? m.CategoriePratique.Libelle : null
+                })
                 .Select(g => new
                 {
-                    Total = g.Count(),
-                    Actifs = g.Count(x => x.EstActif)
+                    g.Key.CodeProfession,
+                    g.Key.CategoriePratique,
+                    Nombre = g.Count()
                 })
-                .FirstOrDefault();
+                .ToList();
 
             var vm = new TableauBordAlertesViewModel
             {
-                TotalMedecins = medecins?.Total ?? 0,
-                MedecinsActifs = medecins?.Actifs ?? 0,
                 DateGeneration = DateTime.Now,
                 Privileges30Jours = db.MedecinPrivilege.AsNoTracking().Count(x =>
                     x.EstActif && x.DateFin.HasValue && x.DateFin.Value >= today && x.DateFin.Value <= d30),
@@ -102,6 +108,44 @@ namespace Solution.Services
                     x.EstActif && x.DateExpiration.HasValue &&
                     x.DateExpiration.Value >= today && x.DateExpiration.Value <= d90)
             };
+
+            foreach (var ligne in effectifs)
+            {
+                var profession = (ligne.CodeProfession ?? "MEDECIN").Trim().ToUpperInvariant();
+                vm.TotalProfessionnels += ligne.Nombre;
+
+                switch (profession)
+                {
+                    case "DENTISTE":
+                        vm.Dentistes += ligne.Nombre;
+                        break;
+                    case "PHARMACIEN":
+                        vm.Pharmaciens += ligne.Nombre;
+                        break;
+                    case "SAGE_FEMME":
+                        vm.SagesFemmes += ligne.Nombre;
+                        break;
+                    case "MEDECIN":
+                        vm.TotalMedecins += ligne.Nombre;
+                        var categorie = MedecinCategorieRegistre.Determiner(ligne.CategoriePratique);
+                        if (categorie == MedecinCategorieRegistre.Omnipraticien)
+                        {
+                            vm.MedecinsOmnipraticiens += ligne.Nombre;
+                        }
+                        else if (categorie == MedecinCategorieRegistre.Specialiste)
+                        {
+                            vm.MedecinsSpecialistes += ligne.Nombre;
+                        }
+                        else
+                        {
+                            // Ne pas attribuer arbitrairement une catégorie inconnue.
+                            // Ces médecins figurent dans le total et restent visibles
+                            // dans le récapitulatif du tableau de bord.
+                            vm.MedecinsNonClasses += ligne.Nombre;
+                        }
+                        break;
+                }
+            }
 
             vm.Alertes = ChargerAlertesTableauBord(maxAlertes, today, d30, d90, fitLimite, fitMois);
 

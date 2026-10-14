@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore;
 
 namespace Solution.Models;
@@ -133,9 +132,9 @@ public partial class HopitalMedecinsDbEntities : DbContext
 
         modelBuilder.Entity<MedecinAffectationClinique>(entity =>
         {
-            entity.ToTable("MedecinAffectationClinique", "dbo");
+            entity.ToTable("ProfessionnelAffectationClinique", "dbo");
             entity.HasKey(e => e.MedecinAffectationCliniqueId);
-            entity.Property(e => e.MedecinAffectationCliniqueId).ValueGeneratedOnAdd();
+            entity.Property(e => e.MedecinAffectationCliniqueId).HasColumnName("ProfessionnelAffectationCliniqueId").ValueGeneratedOnAdd();
             entity.Property(e => e.TypeAffectation).HasMaxLength(100);
             entity.Property(e => e.DateDebut).HasColumnType("date");
             entity.Property(e => e.DateFin).HasColumnType("date");
@@ -149,7 +148,7 @@ public partial class HopitalMedecinsDbEntities : DbContext
 
         modelBuilder.Entity<DocumentMedecin>(entity =>
         {
-            entity.ToTable("DocumentMedecin", "dbo");
+            entity.ToTable("DocumentProfessionnel", "dbo");
             entity.HasKey(e => e.DocumentMedecinId);
             entity.Property(e => e.DocumentMedecinId).ValueGeneratedOnAdd();
             entity.Property(e => e.TypeDocument).HasMaxLength(100).IsRequired();
@@ -253,7 +252,7 @@ public partial class HopitalMedecinsDbEntities : DbContext
 
         modelBuilder.Entity<Medecin>(entity =>
         {
-            entity.ToTable("Medecin", "dbo");
+            entity.ToTable("Professionnel", "dbo");
             entity.HasKey(e => e.MedecinId);
             entity.Property(e => e.MedecinId).ValueGeneratedOnAdd();
             entity.Property(e => e.Permis).HasMaxLength(20).IsRequired();
@@ -268,9 +267,9 @@ public partial class HopitalMedecinsDbEntities : DbContext
 
         modelBuilder.Entity<MedecinAdresse>(entity =>
         {
-            entity.ToTable("MedecinAdresse", "dbo");
+            entity.ToTable("ProfessionnelAdresse", "dbo");
             entity.HasKey(e => e.MedecinAdresseId);
-            entity.Property(e => e.MedecinAdresseId).ValueGeneratedOnAdd();
+            entity.Property(e => e.MedecinAdresseId).HasColumnName("ProfessionnelAdresseId").ValueGeneratedOnAdd();
             entity.Property(e => e.AdresseLigne1).HasMaxLength(255);
             entity.Property(e => e.Ville).HasMaxLength(100);
             entity.Property(e => e.Province).HasMaxLength(100);
@@ -279,18 +278,18 @@ public partial class HopitalMedecinsDbEntities : DbContext
 
         modelBuilder.Entity<MedecinComite>(entity =>
         {
-            entity.ToTable("MedecinComite", "dbo");
+            entity.ToTable("ProfessionnelComite", "dbo");
             entity.HasKey(e => e.MedecinComiteId);
-            entity.Property(e => e.MedecinComiteId).ValueGeneratedOnAdd();
+            entity.Property(e => e.MedecinComiteId).HasColumnName("ProfessionnelComiteId").ValueGeneratedOnAdd();
             entity.Property(e => e.RoleMembre).HasMaxLength(100);
             entity.Property(e => e.Commentaire).HasMaxLength(500);
         });
 
         modelBuilder.Entity<MedecinCourriel>(entity =>
         {
-            entity.ToTable("MedecinCourriel", "dbo");
+            entity.ToTable("ProfessionnelCourriel", "dbo");
             entity.HasKey(e => e.MedecinCourrielId);
-            entity.Property(e => e.MedecinCourrielId).ValueGeneratedOnAdd();
+            entity.Property(e => e.MedecinCourrielId).HasColumnName("ProfessionnelCourrielId").ValueGeneratedOnAdd();
             entity.Property(e => e.TypeCourriel).HasMaxLength(50).IsRequired();
             entity.Property(e => e.AdresseCourriel).HasMaxLength(255).IsRequired();
         });
@@ -306,16 +305,16 @@ public partial class HopitalMedecinsDbEntities : DbContext
 
         modelBuilder.Entity<MedecinInstallation>(entity =>
         {
-            entity.ToTable("MedecinInstallation", "dbo");
+            entity.ToTable("ProfessionnelInstallation", "dbo");
             entity.HasKey(e => e.MedecinInstallationId);
-            entity.Property(e => e.MedecinInstallationId).ValueGeneratedOnAdd();
+            entity.Property(e => e.MedecinInstallationId).HasColumnName("ProfessionnelInstallationId").ValueGeneratedOnAdd();
         });
 
         modelBuilder.Entity<MedecinPrivilege>(entity =>
         {
-            entity.ToTable("MedecinPrivilege", "dbo");
+            entity.ToTable("ProfessionnelPrivilege", "dbo");
             entity.HasKey(e => e.MedecinPrivilegeId);
-            entity.Property(e => e.MedecinPrivilegeId).ValueGeneratedOnAdd();
+            entity.Property(e => e.MedecinPrivilegeId).HasColumnName("ProfessionnelPrivilegeId").ValueGeneratedOnAdd();
             entity.Property(e => e.Etat).HasMaxLength(50).IsRequired();
             entity.Property(e => e.NatureActivites).HasMaxLength(500);
             entity.Property(e => e.ChampActivites).HasMaxLength(500);
@@ -325,9 +324,9 @@ public partial class HopitalMedecinsDbEntities : DbContext
 
         modelBuilder.Entity<MedecinTelephone>(entity =>
         {
-            entity.ToTable("MedecinTelephone", "dbo");
+            entity.ToTable("ProfessionnelTelephone", "dbo");
             entity.HasKey(e => e.MedecinTelephoneId);
-            entity.Property(e => e.MedecinTelephoneId).ValueGeneratedOnAdd();
+            entity.Property(e => e.MedecinTelephoneId).HasColumnName("ProfessionnelTelephoneId").ValueGeneratedOnAdd();
             entity.Property(e => e.TypeTelephone).HasMaxLength(50).IsRequired();
             entity.Property(e => e.NumeroTelephone).HasMaxLength(50).IsRequired();
         });
@@ -376,7 +375,7 @@ public partial class HopitalMedecinsDbEntities : DbContext
 
         modelBuilder.Entity<StatutMedecin>(entity =>
         {
-            entity.ToTable("StatutMedecin", "ref");
+            entity.ToTable("StatutProfessionnel", "ref");
             entity.HasKey(e => e.StatutMedecinId);
             entity.Property(e => e.StatutMedecinId).ValueGeneratedOnAdd();
             entity.Property(e => e.CodeStatut).HasMaxLength(30).IsRequired();
@@ -385,7 +384,7 @@ public partial class HopitalMedecinsDbEntities : DbContext
 
         modelBuilder.Entity<TitreMedecin>(entity =>
         {
-            entity.ToTable("TitreMedecin", "ref");
+            entity.ToTable("TitreProfessionnel", "ref");
             entity.HasKey(e => e.TitreId);
             entity.Property(e => e.TitreId).ValueGeneratedOnAdd();
             entity.Property(e => e.Libelle).HasMaxLength(50).IsRequired();
@@ -669,28 +668,27 @@ public partial class HopitalMedecinsDbEntities : DbContext
             .HasForeignKey(d => d.DepartementId)
             .OnDelete(DeleteBehavior.NoAction);
 
-        // Adaptation des noms SQL vers bd_cmdpsf, sans casser les classes et routes MVC historiques.
-        // Ne s'applique qu'aux identifiants SQL, et conserve les noms C# pour compatibilité.
-        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
-        {
-            var tableName = entityType.GetTableName();
-            var schema = entityType.GetSchema();
-            if (!string.IsNullOrEmpty(tableName))
-            {
-                var sourceObject = StoreObjectIdentifier.Table(tableName, schema);
-                foreach (var property in entityType.GetProperties())
-                {
-                    var existingColumn = property.GetColumnName(sourceObject);
-                    if (!string.IsNullOrEmpty(existingColumn) && existingColumn.Contains("Medecin", StringComparison.Ordinal))
-                        property.SetColumnName(existingColumn.Replace("Medecin", "Professionnel", StringComparison.Ordinal));
-                }
-                if (tableName.Contains("Medecin", StringComparison.Ordinal))
-                    entityType.SetTableName(tableName.Replace("Medecin", "Professionnel", StringComparison.Ordinal));
-            }
-            var viewName = entityType.GetViewName();
-            if (!string.IsNullOrEmpty(viewName) && viewName.Contains("Medecin", StringComparison.Ordinal))
-                entityType.SetViewName(viewName.Replace("Medecin", "Professionnel", StringComparison.Ordinal));
-        }
 
+        // Compatibilité avec les noms CLR historiques Medecin/MedecinId utilisés
+        // par les vues, contrôleurs et formulaires. Les tables/colonnes SQL sont celles
+        // de bd_cmdpsf : Professionnel / ProfessionnelId.
+        modelBuilder.Entity<Medecin>().Property(e => e.MedecinId).HasColumnName("ProfessionnelId");
+        modelBuilder.Entity<MedecinAdresse>().Property(e => e.MedecinId).HasColumnName("ProfessionnelId");
+        modelBuilder.Entity<MedecinAffectationClinique>().Property(e => e.MedecinId).HasColumnName("ProfessionnelId");
+        modelBuilder.Entity<MedecinComite>().Property(e => e.MedecinId).HasColumnName("ProfessionnelId");
+        modelBuilder.Entity<MedecinCourriel>().Property(e => e.MedecinId).HasColumnName("ProfessionnelId");
+        modelBuilder.Entity<MedecinInstallation>().Property(e => e.MedecinId).HasColumnName("ProfessionnelId");
+        modelBuilder.Entity<MedecinPrivilege>().Property(e => e.MedecinId).HasColumnName("ProfessionnelId");
+        modelBuilder.Entity<MedecinTelephone>().Property(e => e.MedecinId).HasColumnName("ProfessionnelId");
+        modelBuilder.Entity<DocumentMedecin>().Property(e => e.MedecinId).HasColumnName("ProfessionnelId");
+        modelBuilder.Entity<CotisationAnnuelle>().Property(e => e.MedecinId).HasColumnName("ProfessionnelId");
+        modelBuilder.Entity<EntenteFDC>().Property(e => e.MedecinId).HasColumnName("ProfessionnelId");
+        modelBuilder.Entity<FitTest>().Property(e => e.MedecinId).HasColumnName("ProfessionnelId");
+        modelBuilder.Entity<NominationAdministrative>().Property(e => e.MedecinId).HasColumnName("ProfessionnelId");
+        modelBuilder.Entity<AffectationOrganisationnelle>().Property(e => e.MedecinId).HasColumnName("ProfessionnelId");
+        modelBuilder.Entity<vw_CotisationsParAnnee>().Property(e => e.MedecinId).HasColumnName("ProfessionnelId");
+        modelBuilder.Entity<Medecin>().Property(e => e.StatutMedecinId).HasColumnName("StatutProfessionnelId");
+        modelBuilder.Entity<StatutMedecin>().Property(e => e.StatutMedecinId).HasColumnName("StatutProfessionnelId");
+        modelBuilder.Entity<DocumentMedecin>().Property(e => e.DocumentMedecinId).HasColumnName("DocumentProfessionnelId");
     }
 }

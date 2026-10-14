@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using Solution.Models;
@@ -23,18 +24,42 @@ public class CmdpsfController : Controller
     }
     private AuditService Audit => new AuditService(db, HttpContext);
 
-    [HttpGet]
-    public IActionResult Index(string profession = null, string recherche = null, bool actifsSeulement = false)
+    private async Task<int[]> ChargerIdsCategoriesPratiqueAsync(string categoriePratique)
     {
-        ViewBag.Profession = profession;
+        var categories = await db.CategoriePratique.AsNoTracking()
+            .Select(c => new { c.CategoriePratiqueId, c.Libelle })
+            .ToListAsync();
+        return categories
+            .Where(c => MedecinCategorieRegistre.Determiner(c.Libelle) == categoriePratique)
+            .Select(c => c.CategoriePratiqueId)
+            .ToArray();
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Index(string profession = null, string recherche = null, int? statutMedecinId = null, string categoriePratique = null)
+    {
+        categoriePratique = MedecinCategorieRegistre.NormaliserFiltre(categoriePratique);
+        ViewBag.Profession = categoriePratique != null ? "MEDECIN" : profession;
+        ViewBag.CategoriePratique = categoriePratique;
         ViewBag.Recherche = recherche;
-        ViewBag.ActifsSeulement = actifsSeulement;
+        // Afficher tous les statuts définis en base, y compris ceux non actifs.
+        // Aucun filtrage par EstActif ne s'applique au registre.
+        var statuts = await db.StatutMedecin.AsNoTracking()
+            .OrderBy(s => s.Libelle)
+            .Select(s => new { s.StatutMedecinId, s.Libelle })
+            .ToListAsync();
+        ViewBag.StatutsMedecin = statuts.Select(s => new SelectListItem
+        {
+            Value = s.StatutMedecinId.ToString(),
+            Text = s.Libelle,
+            Selected = statutMedecinId == s.StatutMedecinId
+        }).ToList();
         return View();
     }
 
     // Mêmes colonnes et stratégie de pagination SQL que le registre Medecins.
     [HttpPost]
-    public async Task<IActionResult> GetRegistre(string profession = null, string recherche = null, bool actifsSeulement = false)
+    public async Task<IActionResult> GetRegistre(string profession = null, string recherche = null, int? statutMedecinId = null, string categoriePratique = null)
     {
         var form = Request.Form;
         int.TryParse(form["draw"].FirstOrDefault(), out var draw);
@@ -49,6 +74,8 @@ public class CmdpsfController : Controller
             m.Nom,
             m.Prenom,
             m.EstActif,
+            m.StatutMedecinId,
+            m.CategoriePratiqueId,
             CodeProfession = m.Profession != null ? m.Profession.CodeProfession : "MEDECIN",
             Profession = m.Profession != null ? m.Profession.Libelle : "Médecin",
             NomComplet = ((m.TitreMedecin != null ? m.TitreMedecin.Libelle : "") + " " + m.Prenom + " " + m.Nom).Trim(),
@@ -67,7 +94,19 @@ public class CmdpsfController : Controller
         int total = await query.CountAsync();
         if (!string.IsNullOrWhiteSpace(profession) && Codes.Contains(profession))
             query = query.Where(m => m.CodeProfession == profession);
-        if (actifsSeulement) query = query.Where(m => m.EstActif);
+        // Filtrage par catégorie conforme aux compteurs du tableau de bord.
+        // La sélection ne tient compte ni de EstActif ni de StatutMedecinId.
+        categoriePratique = MedecinCategorieRegistre.NormaliserFiltre(categoriePratique);
+        if (categoriePratique != null)
+        {
+            var idsCategories = await ChargerIdsCategoriesPratiqueAsync(categoriePratique);
+            query = query.Where(m => m.CodeProfession == "MEDECIN" &&
+                m.CategoriePratiqueId.HasValue && idsCategories.Contains(m.CategoriePratiqueId.Value));
+        }
+        // Filtre sur l'identifiant de statut du médecin, sans aucune condition EstActif.
+        // La valeur null signifie « Tous les statuts » (y compris les statuts non renseignés).
+        if (statutMedecinId.HasValue)
+            query = query.Where(m => m.StatutMedecinId == statutMedecinId.Value);
         var termes = (recherche ?? "").Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
         foreach (var terme in termes)
         {
@@ -116,7 +155,7 @@ public class CmdpsfController : Controller
     // Aucune pagination DataTables n’est appliquée à l’export (toutes les lignes filtrées).
     [HttpGet, Authorize(Roles = "Admin")]
     public async Task<IActionResult> Exporter(string format, string profession = null,
-        string recherche = null, bool actifsSeulement = false)
+        string recherche = null, int? statutMedecinId = null, string categoriePratique = null)
     {
         format = (format ?? string.Empty).Trim().ToLowerInvariant();
         if (format != "pdf" && format != "word" && format != "excel")
@@ -129,6 +168,8 @@ public class CmdpsfController : Controller
             m.Nom,
             m.Prenom,
             m.EstActif,
+            m.StatutMedecinId,
+            m.CategoriePratiqueId,
             CodeProfession = m.Profession != null ? m.Profession.CodeProfession : "MEDECIN",
             Profession = m.Profession != null ? m.Profession.Libelle : "Médecin",
             NomComplet = ((m.TitreMedecin != null ? m.TitreMedecin.Libelle : "") + " " + m.Prenom + " " + m.Nom).Trim(),
@@ -146,7 +187,19 @@ public class CmdpsfController : Controller
         });
         if (!string.IsNullOrWhiteSpace(profession) && Codes.Contains(profession))
             query = query.Where(m => m.CodeProfession == profession);
-        if (actifsSeulement) query = query.Where(m => m.EstActif);
+        // Filtrage par catégorie conforme aux compteurs du tableau de bord.
+        // La sélection ne tient compte ni de EstActif ni de StatutMedecinId.
+        categoriePratique = MedecinCategorieRegistre.NormaliserFiltre(categoriePratique);
+        if (categoriePratique != null)
+        {
+            var idsCategories = await ChargerIdsCategoriesPratiqueAsync(categoriePratique);
+            query = query.Where(m => m.CodeProfession == "MEDECIN" &&
+                m.CategoriePratiqueId.HasValue && idsCategories.Contains(m.CategoriePratiqueId.Value));
+        }
+        // Filtre sur l'identifiant de statut du médecin, sans aucune condition EstActif.
+        // La valeur null signifie « Tous les statuts » (y compris les statuts non renseignés).
+        if (statutMedecinId.HasValue)
+            query = query.Where(m => m.StatutMedecinId == statutMedecinId.Value);
         var termes = (recherche ?? "").Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
         foreach (var terme in termes)
         {
@@ -172,12 +225,23 @@ public class CmdpsfController : Controller
         // Sécurité : ne jamais produire un export partiel silencieusement.
         if (rows.Count != nombre)
             return StatusCode(409, $"Le nombre de dossiers a changé durant l'export : attendus {nombre}, obtenus {rows.Count}. Relancez l'export.");
+        string libelleStatut = "Tous les statuts";
+        if (statutMedecinId.HasValue)
+        {
+            var libelle = await db.StatutMedecin.AsNoTracking()
+                .Where(s => s.StatutMedecinId == statutMedecinId.Value)
+                .Select(s => s.Libelle)
+                .FirstOrDefaultAsync();
+            libelleStatut = !string.IsNullOrWhiteSpace(libelle)
+                ? $"{libelle} (ID {statutMedecinId.Value})"
+                : $"ID {statutMedecinId.Value}";
+        }
         var demande = new AdminTableExportRequest
         {
             Format = format,
             Titre = "Registre CMDPSF",
             PageSource = "Cmdpsf/Index",
-            Filtres = $"Profession : {profession ?? "Toutes"} ; Recherche : {recherche ?? ""} ; Actifs seulement : {(actifsSeulement ? "Oui" : "Non")}",
+            Filtres = $"Profession : {profession ?? "Toutes"} ; Catégorie de pratique : {categoriePratique ?? "Toutes"} ; Recherche : {recherche ?? ""} ; Statut médecin : {libelleStatut}",
             Entetes = new List<string> {
                 "Profession", "Permis", "Professionnel", "Type permis", "Statut",
                 "Catégorie", "Téléphone", "Courriel", "Installation", "Nomination", "Actif"

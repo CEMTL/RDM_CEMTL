@@ -1,12 +1,17 @@
-@{
+﻿@{
     ViewBag.Title = "Registre CMDPSF";
     bool canEdit = User.IsInRole("Admin") || User.IsInRole("SuperUtilisateur");
     bool canDelete = User.IsInRole("Admin");
+    string categoriePratiqueSelectionnee = ViewBag.CategoriePratique as string ?? "";
 }
 @await Html.PartialAsync("~/Views/Shared/_Alerts.cshtml")
 <div class="dashboard-card">
     <h2><i class="fa-solid fa-users"></i> Registre CMDPSF</h2>
     <p class="text-muted">Médecins, dentistes, pharmaciens et sages-femmes — mêmes informations que le registre médical.</p>
+    @if (categoriePratiqueSelectionnee == "OMNIPRATICIEN" || categoriePratiqueSelectionnee == "SPECIALISTE")
+    {
+        <p><strong>Liste des médecins @(categoriePratiqueSelectionnee == "OMNIPRATICIEN" ? "omnipraticiens" : "spécialistes") — tous statuts confondus.</strong></p>
+    }
     @if (canEdit) {
     <div class="btn-toolbar" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">
         <a class="btn btn-primary" asp-controller="Cmdpsf" asp-action="Creer" asp-route-profession="MEDECIN"><i class="fa-solid fa-plus"></i> Médecin</a>
@@ -34,18 +39,27 @@
 </div>
 <div class="dashboard-card filters-bar">
     <form id="formRechercheCmdpsf" method="get" asp-action="Index" class="row">
-        <div class="col-md-3 form-group"><label for="profession">Profession</label>
+        <div class="col-md-2 form-group"><label for="profession">Profession</label>
             <select class="form-control" id="profession" name="profession">
                 <option value="">Toutes les professions</option>
                 <option value="MEDECIN">Médecins</option><option value="DENTISTE">Dentistes</option>
                 <option value="PHARMACIEN">Pharmaciens</option><option value="SAGE_FEMME">Sages-femmes</option>
             </select>
         </div>
-        <div class="col-md-5 form-group"><label for="recherche">Recherche dans toutes les colonnes</label>
+        <div class="col-md-4 form-group"><label for="recherche">Recherche dans toutes les colonnes</label>
             <input id="recherche" name="recherche" value="@ViewBag.Recherche" class="form-control" placeholder="Permis, nom, coordonnées, installation..." />
         </div>
-        <div class="col-md-2 form-group"><label style="display:block">Statut</label>
-            <label class="checkbox-inline"><input id="actifsSeulement" name="actifsSeulement" value="true" type="checkbox" checked="@(ViewBag.ActifsSeulement == true)" /> Actifs uniquement</label>
+        <div class="col-md-2 form-group"><label for="categoriePratique">Catégorie de pratique</label>
+            <select class="form-control" id="categoriePratique" name="categoriePratique">
+                <option value="">Toutes les catégories</option>
+                <option value="OMNIPRATICIEN">Omnipraticiens</option>
+                <option value="SPECIALISTE">Spécialistes</option>
+            </select>
+        </div>
+        <div class="col-md-2 form-group"><label for="statutMedecinId">Statut médecin</label>
+            <select class="form-control" id="statutMedecinId" name="statutMedecinId" asp-items="@((IEnumerable<SelectListItem>)ViewBag.StatutsMedecin)">
+                <option value="">Tous les statuts</option>
+            </select>
         </div>
         <div class="col-md-2 form-group"><label style="display:block">&nbsp;</label>
             <button type="submit" class="btn btn-primary"><i class="fa-solid fa-magnifying-glass"></i> Rechercher</button>
@@ -66,6 +80,7 @@
 $(function () {
     var initialProfession = '@(ViewBag.Profession ?? "")';
     $('#profession').val(initialProfession);
+    $('#categoriePratique').val('@(ViewBag.CategoriePratique ?? "")');
     var canEdit = @(canEdit ? "true" : "false");
     var canDelete = @(canDelete ? "true" : "false");
     function safe(value) { return $('<div>').text(value == null ? '' : String(value)).html(); }
@@ -73,7 +88,7 @@ $(function () {
         processing:true,serverSide:true,searching:false,autoWidth:false,
         pageLength:10,lengthMenu:[[5,10,25,50,100],[5,10,25,50,100]],order:[[2,'asc']],
         ajax:{url:'@Url.Action("GetRegistre","Cmdpsf")',type:'POST',data:function(d){
-            d.profession=$('#profession').val();d.recherche=$('#recherche').val();d.actifsSeulement=$('#actifsSeulement').prop('checked');
+            d.profession=$('#profession').val();d.recherche=$('#recherche').val();d.statutMedecinId=$('#statutMedecinId').val();d.categoriePratique=$('#categoriePratique').val();
         }},
         language:{processing:'Traitement en cours...',lengthMenu:'Afficher _MENU_ éléments',info:'Affichage de _START_ à _END_ sur _TOTAL_',infoEmpty:'Aucun professionnel',zeroRecords:'Aucun résultat',emptyTable:'Aucun dossier',paginate:{previous:'Précédent',next:'Suivant'}},
         columns:[
@@ -98,12 +113,21 @@ $(function () {
             format: $(this).data('format'),
             profession: $('#profession').val() || '',
             recherche: $('#recherche').val() || '',
-            actifsSeulement: $('#actifsSeulement').prop('checked') ? 'true' : 'false'
+            statutMedecinId: $('#statutMedecinId').val() || '',
+            categoriePratique: $('#categoriePratique').val() || ''
         });
         window.location.href = '@Url.Action("Exporter", "Cmdpsf")' + '?' + params.toString();
     });
     $('#formRechercheCmdpsf').on('submit',function(e){e.preventDefault();table.ajax.reload();});
-    $('#profession,#actifsSeulement').on('change',function(){table.ajax.reload();});
+    $('#profession').on('change',function(){
+        if ($(this).val() !== 'MEDECIN') $('#categoriePratique').val('');
+        table.ajax.reload();
+    });
+    $('#categoriePratique').on('change',function(){
+        if ($(this).val()) $('#profession').val('MEDECIN');
+        table.ajax.reload();
+    });
+    $('#statutMedecinId').on('change',function(){table.ajax.reload();});
     $(document).on('click','.js-supprimer',function(){
         if(confirm('Archiver ce professionnel ? Ses données associées seront conservées.')){
             $('#cmdpsfSuppressionId').val($(this).data('id'));

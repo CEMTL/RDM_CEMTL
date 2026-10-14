@@ -7,7 +7,7 @@ Contenu ajouté / ajusté
 2. Activation automatique du layout : Views/_ViewStart.cshtml
 3. Feuille de style commune : Content/registre-medecins.css
 4. Tableau de bord enrichi : HomeController + Views/Home/Index.cshtml
-5. Menu latéral par grands blocs du registre CEMTL
+5. Menu latéral par grands blocs du Registre CMDPSF
 6. Filtres + pagination serveur sur :
    - Medecins
    - CotisationsAnnuelles
