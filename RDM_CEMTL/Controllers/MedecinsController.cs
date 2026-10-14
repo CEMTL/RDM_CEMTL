@@ -69,7 +69,7 @@ namespace Solution.Controllers
         }
 
         [HttpPost]
-        public ActionResult GetMedecins(string searchTop, bool? actifsSeulement)
+        public ActionResult GetMedecins(string searchTop)
         {
             var dataTableRequest = DataTableRequest.FromForm(Request.Form);
             int draw = dataTableRequest.Draw;
@@ -83,8 +83,6 @@ namespace Solution.Controllers
             string termeRecherche = !string.IsNullOrWhiteSpace(searchTop)
                 ? searchTop.Trim()
                 : (!string.IsNullOrWhiteSpace(dataTableSearch) ? dataTableSearch.Trim() : null);
-
-            bool filtreActifs = actifsSeulement ?? false;
 
             // Projection SQL des valeurs réellement affichées dans le tableau.
             // Ainsi, la recherche porte bien sur TOUTES les colonnes visibles.
@@ -128,10 +126,7 @@ namespace Solution.Controllers
 
             int recordsTotal = query.Count();
 
-            if (filtreActifs)
-            {
-                query = query.Where(m => m.EstActifBool);
-            }
+            // Aucun filtre EstActif ni StatutMedecinId : tous les médecins sont affichés.
 
             if (!string.IsNullOrWhiteSpace(termeRecherche))
             {
@@ -239,13 +234,14 @@ namespace Solution.Controllers
         }
 
         [HttpGet]
-        public ActionResult Index(string search, bool? actifsSeulement, int? openMedecin = null, string tab = null)
+        public ActionResult Index(string search, int? openMedecin = null, string tab = null, int? statutMedecinId = null, string categoriePratique = null)
         {
             return RedirectToAction("Index", "Cmdpsf", new
             {
-                searchTop = search,
-                actifsSeulement = actifsSeulement ?? false,
-                profession = "MEDECIN"
+                recherche = search,
+                profession = "MEDECIN",
+                statutMedecinId = statutMedecinId,
+                categoriePratique = categoriePratique
             });
         }
 

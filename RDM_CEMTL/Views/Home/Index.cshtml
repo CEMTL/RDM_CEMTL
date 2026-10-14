@@ -27,7 +27,7 @@
     }
     .dashboard-kpis {
         display: grid;
-        grid-template-columns: repeat(3, minmax(180px, 1fr));
+        grid-template-columns: repeat(2, minmax(180px, 1fr));
         gap: 14px;
         margin-bottom: 18px;
     }
@@ -49,7 +49,11 @@
         color: inherit;
         text-decoration: none;
     }
-    .dashboard-kpi.medecins { border-left-color: #198754; }
+    .dashboard-kpi.omnipraticiens { border-left-color: #198754; }
+    .dashboard-kpi.specialistes { border-left-color: #0d6efd; }
+    .dashboard-kpi.dentistes { border-left-color: #20c997; }
+    .dashboard-kpi.pharmaciens { border-left-color: #6f42c1; }
+    .dashboard-kpi.sages-femmes { border-left-color: #fd7e14; }
     .dashboard-kpi.privileges { border-left-color: #dc3545; }
     .dashboard-kpi.surveillance { border-left-color: #f59e0b; }
     .dashboard-kpi .value {
@@ -67,6 +71,31 @@
         margin-top: 3px;
         color: #6b7280;
         font-size: 12px;
+    }
+    .dashboard-professions-heading {
+        display: flex;
+        align-items: baseline;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 12px;
+    }
+    .dashboard-professions-heading h3 { margin: 0; font-size: 18px; font-weight: 700; }
+    .dashboard-professions-heading p { margin: 0; font-size: 13px; color: #64748b; }
+    .dashboard-professions {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+    .dashboard-professions .dashboard-kpi {
+        min-width: 0;
+        min-height: 110px;
+    }
+    .dashboard-professions .dashboard-kpi .title { overflow-wrap: anywhere; }
+    .dashboard-profession-summary {
+        font-size: 13px;
+        color: #64748b;
+        margin-bottom: 20px;
     }
     .dashboard-followups {
         display: grid;
@@ -148,19 +177,26 @@
         color: #3c763d;
         background: #f4fbf4;
     }
+    @@media (max-width: 1100px) {
+        .dashboard-professions { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
     @@media (max-width: 900px) {
         .dashboard-kpis { grid-template-columns: 1fr; }
         .dashboard-followups { grid-template-columns: repeat(2, minmax(130px, 1fr)); }
         .dashboard-alert-row { grid-template-columns: 1fr; }
     }
+    @@media (max-width: 620px) {
+        .dashboard-professions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
     @@media (max-width: 520px) {
         .dashboard-followups { grid-template-columns: 1fr; }
+        .dashboard-professions { grid-template-columns: 1fr; }
     }
 </style>
 
 <div class="dashboard-simple-header">
     <h2><i class="fa-solid fa-gauge-high"></i> Tableau de bord</h2>
-    <p>Vue rapide des médecins et des éléments qui nécessitent une intervention.</p>
+    <p>Effectifs des professionnels, tous statuts confondus, et éléments à surveiller.</p>
     @if (alertes.DateGeneration != default)
     {
         <div class="dashboard-updated">
@@ -170,13 +206,47 @@
     }
 </div>
 
-<div class="dashboard-kpis">
-    <a class="dashboard-kpi medecins" href="@Url.Action("Index", "Cmdpsf", new { profession = "MEDECIN", actifsSeulement = true })">
-        <div class="value">@alertes.MedecinsActifs</div>
-        <div class="title">Médecins actifs</div>
-        <div class="detail">@alertes.TotalMedecins médecin(s) au registre</div>
+<div class="dashboard-professions-heading">
+    <h3><i class="fa-solid fa-user-doctor"></i> Effectifs par profession</h3>
+    <p>Tous les statuts inclus, sans filtrage « actifs seulement ».</p>
+</div>
+<div class="dashboard-professions" aria-label="Effectifs des professionnels, tous statuts confondus">
+    <a class="dashboard-kpi omnipraticiens" href="@Url.Action("Index", "Medecins", new { categoriePratique = "OMNIPRATICIEN" })" aria-label="Afficher tous les médecins omnipraticiens, tous statuts">
+        <div class="value">@alertes.MedecinsOmnipraticiens</div>
+        <div class="title">Médecins omnipraticiens</div>
+        <div class="detail">Toutes situations et tous statuts</div>
     </a>
+    <a class="dashboard-kpi specialistes" href="@Url.Action("Index", "Medecins", new { categoriePratique = "SPECIALISTE" })" aria-label="Afficher tous les médecins spécialistes, tous statuts">
+        <div class="value">@alertes.MedecinsSpecialistes</div>
+        <div class="title">Médecins spécialistes</div>
+        <div class="detail">Toutes situations et tous statuts</div>
+    </a>
+    <a class="dashboard-kpi dentistes" href="@Url.Action("Index", "Cmdpsf", new { profession = "DENTISTE" })">
+        <div class="value">@alertes.Dentistes</div>
+        <div class="title">Dentistes</div>
+        <div class="detail">Tous les statuts</div>
+    </a>
+    <a class="dashboard-kpi pharmaciens" href="@Url.Action("Index", "Cmdpsf", new { profession = "PHARMACIEN" })">
+        <div class="value">@alertes.Pharmaciens</div>
+        <div class="title">Pharmaciens</div>
+        <div class="detail">Tous les statuts</div>
+    </a>
+    <a class="dashboard-kpi sages-femmes" href="@Url.Action("Index", "Cmdpsf", new { profession = "SAGE_FEMME" })">
+        <div class="value">@alertes.SagesFemmes</div>
+        <div class="title">Sages-femmes</div>
+        <div class="detail">Tous les statuts</div>
+    </a>
+</div>
+<div class="dashboard-profession-summary">
+    Total : <strong>@alertes.TotalProfessionnels</strong> professionnel(s) au registre,
+    dont <strong>@alertes.TotalMedecins</strong> médecin(s).
+    @if (alertes.MedecinsNonClasses > 0)
+    {
+        <span>Attention : <strong>@alertes.MedecinsNonClasses</strong> médecin(s) ont une catégorie de pratique non renseignée ou non reconnue et ne sont pas inclus dans les deux compteurs médicaux ci-dessus.</span>
+    }
+</div>
 
+<div class="dashboard-kpis">
     <a class="dashboard-kpi privileges" href="@Url.Action("Index", "MedecinPrivileges")">
         <div class="value">@alertes.Privileges30Jours</div>
         <div class="title">Privilèges à échéance</div>

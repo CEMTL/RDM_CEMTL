@@ -18,16 +18,6 @@
                        placeholder="Rechercher dans toutes les colonnes (accents ignorés)..." />
             </div>
 
-            <div class="col-md-2">
-                <label class="checkbox-inline" style="margin-top:7px;">
-                    <input type="checkbox"
-                           name="actifsSeulement"
-                           value="true"
-                           @(ViewBag.ActifsSeulement != null && (bool)ViewBag.ActifsSeulement ? "checked=\"checked\"" : "") />
-                    Actifs seulement
-                </label>
-            </div>
-
             <div class="col-md-4 text-right">
                 <button type="submit" class="btn btn-default">
                     <i class="fa-solid fa-magnifying-glass"></i> Rechercher
@@ -86,7 +76,6 @@
                     type: "POST",
                     data: function (d) {
                         d.searchTop = $('input[name="search"]').val();
-                        d.actifsSeulement = $('input[name="actifsSeulement"]').is(':checked');
                     }
                 },
                 pageLength: 10,

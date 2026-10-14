@@ -92,7 +92,7 @@ public sealed class AccountController : Controller
 
         if (localUser == null)
         {
-            model.ErrorMessage = "Votre compte Windows est valide, mais aucun accès RDM n'est configuré dans AspNetUsers.";
+            model.ErrorMessage = "Votre compte Windows est valide, mais aucun accès n'est configuré dans le système.";
             return View(model);
         }
 

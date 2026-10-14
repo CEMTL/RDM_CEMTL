@@ -18,8 +18,15 @@ namespace Solution.ViewModels.Shared
 
     public class TableauBordAlertesViewModel
     {
+        // Effectifs sans exclusion selon EstActif ou StatutMedecinId.
         public int TotalMedecins { get; set; }
-        public int MedecinsActifs { get; set; }
+        public int TotalProfessionnels { get; set; }
+        public int MedecinsOmnipraticiens { get; set; }
+        public int MedecinsSpecialistes { get; set; }
+        public int MedecinsNonClasses { get; set; }
+        public int Dentistes { get; set; }
+        public int Pharmaciens { get; set; }
+        public int SagesFemmes { get; set; }
         public int Privileges30Jours { get; set; }
         public int Privileges90Jours { get; set; }
         public int CotisationsNonReglees { get; set; }

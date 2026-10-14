@@ -228,7 +228,7 @@ WHERE {string.Join(" OR ", conditions)};";
                 cancellationToken);
 
             _logger.LogWarning(
-                "BootstrapAdmin RDM créé automatiquement dans AspNetUsers pour {UserName}.",
+                "BootstrapAdmin CMDPSF créé automatiquement dans AspNetUsers pour {UserName}.",
                 normalizedUser);
         }
         else
