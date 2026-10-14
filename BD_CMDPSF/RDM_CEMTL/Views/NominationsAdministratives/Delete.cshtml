@@ -1,0 +1,23 @@
+@model Solution.ViewModels.Nominations.NominationAdministrativeDetailsViewModel
+@{ ViewBag.Title = "Terminer la nomination administrative"; }
+<div class="page-header-custom"><h2>Terminer la nomination administrative</h2></div>
+<div class="alert alert-warning">La nomination sera terminée et conservée dans l'historique; elle ne sera pas supprimée physiquement.</div>
+<div class="dashboard-card"><dl class="dl-horizontal">
+    <dt>Médecin</dt><dd>@Model.MedecinNomComplet</dd>
+    <dt>Nomination</dt><dd>@Model.LibelleNomination</dd>
+    <dt>Type</dt><dd>@Model.TypeNominationLibelle</dd>
+    <dt>Date nomination</dt><dd>@(Model.DateNomination.HasValue ? Model.DateNomination.Value.ToString("yyyy-MM-dd") : "-")</dd>
+</dl>
+@using (Html.BeginForm("Delete", "NominationsAdministratives", new { id=Model.NominationAdministrativeId }, FormMethod.Post, null, null))
+{
+    @Html.AntiForgeryToken()
+    @if (ViewBag.ReturnMedecinId != null)
+    {
+        <input type="hidden" name="returnMedecinId" value="@ViewBag.ReturnMedecinId" />
+        <input type="hidden" name="returnTab" value="@ViewBag.ReturnTab" />
+    }
+    <button type="submit" class="btn btn-danger"><i class="fa-solid fa-box-archive"></i> Terminer</button>
+    @if (ViewBag.ReturnMedecinId != null) { <a href="@Url.Action("Index","Medecins",new { openMedecin=ViewBag.ReturnMedecinId, tab=ViewBag.ReturnTab })" class="btn btn-default">Annuler</a> }
+    else { <a href="@Url.Action("Index")" class="btn btn-default">Annuler</a> }
+}
+</div>

@@ -1,0 +1,50 @@
+RDM(21) - Validation détaillée Medecins/Edit
+Date : 2026-10-03
+
+Objectif
+--------
+Corriger le cas où Medecins/Edit affichait seulement :
+"Une erreur inattendue est survenue lors de l'enregistrement"
+sans indiquer le champ ou la section responsable.
+
+Corrections
+-----------
+1. Ajout d'une liste explicite "champs ou sections à vérifier" en haut du formulaire.
+   Exemples :
+   - Permis — Le permis est obligatoire.
+   - Téléphone #2 — Numéro — Le numéro de téléphone est obligatoire...
+   - Installation #1 — Rang — Le rang doit être compris entre 1 et 3.
+
+2. Les erreurs ModelState des collections sont traduites en libellés français lisibles.
+
+3. Les erreurs serveur sont reliées au bon onglet :
+   - Général
+   - Coordonnées
+   - Organisation
+   - Nominations
+
+4. Les champs exacts sont encadrés en rouge. Pour une erreur de groupe, le panneau
+   complet est encadré en rouge.
+
+5. Vérification serveur avant sauvegarde :
+   - références Titre/Type permis/Statut/Catégorie/Genre ;
+   - Installation et rang (1 à 3) ;
+   - Nomination et type de nomination ;
+   - appartenance des lignes Adresses/Téléphones/Courriels/Installations/Nominations
+     au médecin courant.
+
+6. Les erreurs DbUpdateException sont associées autant que possible au champ ou groupe.
+   Une référence courte est affichée et le détail technique est journalisé côté serveur.
+
+7. Les erreurs inattendues indiquent maintenant l'étape précise :
+   informations générales, adresses, téléphones, courriels, installations,
+   nominations, audit ou sauvegarde finale.
+
+8. Correction importante de l'audit :
+   l'ancien AuditService interrogeait dbo.UtilisateurMetier. Cette table n'existe pas
+   dans le schéma RDM_CEMTL fourni. L'audit conserve maintenant NomUtilisateur et
+   laisse AuditLog.UtilisateurId à NULL. Le DbSet/modèle UtilisateurMetier a été retiré.
+
+9. RangInstallation : validation alignée sur la contrainte SQL (1 à 3 au lieu de 1 à 255).
+
+Aucune modification appsettings.json.

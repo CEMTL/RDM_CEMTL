@@ -1,0 +1,32 @@
+@model Solution.ViewModels.AffectationsOrganisationnelles.AffectationOrganisationnelleDetailsViewModel
+@{
+    ViewBag.Title = "Détails de l'affectation organisationnelle";
+    var canManage = User.IsInRole("Admin") || User.IsInRole("SuperUtilisateur");
+}
+@await Html.PartialAsync("~/Views/Shared/_Alerts.cshtml")
+<div class="page-header-custom"><h2>@Model.NomAffiche</h2></div>
+<div class="dashboard-card">
+    <dl class="dl-horizontal">
+        <dt>Rôle</dt><dd>@Model.RoleLibelle</dd>
+        <dt>Cible</dt><dd>@Model.Cible</dd>
+        <dt>Regroupement</dt><dd>@(Model.RegroupementSource ?? "—")</dd>
+        <dt>Médecin lié</dt><dd>@(Model.NomMedecin ?? "—")</dd>
+        <dt>Titre</dt><dd>@(Model.Titre ?? "—")</dd>
+        <dt>Courriel validé</dt><dd>@(Model.Courriel ?? "—")</dd>
+        <dt>Courriel source</dt><dd>@(Model.CourrielSource ?? "—")</dd>
+        <dt>Téléphone</dt><dd>@(Model.Telephone ?? "—")</dd>
+        <dt>Poste</dt><dd>@(Model.PosteTelephone ?? "—")</dd>
+        <dt>Site</dt><dd>@(Model.Site ?? "—")</dd>
+        <dt>Date de début</dt><dd>@(Model.DateDebut?.ToString("yyyy-MM-dd") ?? "—")</dd>
+        <dt>Date de fin</dt><dd>@(Model.DateFin?.ToString("yyyy-MM-dd") ?? "—")</dd>
+        <dt>Intérim</dt><dd>@(Model.EstInterim ? "Oui" : "Non")</dd>
+        <dt>Active</dt><dd>@(Model.EstActive ? "Oui" : "Non")</dd>
+        <dt>À valider</dt><dd>@(Model.EstAValider ? "Oui" : "Non")</dd>
+        <dt>Source</dt><dd>@(Model.SourceDonnees ?? "Saisie manuelle") @if (Model.SourceLigne.HasValue) { <span>— ligne @Model.SourceLigne</span> }</dd>
+        <dt>Dernière modification</dt><dd>@Model.DateModification.ToString("yyyy-MM-dd HH:mm") UTC</dd>
+    </dl>
+</div>
+<div class="dashboard-card actions-card">
+    @if (canManage) { <a href="@Url.Action("Edit", new { id = Model.AffectationOrganisationnelleId })" class="btn btn-warning"><i class="fa-solid fa-pen-to-square"></i> Modifier</a> }
+    <a href="@Url.Action("Index")" class="btn btn-default"><i class="fa-solid fa-arrow-left"></i> Retour</a>
+</div>

@@ -1,0 +1,31 @@
+RDM - Gestion des utilisateurs alignee sur SRSAD
+Date : 2026-09-30
+
+Principaux changements
+- Authentification Active Directory sur 2 domaines : 06CEMTL et hmr.hmr.qc.ca.
+- Si le domaine n'est pas saisi, RDM essaie les deux domaines dans cet ordre.
+- Un compte HMR peut donc se connecter avec hmr80111 sans saisir hmr.hmr.qc.ca\hmr80111.
+- Active Directory valide le compte et le mot de passe uniquement.
+- Les autorisations RDM proviennent ensuite de dbo.AspNetUsers, dbo.AspNetUserRoles et dbo.AspNetRoles.
+- Roles RDM : Admin, SuperUtilisateur, Utilisateur.
+- Ecran Administration > Gestion des utilisateurs reserve aux Admin.
+- Ajout, modification des roles, retrait des acces et suppression locale d'un utilisateur.
+- Aucune modification des groupes Active Directory par l'ecran de gestion.
+- Authentication:BootstrapAdmin est protege : ses roles, ses acces et son utilisateur ne peuvent pas etre modifies/supprimes par l'ecran.
+- Les trois roles RDM sont assures dans AspNetRoles lors du chargement de l'ecran de gestion.
+- Compatibilite avec la structure ASP.NET Identity historique RDM (Nom/Prenom/Email obligatoires).
+
+Configuration
+Authentication:BootstrapAdmin = 06CEMTL\T2-MERA8300
+ActiveDirectory:Domains = [ 06CEMTL, hmr.hmr.qc.ca ]
+
+Important
+Les anciens ActiveDirectory:RoleGroups restent presents uniquement pour compatibilite de configuration. Ils ne donnent plus directement acces a RDM : les roles applicatifs sont lus dans AspNetUserRoles/AspNetRoles, comme dans SRSAD.
+
+
+CORRECTION BOOTSTRAPADMIN 2026-09-30
+- Le compte Authentication:BootstrapAdmin reste un administrateur de secours protégé même si un autre Admin existe déjà.
+- Après validation AD, RDM garantit sa présence dans AspNetUsers et son rôle Admin dans AspNetUserRoles.
+- Le compte est enregistré sous le nom canonique configuré (ex. 06CEMTL\T2-MERA8300).
+- Une saisie sans domaine est acceptée quand AD renvoie le même SAM account avec un suffixe DNS différent.
+- Un compte résolu explicitement dans l'autre domaine configuré n'est pas confondu avec le BootstrapAdmin.

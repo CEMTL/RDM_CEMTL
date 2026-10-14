@@ -1,0 +1,604 @@
+@model IReadOnlyList<Solution.ViewModels.Departements.OrganisationDepartementViewModel>
+@{
+    ViewBag.Title = "Organisation médicale";
+    var canManage = User.IsInRole("Admin") || User.IsInRole("SuperUtilisateur");
+}
+
+@await Html.PartialAsync("~/Views/Shared/_Alerts.cshtml")
+
+<div class="page-header-custom organisation-page-header">
+    <div>
+        <h2>Départements et services</h2>
+        <p class="text-muted">Organisation médicale courante selon les affectations actives.</p>
+    </div>
+    <div class="organisation-header-actions">
+        <span class="organisation-count"><strong>@Model.Count</strong> départements</span>
+        @if (canManage)
+        {
+            <a href="@Url.Action("Create", "Departements")" class="btn btn-primary">
+                <i class="fa-solid fa-plus" aria-hidden="true"></i> Ajouter un département
+            </a>
+        }
+    </div>
+</div>
+
+<div class="dashboard-card organisation-card">
+    <div class="table-responsive">
+        <table id="tableOrganisationDepartements" class="table table-bordered table-hover registre-table organisation-table">
+            <thead>
+                <tr>
+                    <th>Département</th>
+                    <th>Chef de département</th>
+                    <th>Date nomin. admin.</th>
+                    <th>Secrétaire</th>
+                    <th>Adjoint de site<br /><small>Santa Cabrini</small></th>
+                    <th class="text-center services-column">Services</th>
+                    <th class="text-center actions-column">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var departement in Model)
+            {
+                var nombreAffectationsDepartement = departement.ChefsDepartement.Count
+                    + departement.Secretaires.Count
+                    + departement.AdjointsSantaCabrini.Count;
+                <tr>
+                    <td>
+                        <strong>@departement.NomDepartement</strong>
+                        <div class="text-muted organisation-secondary">@departement.Services.Count service(s)</div>
+                    </td>
+                    <td>
+                        @if (departement.ChefsDepartement.Count == 0)
+                        {
+                            <span class="text-muted">—</span>
+                        }
+                        else
+                        {
+                            foreach (var responsable in departement.ChefsDepartement)
+                            {
+                                <div class="organisation-person">
+                                    @responsable.NomAffiche
+                                    @if (responsable.EstInterim)
+                                    {
+                                        <span class="label label-info">Intérim</span>
+                                    }
+                                    @if (responsable.EstAValider)
+                                    {
+                                        <span class="label label-warning">À valider</span>
+                                    }
+                                </div>
+                            }
+                        }
+                    </td>
+                    <td>
+                        @if (departement.ChefsDepartement.Count == 0)
+                        {
+                            <span class="text-muted">—</span>
+                        }
+                        else
+                        {
+                            foreach (var responsable in departement.ChefsDepartement)
+                            {
+                                <div class="organisation-person">@(responsable.DateDebut?.ToString("dd/MM/yyyy") ?? "—")</div>
+                            }
+                        }
+                    </td>
+                    <td>
+                        @if (departement.Secretaires.Count == 0)
+                        {
+                            <span class="text-muted">—</span>
+                        }
+                        else
+                        {
+                            foreach (var responsable in departement.Secretaires)
+                            {
+                                <div class="organisation-person">
+                                    @responsable.NomAffiche
+                                </div>
+                            }
+                        }
+                    </td>
+                    <td>
+                        @if (departement.AdjointsSantaCabrini.Count == 0)
+                        {
+                            <span class="text-muted">—</span>
+                        }
+                        else
+                        {
+                            foreach (var responsable in departement.AdjointsSantaCabrini)
+                            {
+                                <div class="organisation-person">
+                                    @responsable.NomAffiche
+                                    @if (responsable.EstInterim)
+                                    {
+                                        <span class="label label-info">Intérim</span>
+                                    }
+                                </div>
+                            }
+                        }
+                    </td>
+                    <td class="text-center">
+                        <button type="button"
+                                class="btn btn-primary btn-sm organisation-services-button"
+                                data-toggle="modal"
+                                data-target="#services-departement-@departement.DepartementId"
+                                aria-label="Afficher les services du département @departement.NomDepartement">
+                            <i class="fa-solid fa-list-ul" aria-hidden="true"></i>
+                            Voir les services
+                            <span class="badge organisation-services-count" aria-label="@departement.Services.Count services">@departement.Services.Count</span>
+                        </button>
+                    </td>
+                    <td class="text-center organisation-row-actions">
+                        <div class="btn-group btn-group-sm" role="group" aria-label="Actions pour @departement.NomDepartement">
+                            <a href="@Url.Action("Details", "Departements", new { id = departement.DepartementId })" class="btn btn-info" title="Consulter le département"><i class="fa-solid fa-circle-info" aria-hidden="true"></i></a>
+                            @if (canManage)
+                            {
+                                <a href="@Url.Action("Edit", "Departements", new { id = departement.DepartementId })" class="btn btn-warning" title="Modifier le département"><i class="fa-solid fa-pen-to-square" aria-hidden="true"></i></a>
+                                <a href="@Url.Action("Delete", "Departements", new { id = departement.DepartementId })" class="btn btn-danger" title="Supprimer le département"><i class="fa-solid fa-trash" aria-hidden="true"></i></a>
+                            }
+                        </div>
+                        <div class="organisation-secondary-actions">
+                            @if (canManage)
+                            {
+                                <div class="btn-group btn-group-sm organisation-add-menu">
+                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <i class="fa-solid fa-user-plus" aria-hidden="true"></i> Responsable <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-right">
+                                        @if (departement.PeutAjouterChefDepartement)
+                                        {
+                                            <li><a href="@Url.Action("Create", "AffectationsOrganisationnelles", new { departementId = departement.DepartementId, roleCode = RoleAffectationOrganisationnelle.ChefDepartement })">Ajouter un chef de département</a></li>
+                                        }
+                                        <li><a href="@Url.Action("Create", "AffectationsOrganisationnelles", new { departementId = departement.DepartementId, roleCode = RoleAffectationOrganisationnelle.SecretaireDepartement })">Ajouter un secrétaire</a></li>
+                                        <li><a href="@Url.Action("Create", "AffectationsOrganisationnelles", new { departementId = departement.DepartementId, roleCode = RoleAffectationOrganisationnelle.AdjointSite })">Ajouter un adjoint de site</a></li>
+                                    </ul>
+                                </div>
+                            }
+                            @if (nombreAffectationsDepartement > 0)
+                            {
+                                <div class="btn-group btn-group-sm organisation-affectations-menu">
+                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <i class="fa-solid fa-users-gear" aria-hidden="true"></i> Affectations <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-right organisation-actions-dropdown">
+                                    @foreach (var responsable in departement.ChefsDepartement)
+                                    {
+                                        <li>
+                                            <div class="organisation-action-item">
+                                                <span><small>Chef de département</small><strong>@responsable.NomAffiche</strong></span>
+                                                <span class="btn-group btn-group-xs">
+                                                    <a href="@Url.Action("Details", "AffectationsOrganisationnelles", new { id = responsable.AffectationOrganisationnelleId })" class="btn btn-info" title="Consulter"><i class="fa-solid fa-circle-info" aria-hidden="true"></i></a>
+                                                    @if (canManage)
+                                                    {
+                                                        <a href="@Url.Action("Edit", "AffectationsOrganisationnelles", new { id = responsable.AffectationOrganisationnelleId })" class="btn btn-warning" title="Modifier"><i class="fa-solid fa-pen-to-square" aria-hidden="true"></i></a>
+                                                        <a href="@Url.Action("Delete", "AffectationsOrganisationnelles", new { id = responsable.AffectationOrganisationnelleId })" class="btn btn-danger" title="Supprimer"><i class="fa-solid fa-trash" aria-hidden="true"></i></a>
+                                                    }
+                                                </span>
+                                            </div>
+                                        </li>
+                                    }
+                                    @foreach (var responsable in departement.Secretaires)
+                                    {
+                                        <li>
+                                            <div class="organisation-action-item">
+                                                <span><small>Secrétaire</small><strong>@responsable.NomAffiche</strong></span>
+                                                <span class="btn-group btn-group-xs">
+                                                    <a href="@Url.Action("Details", "AffectationsOrganisationnelles", new { id = responsable.AffectationOrganisationnelleId })" class="btn btn-info" title="Consulter"><i class="fa-solid fa-circle-info" aria-hidden="true"></i></a>
+                                                    @if (canManage)
+                                                    {
+                                                        <a href="@Url.Action("Edit", "AffectationsOrganisationnelles", new { id = responsable.AffectationOrganisationnelleId })" class="btn btn-warning" title="Modifier"><i class="fa-solid fa-pen-to-square" aria-hidden="true"></i></a>
+                                                        <a href="@Url.Action("Delete", "AffectationsOrganisationnelles", new { id = responsable.AffectationOrganisationnelleId })" class="btn btn-danger" title="Supprimer"><i class="fa-solid fa-trash" aria-hidden="true"></i></a>
+                                                    }
+                                                </span>
+                                            </div>
+                                        </li>
+                                    }
+                                    @foreach (var responsable in departement.AdjointsSantaCabrini)
+                                    {
+                                        <li>
+                                            <div class="organisation-action-item">
+                                                <span><small>Adjoint Santa Cabrini</small><strong>@responsable.NomAffiche</strong></span>
+                                                <span class="btn-group btn-group-xs">
+                                                    <a href="@Url.Action("Details", "AffectationsOrganisationnelles", new { id = responsable.AffectationOrganisationnelleId })" class="btn btn-info" title="Consulter"><i class="fa-solid fa-circle-info" aria-hidden="true"></i></a>
+                                                    @if (canManage)
+                                                    {
+                                                        <a href="@Url.Action("Edit", "AffectationsOrganisationnelles", new { id = responsable.AffectationOrganisationnelleId })" class="btn btn-warning" title="Modifier"><i class="fa-solid fa-pen-to-square" aria-hidden="true"></i></a>
+                                                        <a href="@Url.Action("Delete", "AffectationsOrganisationnelles", new { id = responsable.AffectationOrganisationnelleId })" class="btn btn-danger" title="Supprimer"><i class="fa-solid fa-trash" aria-hidden="true"></i></a>
+                                                    }
+                                                </span>
+                                            </div>
+                                        </li>
+                                    }
+                                    </ul>
+                                </div>
+                            }
+                        </div>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@foreach (var departement in Model)
+{
+    <div class="modal fade organisation-modal"
+         id="services-departement-@departement.DepartementId"
+         tabindex="-1"
+         role="dialog"
+         aria-labelledby="titre-services-departement-@departement.DepartementId">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Fermer"><span aria-hidden="true">&times;</span></button>
+                    <h3 class="modal-title" id="titre-services-departement-@departement.DepartementId">
+                        <i class="fa-solid fa-stethoscope" aria-hidden="true"></i>
+                        Services — @departement.NomDepartement
+                    </h3>
+                    <p class="text-muted">@departement.Services.Count service(s) actif(s)</p>
+                    @if (canManage)
+                    {
+                        <a href="@Url.Action("Create", "Services", new { departementId = departement.DepartementId })" class="btn btn-primary btn-sm organisation-modal-add">
+                            <i class="fa-solid fa-plus" aria-hidden="true"></i> Ajouter un service
+                        </a>
+                    }
+                </div>
+                <div class="modal-body">
+                    @if (departement.Services.Count == 0)
+                    {
+                        <div class="alert alert-info">Aucun service actif n’est rattaché à ce département.</div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped table-hover organisation-services-table">
+                                <thead>
+                                    <tr>
+                                        <th>Service</th>
+                                        <th>Chef de service</th>
+                                        <th>Titre</th>
+                                        <th>Courriel</th>
+                                        <th class="text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                @foreach (var service in departement.Services)
+                                {
+                                    <tr>
+                                        <td>
+                                            <strong>@service.NomService</strong>
+                                            @if (!string.IsNullOrWhiteSpace(service.RegroupementSource))
+                                            {
+                                                <div class="text-muted organisation-secondary">@service.RegroupementSource</div>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (service.ChefsService.Count == 0)
+                                            {
+                                                <span class="text-muted">—</span>
+                                            }
+                                            else
+                                            {
+                                                foreach (var responsable in service.ChefsService)
+                                                {
+                                                    <div class="organisation-person">
+                                                        @responsable.NomAffiche
+                                                        @if (responsable.EstInterim)
+                                                        {
+                                                            <span class="label label-info">Intérim</span>
+                                                        }
+                                                        @if (responsable.EstAValider)
+                                                        {
+                                                            <span class="label label-warning">À valider</span>
+                                                        }
+                                                    </div>
+                                                }
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (service.ChefsService.Count == 0)
+                                            {
+                                                <span class="text-muted">—</span>
+                                            }
+                                            else
+                                            {
+                                                foreach (var responsable in service.ChefsService)
+                                                {
+                                                    <div class="organisation-person">@(string.IsNullOrWhiteSpace(responsable.Titre) ? "—" : responsable.Titre)</div>
+                                                }
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (service.ChefsService.Count == 0)
+                                            {
+                                                <span class="text-muted">—</span>
+                                            }
+                                            else
+                                            {
+                                                foreach (var responsable in service.ChefsService)
+                                                {
+                                                    <div class="organisation-person organisation-email">
+                                                        @if (!string.IsNullOrWhiteSpace(responsable.Courriel) && responsable.Courriel.Contains("@"))
+                                                        {
+                                                            <a href="mailto:@responsable.Courriel">@responsable.Courriel</a>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span>@(string.IsNullOrWhiteSpace(responsable.Courriel) ? "—" : responsable.Courriel)</span>
+                                                        }
+                                                    </div>
+                                                }
+                                            }
+                                        </td>
+                                        <td class="text-center organisation-row-actions">
+                                            <div class="btn-group btn-group-sm" role="group" aria-label="Actions pour le service @service.NomService">
+                                                <a href="@Url.Action("Details", "Services", new { id = service.ServiceId })" class="btn btn-info" title="Consulter le service"><i class="fa-solid fa-circle-info" aria-hidden="true"></i></a>
+                                                @if (canManage)
+                                                {
+                                                    <a href="@Url.Action("Edit", "Services", new { id = service.ServiceId })" class="btn btn-warning" title="Modifier le service"><i class="fa-solid fa-pen-to-square" aria-hidden="true"></i></a>
+                                                    <a href="@Url.Action("Delete", "Services", new { id = service.ServiceId })" class="btn btn-danger" title="Supprimer le service"><i class="fa-solid fa-trash" aria-hidden="true"></i></a>
+                                                }
+                                            </div>
+                                            <div class="organisation-secondary-actions">
+                                                @if (canManage && service.PeutAjouterChefService)
+                                                {
+                                                    <a href="@Url.Action("Create", "AffectationsOrganisationnelles", new { serviceId = service.ServiceId, roleCode = RoleAffectationOrganisationnelle.ChefService })" class="btn btn-default btn-sm organisation-add-chief" title="Ajouter un chef de service">
+                                                        <i class="fa-solid fa-user-plus" aria-hidden="true"></i> Chef
+                                                    </a>
+                                                }
+                                                @if (service.ChefsService.Count > 0)
+                                                {
+                                                    <div class="btn-group btn-group-sm organisation-affectations-menu">
+                                                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                            <i class="fa-solid fa-users-gear" aria-hidden="true"></i> Affectations <span class="caret"></span>
+                                                        </button>
+                                                        <ul class="dropdown-menu dropdown-menu-right organisation-actions-dropdown">
+                                                        @foreach (var responsable in service.ChefsService)
+                                                        {
+                                                            <li>
+                                                                <div class="organisation-action-item">
+                                                                    <span><small>Chef de service</small><strong>@responsable.NomAffiche</strong></span>
+                                                                    <span class="btn-group btn-group-xs">
+                                                                        <a href="@Url.Action("Details", "AffectationsOrganisationnelles", new { id = responsable.AffectationOrganisationnelleId })" class="btn btn-info" title="Consulter"><i class="fa-solid fa-circle-info" aria-hidden="true"></i></a>
+                                                                        @if (canManage)
+                                                                        {
+                                                                            <a href="@Url.Action("Edit", "AffectationsOrganisationnelles", new { id = responsable.AffectationOrganisationnelleId })" class="btn btn-warning" title="Modifier"><i class="fa-solid fa-pen-to-square" aria-hidden="true"></i></a>
+                                                                            <a href="@Url.Action("Delete", "AffectationsOrganisationnelles", new { id = responsable.AffectationOrganisationnelleId })" class="btn btn-danger" title="Supprimer"><i class="fa-solid fa-trash" aria-hidden="true"></i></a>
+                                                                        }
+                                                                    </span>
+                                                                </div>
+                                                            </li>
+                                                        }
+                                                        </ul>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section Styles {
+<style>
+    .organisation-page-header {
+        align-items: center;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .organisation-page-header h2,
+    .organisation-modal .modal-header p {
+        margin-bottom: 0;
+    }
+
+    .organisation-count {
+        background: #eef5ff;
+        border: 1px solid #c8dcf7;
+        border-radius: 18px;
+        color: #24527a;
+        padding: 7px 14px;
+        white-space: nowrap;
+    }
+
+    .organisation-header-actions {
+        align-items: center;
+        display: flex;
+        gap: 10px;
+    }
+
+    .organisation-table > thead > tr > th,
+    .organisation-services-table > thead > tr > th {
+        background: #234f76;
+        color: #fff;
+        vertical-align: middle;
+    }
+
+    .organisation-table > tbody > tr > td,
+    .organisation-services-table > tbody > tr > td {
+        vertical-align: top;
+    }
+
+    @@media (min-width: 768px) {
+        .organisation-card .table-responsive {
+            overflow: visible;
+        }
+    }
+
+    .organisation-table .services-column {
+        min-width: 155px;
+    }
+
+    .organisation-table .actions-column {
+        min-width: 220px;
+    }
+
+    .organisation-person + .organisation-person {
+        border-top: 1px solid #e7e7e7;
+        margin-top: 6px;
+        padding-top: 6px;
+    }
+
+    .organisation-secondary {
+        font-size: 12px;
+        margin-top: 3px;
+    }
+
+    .organisation-row-actions .btn-group,
+    .organisation-add-menu,
+    .organisation-add-chief,
+    .organisation-affectations-menu {
+        margin: 2px;
+    }
+
+    .organisation-row-actions .dropdown-menu {
+        text-align: left;
+    }
+
+    .organisation-secondary-actions {
+        align-items: center;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-top: 4px;
+    }
+
+    .organisation-actions-dropdown {
+        min-width: 360px;
+        padding: 5px;
+    }
+
+    .organisation-action-item {
+        align-items: center;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        gap: 12px;
+        justify-content: space-between;
+        padding: 7px 5px;
+    }
+
+    .organisation-actions-dropdown li:last-child .organisation-action-item {
+        border-bottom: 0;
+    }
+
+    .organisation-action-item small,
+    .organisation-action-item strong {
+        display: block;
+    }
+
+    .organisation-services-button .organisation-services-count {
+        background: #fff;
+        border: 1px solid #163f63;
+        color: #163f63;
+        font-size: 12px;
+        font-weight: 700;
+        margin-left: 7px;
+        min-width: 25px;
+        padding: 3px 7px;
+    }
+
+    .organisation-modal .modal-dialog {
+        width: min(1180px, 94vw);
+    }
+
+    .organisation-modal .modal-header {
+        background: #f4f8fc;
+        border-radius: 5px 5px 0 0;
+    }
+
+    .organisation-modal .modal-title {
+        color: #234f76;
+        font-size: 22px;
+    }
+
+    .organisation-modal-add {
+        margin-top: 10px;
+    }
+
+    .organisation-services-table {
+        margin-bottom: 0;
+    }
+
+    .organisation-services-table th:first-child {
+        width: 20%;
+    }
+
+    .organisation-services-table th:nth-child(2) {
+        width: 20%;
+    }
+
+    .organisation-services-table th:nth-child(3) {
+        width: 25%;
+    }
+
+    .organisation-services-table th:nth-child(4) {
+        width: 20%;
+    }
+
+    .organisation-services-table th:nth-child(5) {
+        min-width: 140px;
+        width: 15%;
+    }
+
+    .organisation-email {
+        overflow-wrap: anywhere;
+    }
+
+    @@media (max-width: 767px) {
+        .organisation-page-header {
+            align-items: flex-start;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .organisation-header-actions {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .organisation-modal .modal-dialog {
+            margin: 10px auto;
+            width: 96vw;
+        }
+    }
+</style>
+}
+
+@section Scripts {
+<script>
+$(function () {
+    $('#tableOrganisationDepartements').DataTable({
+        pageLength: 25,
+        ordering: true,
+        searching: true,
+        autoWidth: false,
+        order: [[0, 'asc']],
+        columnDefs: [{ orderable: false, searchable: false, targets: [5, 6] }],
+        language: {
+            search: 'Rechercher :',
+            lengthMenu: 'Afficher _MENU_ départements',
+            info: 'Affichage de _START_ à _END_ sur _TOTAL_ départements',
+            infoEmpty: 'Aucun département',
+            zeroRecords: 'Aucun département trouvé',
+            emptyTable: 'Aucun département',
+            paginate: { previous: 'Précédent', next: 'Suivant' }
+        }
+    });
+
+    $('.organisation-modal').on('shown.bs.modal', function () {
+        $(this).find('.modal-body').scrollTop(0);
+    });
+});
+</script>
+}

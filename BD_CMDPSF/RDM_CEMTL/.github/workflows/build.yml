@@ -1,0 +1,29 @@
+name: Validation .NET
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Extraire le dépôt
+        uses: actions/checkout@v4
+
+      - name: Installer .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restaurer
+        run: dotnet restore Solution.csproj --locked-mode
+
+      - name: Compiler
+        run: dotnet build Solution.csproj --configuration Release --no-restore --nologo

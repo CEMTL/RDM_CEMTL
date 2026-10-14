@@ -1,0 +1,37 @@
+@model Solution.ViewModels.TypesCourriel.TypeCourrielDetailsViewModel
+@{
+    ViewBag.Title = "Supprimer un type de courriel";
+}
+<div class="page-header-custom"><h2>Supprimer un type de courriel</h2></div>
+@await Html.PartialAsync("~/Views/Shared/_Alerts.cshtml")
+<div class="dashboard-card">
+    @if (Model.NombreUtilisations > 0)
+    {
+        <div class="alert alert-warning">Ce type est associé à @Model.NombreUtilisations courriel(s). Il doit être désactivé plutôt que supprimé.</div>
+    }
+    else
+    {
+        <div class="alert alert-danger">Cette suppression est définitive.</div>
+    }
+    <table class="table table-bordered table-striped">
+        <tr><th style="width:220px;">Libellé</th><td>@Model.Libelle</td></tr>
+        <tr><th>Actif</th><td>@(Model.EstActif ? "Oui" : "Non")</td></tr>
+        <tr><th>Courriels associés</th><td>@Model.NombreUtilisations</td></tr>
+    </table>
+    @using (Html.BeginForm("Delete", "TypesCourriel", null, FormMethod.Post, null, null))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(m => m.TypeCourrielId)
+        <div class="text-right">
+            <a href="@Url.Action("Index")" class="btn btn-default">Annuler</a>
+            @if (Model.NombreUtilisations == 0)
+            {
+                <button type="submit" class="btn btn-danger"><i class="fa-solid fa-trash"></i> Confirmer la suppression</button>
+            }
+            else
+            {
+                <a href="@Url.Action("Edit", new { id = Model.TypeCourrielId })" class="btn btn-warning">Désactiver</a>
+            }
+        </div>
+    }
+</div>

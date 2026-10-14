@@ -1,0 +1,121 @@
+﻿@model Solution.ViewModels.Privileges.MedecinPrivilegeFormViewModel
+
+<div class="dashboard-card">
+    <div class="form-group">
+        @Html.LabelFor(m => m.MedecinId)
+        @if (ViewBag.ReturnMedecinId != null)
+        {
+            var medecinSelectionne = Model.MedecinOptions?.FirstOrDefault(x => x.Value == Model.MedecinId.ToString());
+            @Html.HiddenFor(m => m.MedecinId)
+            <input type="text" class="form-control" value="@(medecinSelectionne != null ? medecinSelectionne.Text : Model.MedecinId.ToString())" readonly="readonly" />
+        }
+        else
+        {
+            @Html.DropDownListFor(m => m.MedecinId, Model.MedecinOptions, "-- Sélectionner --", new { @class = "form-control" })
+        }
+        @Html.ValidationMessageFor(m => m.MedecinId, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.PrivilegeReferenceId)
+        @Html.DropDownListFor(m => m.PrivilegeReferenceId, Model.PrivilegeOptions, "-- Sélectionner --", new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.PrivilegeReferenceId, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.InstallationId)
+        @Html.DropDownListFor(m => m.InstallationId, Model.InstallationOptions, "-- Aucune --", new { @class = "form-control", data_services_url = Url.Action("ServicesForInstallation", "MedecinPrivileges") })
+        @Html.ValidationMessageFor(m => m.InstallationId, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.ServiceId)
+        @Html.DropDownListFor(m => m.ServiceId, Model.ServiceOptions, "-- Aucun --", new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.ServiceId, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.DateDebut)
+        @Html.TextBoxFor(m => m.DateDebut, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+        @Html.ValidationMessageFor(m => m.DateDebut, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.DateFin)
+        @Html.TextBoxFor(m => m.DateFin, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+        @Html.ValidationMessageFor(m => m.DateFin, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.Etat)
+        @Html.DropDownListFor(m => m.Etat, Model.EtatOptions, "-- Sélectionner --", new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Etat, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.NatureActivites)
+        @Html.TextBoxFor(m => m.NatureActivites, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.NatureActivites, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.ChampActivites)
+        @Html.TextBoxFor(m => m.ChampActivites, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.ChampActivites, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.Obligations)
+        @Html.TextAreaFor(m => m.Obligations, 4, 80, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Obligations, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.Commentaire)
+        @Html.TextAreaFor(m => m.Commentaire, 4, 80, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Commentaire, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.NumeroResolutionCA)
+        @Html.TextBoxFor(m => m.NumeroResolutionCA, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.NumeroResolutionCA, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.DateResolutionCA)
+        @Html.TextBoxFor(m => m.DateResolutionCA, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+        @Html.ValidationMessageFor(m => m.DateResolutionCA, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="checkbox">
+        <label>@Html.CheckBoxFor(m => m.ReconnaissanceEcriteRecue) Reconnaissance écrite reçue</label>
+    </div>
+
+    <div class="checkbox">
+        <label>@Html.CheckBoxFor(m => m.EstActif) Actif</label>
+    </div>
+</div>
+
+<script>
+(function () {
+    var installation = document.getElementById("InstallationId");
+    var service = document.getElementById("ServiceId");
+    if (!installation || !service) return;
+
+    installation.addEventListener("change", function () {
+        var url = installation.getAttribute("data-services-url") + "?installationId=" + encodeURIComponent(installation.value || "");
+        fetch(url, { credentials: "same-origin" })
+            .then(function (response) { return response.json(); })
+            .then(function (items) {
+                service.innerHTML = '<option value="">-- Aucun --</option>';
+                items.forEach(function (item) {
+                    var option = document.createElement("option");
+                    option.value = item.value;
+                    option.textContent = item.text;
+                    service.appendChild(option);
+                });
+            });
+    });
+})();
+</script>

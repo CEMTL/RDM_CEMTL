@@ -1,0 +1,23 @@
+@model Solution.ViewModels.Nominations.NominationAdministrativeFormViewModel
+@{ ViewBag.Title = "Modifier la nomination administrative"; }
+<div class="page-header-custom"><h2>Modifier la nomination administrative</h2></div>
+@using (Html.BeginForm("Edit", "NominationsAdministratives", new { id=Model.NominationAdministrativeId }, FormMethod.Post, null, null))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.NominationAdministrativeId)
+    @if (ViewBag.ReturnMedecinId != null)
+    {
+        <input type="hidden" name="returnMedecinId" value="@ViewBag.ReturnMedecinId" />
+        <input type="hidden" name="returnTab" value="@ViewBag.ReturnTab" />
+    }
+    @Html.ValidationSummary(true, "Veuillez corriger les erreurs.", new { @class = "alert alert-danger" })
+    @await Html.PartialAsync("_Form", Model)
+    <div class="dashboard-card text-right">
+        @if (ViewBag.ReturnMedecinId != null)
+        { <a href="@Url.Action("Index","Medecins",new { openMedecin=ViewBag.ReturnMedecinId, tab=ViewBag.ReturnTab })" class="btn btn-default">Annuler</a> }
+        else
+        { <a href="@Url.Action("Index")" class="btn btn-default">Annuler</a> }
+        <button type="submit" class="btn btn-success"><i class="fa-solid fa-floppy-disk"></i> Enregistrer</button>
+    </div>
+}
+@section Scripts { @await Html.PartialAsync("_ValidationScriptsPartial") }

@@ -1,0 +1,100 @@
+@model Solution.ViewModels.Medecins.MedecinDetailsModalViewModel
+
+@functions{
+    public string F(DateTime? d)
+    {
+        return d.HasValue ? d.Value.ToString("yyyy-MM-dd") : "";
+    }
+}
+
+@if (Model != null && Model.MedecinId > 0)
+{
+    <div class="medecin-tab-toolbar" style="margin-top:20px;">
+        <h4 style="margin:0;">Affectations cliniques</h4>
+        <a href="@Url.Action("Create", "MedecinAffectationsCliniques", new { medecinId = Model.MedecinId, returnMedecinId = Model.MedecinId, returnTab = "organisation" })" class="btn btn-success btn-sm">
+            <i class="fa-solid fa-plus"></i> Nouvelle affectation clinique
+        </a>
+    </div>
+
+    @if (Model.AffectationsCliniques.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-condensed medecin-tab-table">
+                <thead>
+                    <tr>
+                        <th>Département</th><th>Service</th><th>Installation</th><th>Type</th><th>Début</th><th>Fin</th><th>Principale</th><th>État</th><th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var item in Model.AffectationsCliniques)
+                {
+                    <tr>
+                        <td>@item.Departement</td>
+                        <td>@item.Service</td>
+                        <td>@item.Installation</td>
+                        <td>@item.TypeAffectation</td>
+                        <td>@F(item.DateDebut)</td>
+                        <td>@F(item.DateFin)</td>
+                        <td>@(item.EstPrincipale ? "Oui" : "")</td>
+                        <td>@(item.EstActive ? "Active" : "Terminée")</td>
+                        <td class="nowrap">
+                            <a href="@Url.Action("Details", "MedecinAffectationsCliniques", new { id = item.MedecinAffectationCliniqueId, returnMedecinId = Model.MedecinId, returnTab = "organisation" })" class="btn btn-info btn-sm btn-icon-only" title="Détails"><i class="fa-solid fa-circle-info"></i></a>
+                            <a href="@Url.Action("Edit", "MedecinAffectationsCliniques", new { id = item.MedecinAffectationCliniqueId, returnMedecinId = Model.MedecinId, returnTab = "organisation" })" class="btn btn-warning btn-sm btn-icon-only" title="Modifier"><i class="fa-solid fa-pen-to-square"></i></a>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="medecin-tab-empty">Aucune affectation clinique pour ce médecin.</div>
+    }
+
+    <div class="medecin-tab-toolbar" style="margin-top:20px;">
+        <h4 style="margin:0;">Fonctions organisationnelles</h4>
+        <a href="@Url.Action("Create", "AffectationsOrganisationnelles", new { medecinId = Model.MedecinId, returnMedecinId = Model.MedecinId, returnTab = "organisation" })" class="btn btn-success btn-sm">
+            <i class="fa-solid fa-plus"></i> Nouvelle fonction
+        </a>
+    </div>
+
+    @if (Model.AffectationsOrganisationnelles.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-condensed medecin-tab-table">
+                <thead>
+                    <tr><th>Rôle</th><th>Département</th><th>Service</th><th>Regroupement</th><th>Titre</th><th>Début</th><th>Fin</th><th>État</th><th>Action</th></tr>
+                </thead>
+                <tbody>
+                @foreach (var item in Model.AffectationsOrganisationnelles)
+                {
+                    <tr>
+                        <td>@item.Role</td>
+                        <td>@item.Departement</td>
+                        <td>@item.Service</td>
+                        <td>@item.Regroupement</td>
+                        <td>@item.Titre</td>
+                        <td>@F(item.DateDebut)</td>
+                        <td>@F(item.DateFin)</td>
+                        <td>
+                            @(item.EstActive ? "Active" : "Inactive")
+                            @if (item.EstAValider)
+                            {
+                                <span class="label label-warning">À valider</span>
+                            }
+                        </td>
+                        <td>
+                            <a href="@Url.Action("Details", "AffectationsOrganisationnelles", new { id = item.AffectationOrganisationnelleId })" class="btn btn-info btn-sm btn-icon-only" title="Détails"><i class="fa-solid fa-circle-info"></i></a>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="medecin-tab-empty">Aucune fonction organisationnelle liée à ce médecin.</div>
+    }
+}

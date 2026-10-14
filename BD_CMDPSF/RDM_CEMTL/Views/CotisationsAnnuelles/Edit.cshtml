@@ -1,0 +1,44 @@
+﻿@model Solution.ViewModels.CotisationsAnnuelles.CotisationAnnuelleFormViewModel
+
+@{
+    ViewBag.Title = "Modifier une cotisation annuelle";
+}
+
+<div class="page-header-custom">
+    <h2>Modifier une cotisation annuelle</h2>
+</div>
+
+@using (Html.BeginForm("Edit", "CotisationsAnnuelles", new { id = Model.CotisationAnnuelleId }, FormMethod.Post, null, new { role = "form" }))
+{
+    @Html.AntiForgeryToken()
+    @if (ViewBag.ReturnMedecinId != null)
+    {
+        <input type="hidden" name="returnMedecinId" value="@ViewBag.ReturnMedecinId" />
+        <input type="hidden" name="returnTab" value="@ViewBag.ReturnTab" />
+    }
+
+    @Html.ValidationSummary(true, "Veuillez corriger les erreurs ci-dessous.", new { @class = "alert alert-danger" })
+
+    @Html.HiddenFor(m => m.CotisationAnnuelleId)
+
+    @await Html.PartialAsync("_Form", Model)
+
+    <div class="dashboard-card">
+        <button type="submit" class="btn btn-success">
+            <i class="fa fa-save"></i> Enregistrer
+        </button>
+
+        @if (ViewBag.ReturnMedecinId != null)
+        {
+            <a href="@Url.Action("Edit", "Medecins", new { id = ViewBag.ReturnMedecinId, tab = ViewBag.ReturnTab })" class="btn btn-default">Retour au médecin</a>
+        }
+        else
+        {
+            @Html.ActionLink("Retour à la liste", "Index", null, new { @class = "btn btn-default" })
+        }
+    </div>
+}
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

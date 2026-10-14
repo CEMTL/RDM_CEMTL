@@ -1,0 +1,74 @@
+@model IEnumerable<Solution.ViewModels.AffectationsOrganisationnelles.AffectationOrganisationnelleListViewModel>
+@{
+    ViewBag.Title = "Affectations organisationnelles";
+    var canManage = User.IsInRole("Admin") || User.IsInRole("SuperUtilisateur");
+    var seulementAValider = (bool)(ViewBag.SeulementAValider ?? false);
+    var inclureInactives = (bool)(ViewBag.InclureInactives ?? false);
+}
+@await Html.PartialAsync("~/Views/Shared/_Alerts.cshtml")
+<div class="page-header-custom"><h2>Affectations organisationnelles</h2></div>
+
+<div class="dashboard-card filters-bar">
+@using (Html.BeginForm("Index", "AffectationsOrganisationnelles", null, FormMethod.Get, null, new { id = "formRechercheAffectations" }))
+{
+    <div class="row">
+        <div class="col-md-4"><input type="text" name="search" value="@Context.Request.Query["search"].ToString()" class="form-control" placeholder="Nom, titre, département ou service" /></div>
+        <div class="col-md-3">@Html.DropDownList("roleCode", (IEnumerable<SelectListItem>)ViewBag.RoleOptions, "-- Tous les rôles --", new { @class = "form-control" })</div>
+        <div class="col-md-3">
+            <label class="checkbox-inline"><input type="checkbox" name="seulementAValider" value="true" checked="@(seulementAValider ? "checked" : null)" /> À valider</label>
+            <label class="checkbox-inline"><input type="checkbox" name="inclureInactives" value="true" checked="@(inclureInactives ? "checked" : null)" /> Inclure inactives</label>
+        </div>
+        <div class="col-md-2 text-right">
+            <button type="submit" class="btn btn-default" title="Rechercher"><i class="fa-solid fa-magnifying-glass"></i></button>
+            @if (canManage) { <a href="@Url.Action("Create")" class="btn btn-primary" title="Nouvelle affectation"><i class="fa-solid fa-plus"></i></a> }
+        </div>
+    </div>
+}
+</div>
+
+<div class="dashboard-card">
+<table id="tableAffectations" class="table table-bordered table-striped table-hover registre-table">
+    <thead><tr><th>Rôle</th><th>Personne</th><th>Cible</th><th>Regroupement</th><th>Période</th><th>État</th><th class="nowrap">Actions</th></tr></thead>
+    <tbody>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.RoleLibelle</td>
+            <td>
+                <strong>@item.NomAffiche</strong>
+                @if (!string.IsNullOrWhiteSpace(item.NomMedecin)) { <div class="text-muted">Médecin : @item.NomMedecin</div> }
+                @if (item.EstInterim) { <span class="label label-info">Intérim</span> }
+            </td>
+            <td>@item.Cible</td>
+            <td>@item.RegroupementSource</td>
+            <td>@(item.DateDebut?.ToString("yyyy-MM-dd") ?? "—") à @(item.DateFin?.ToString("yyyy-MM-dd") ?? "—")</td>
+            <td>
+                <span class="label @(item.EstActive ? "label-success" : "label-default")">@(item.EstActive ? "Active" : "Inactive")</span>
+                @if (item.EstAValider) { <span class="label label-warning">À valider</span> }
+            </td>
+            <td class="table-actions nowrap">
+                <a href="@Url.Action("Details", new { id = item.AffectationOrganisationnelleId })" class="btn btn-info btn-sm btn-icon-only" title="Détails"><i class="fa-solid fa-circle-info"></i></a>
+                @if (canManage)
+                {
+                    <a href="@Url.Action("Edit", new { id = item.AffectationOrganisationnelleId })" class="btn btn-warning btn-sm btn-icon-only" title="Modifier"><i class="fa-solid fa-pen-to-square"></i></a>
+                    <a href="@Url.Action("Delete", new { id = item.AffectationOrganisationnelleId })" class="btn btn-danger btn-sm btn-icon-only" title="Supprimer"><i class="fa-solid fa-trash"></i></a>
+                }
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+</div>
+
+@section Scripts {
+<script>
+$(function () {
+    $('#tableAffectations').DataTable({
+        pageLength: 25, ordering: true, searching: true, autoWidth: false,
+        order: [[5, 'desc'], [0, 'asc'], [2, 'asc']],
+        columnDefs: [{ orderable: false, searchable: false, targets: 6 }],
+        language: { search: 'Rechercher :', lengthMenu: 'Afficher _MENU_ éléments', info: 'Affichage de _START_ à _END_ sur _TOTAL_ éléments', infoEmpty: 'Aucun élément', zeroRecords: 'Aucune affectation trouvée', emptyTable: 'Aucune affectation', paginate: { previous: 'Précédent', next: 'Suivant' } }
+    });
+});
+</script>
+}

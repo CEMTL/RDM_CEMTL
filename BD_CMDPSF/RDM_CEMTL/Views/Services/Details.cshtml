@@ -1,0 +1,21 @@
+@model Solution.ViewModels.Services.ServiceDetailsViewModel
+@{
+    ViewBag.Title = "Détails du service";
+    var canManage = User.IsInRole("Admin") || User.IsInRole("SuperUtilisateur");
+}
+<div class="page-header-custom"><h2>@Model.NomService</h2></div>
+<div class="dashboard-card"><dl class="dl-horizontal"><dt>Département</dt><dd>@Model.NomDepartement</dd><dt>Regroupement</dt><dd>@(Model.RegroupementSource ?? "—")</dd><dt>Chef de service</dt><dd>@(Model.ChefService ?? "—") @if (Model.ChefServiceEstAValider) { <span class="label label-warning">À valider</span> }</dd><dt>Code</dt><dd>@Model.CodeService</dd><dt>Actif</dt><dd>@(Model.EstActif ? "Oui" : "Non")</dd><dt>Privilèges liés</dt><dd>@Model.NombrePrivileges</dd></dl></div>
+<div class="dashboard-card">
+    <div class="clearfix"><h3 class="pull-left">Responsables</h3>@if (canManage) { <a href="@Url.Action("Create", "AffectationsOrganisationnelles", new { serviceId = Model.ServiceId })" class="btn btn-primary pull-right">Nouvelle affectation</a> }</div>
+    <table class="table table-bordered table-striped registre-table"><thead><tr><th>Rôle</th><th>Personne</th><th>Titre</th><th>Courriel</th><th>Période</th><th>État</th><th>Actions</th></tr></thead><tbody>
+    @foreach (var item in Model.Affectations)
+    {
+        <tr><td>@item.RoleLibelle</td><td>@item.NomAffiche @if (item.EstInterim) { <span class="label label-info">Intérim</span> }</td><td>@item.Titre</td><td>@item.Courriel</td><td>@(item.DateDebut?.ToString("yyyy-MM-dd") ?? "—") à @(item.DateFin?.ToString("yyyy-MM-dd") ?? "—")</td><td>@(item.EstActive ? "Active" : "Inactive") @if (item.EstAValider) { <span class="label label-warning">À valider</span> }</td><td><a href="@Url.Action("Details", "AffectationsOrganisationnelles", new { id = item.AffectationOrganisationnelleId })" class="btn btn-info btn-sm btn-icon-only" title="Détails"><i class="fa-solid fa-circle-info"></i></a></td></tr>
+    }
+    @if (!Model.Affectations.Any()) { <tr><td colspan="7" class="text-muted">Aucune affectation.</td></tr> }
+    </tbody></table>
+</div>
+<div class="dashboard-card"><h3>Installations desservies</h3><table class="table table-bordered table-striped registre-table"><thead><tr><th>Installation</th><th>Date début</th><th>Date fin</th><th>Actif</th></tr></thead><tbody>
+@foreach (var item in Model.Installations) { <tr><td>@item.NomInstallation</td><td>@(item.DateDebut?.ToString("yyyy-MM-dd"))</td><td>@(item.DateFin?.ToString("yyyy-MM-dd"))</td><td>@(item.EstActif ? "Oui" : "Non")</td></tr> }
+</tbody></table></div>
+<div class="dashboard-card actions-card">@if (canManage) { <a href="@Url.Action("Edit", new { id = Model.ServiceId })" class="btn btn-warning btn-icon-only" title="Modifier"><i class="fa-solid fa-pen-to-square"></i></a> } <a href="@Url.Action("Index")" class="btn btn-default btn-icon-only" title="Retour"><i class="fa-solid fa-arrow-left"></i></a></div>

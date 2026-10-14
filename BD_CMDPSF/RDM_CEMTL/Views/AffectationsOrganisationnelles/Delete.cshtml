@@ -1,0 +1,29 @@
+@model Solution.ViewModels.AffectationsOrganisationnelles.AffectationOrganisationnelleDetailsViewModel
+@{
+    ViewBag.Title = "Supprimer l'affectation organisationnelle";
+    var imported = !string.IsNullOrWhiteSpace(Model.SourceDonnees);
+}
+@await Html.PartialAsync("~/Views/Shared/_Alerts.cshtml")
+<div class="page-header-custom"><h2>Supprimer l'affectation organisationnelle</h2></div>
+<div class="dashboard-card">
+    <p>Rôle : <strong>@Model.RoleLibelle</strong></p>
+    <p>Personne : <strong>@Model.NomAffiche</strong></p>
+    <p>Cible : <strong>@Model.Cible</strong></p>
+    @if (imported)
+    {
+        <div class="alert alert-warning">Cette affectation provient de <strong>@Model.SourceDonnees</strong>. Elle doit être désactivée plutôt que supprimée afin de préserver la traçabilité.</div>
+    }
+    else
+    {
+        <div class="alert alert-danger">Cette suppression est définitive.</div>
+    }
+</div>
+<div class="dashboard-card actions-card">
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.AffectationOrganisationnelleId)
+    if (!imported) { <button type="submit" class="btn btn-danger"><i class="fa-solid fa-trash"></i> Supprimer</button> }
+    <a href="@Url.Action("Details", new { id = Model.AffectationOrganisationnelleId })" class="btn btn-default">Annuler</a>
+}
+</div>

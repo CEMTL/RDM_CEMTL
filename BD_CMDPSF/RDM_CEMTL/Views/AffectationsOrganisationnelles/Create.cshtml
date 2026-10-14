@@ -1,0 +1,14 @@
+@model Solution.ViewModels.AffectationsOrganisationnelles.AffectationOrganisationnelleFormViewModel
+@{
+    ViewBag.Title = "Nouvelle affectation organisationnelle";
+}
+<div class="page-header-custom"><h2>Nouvelle affectation organisationnelle</h2></div>
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    @await Html.PartialAsync("_Form", Model)
+    <div class="dashboard-card actions-card">
+        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Enregistrer</button>
+        <a href="@Url.Action("Index")" class="btn btn-default">Annuler</a>
+    </div>
+}

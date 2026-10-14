@@ -1,0 +1,29 @@
+@model Solution.ViewModels.MedecinsTelephones.MedecinTelephoneFormViewModel
+@{
+    ViewBag.Title = "Créer MedecinTelephone";
+}
+
+<div class="page-header-custom">
+    <h2>Créer MedecinTelephone</h2>
+</div>
+
+@using (Html.BeginForm(null, null, new { medecinId = Model.MedecinId }, FormMethod.Post, null, null))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.MedecinTelephoneId)
+    @await Html.PartialAsync("_Form", Model)
+
+    <div class="dashboard-card">
+        <button type="submit" class="btn btn-success">Enregistrer</button>
+        @Html.ActionLink("Retour", "Index", null, new { @class = "btn btn-default" })
+    </div>
+}
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}
+<div class="dashboard-card" style="margin-bottom:12px">
+    @if (Model.MedecinId > 0) {
+        <a class="btn btn-default" asp-controller="Cmdpsf" asp-action="Details" asp-route-id="@Model.MedecinId"><i class="fa-solid fa-arrow-left"></i> Retour à la fiche CMDPSF</a>
+    }
+</div>

@@ -1,0 +1,90 @@
+@model Solution.Models.Medecin
+@{
+    ViewBag.Title = "Dossier professionnel CMDPSF";
+    bool canEdit = User.IsInRole("Admin") || User.IsInRole("SuperUtilisateur");
+    bool canDelete = User.IsInRole("Admin");
+    bool medecin = Model.Profession?.CodeProfession == "MEDECIN" || Model.Profession == null;
+}
+@await Html.PartialAsync("~/Views/Shared/_Alerts.cshtml")
+@if (TempData["Success"] != null) { <div class="alert alert-success">@TempData["Success"]</div> }
+<div class="dashboard-card">
+    <div class="clearfix">
+        <a class="btn btn-default pull-right" asp-action="Index"><i class="fa-solid fa-arrow-left"></i> Retour au registre</a>
+        <h2><i class="fa-solid fa-id-card"></i> @Model.Prenom @Model.Nom</h2>
+        <p class="text-muted">@(Model.Profession?.Libelle ?? "Médecin (historique)") · Permis : @Model.Permis · @(Model.EstActif ? "Actif" : "Inactif")</p>
+    </div>
+    <div class="btn-toolbar" style="display:flex; flex-wrap:wrap; gap:6px;margin-bottom:16px;">
+        @if (canEdit) {
+            <a class="btn btn-warning" asp-action="Modifier" asp-route-id="@Model.MedecinId"><i class="fa-solid fa-pen-to-square"></i> Modifier</a>
+            @if (!medecin) {
+              <form asp-action="ChangerEtat" method="post" onsubmit="return confirm('Confirmer le changement de statut du dossier ?');" style="display:inline">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" value="@Model.MedecinId" />
+                <input type="hidden" name="actif" value="@(!Model.EstActif ? "true" : "false")" />
+                <button type="submit" class="btn @(Model.EstActif ? "btn-danger" : "btn-success")"><i class="fa-solid fa-power-off"></i> @(Model.EstActif ? "Désactiver" : "Réactiver")</button>
+              </form>
+            }
+        }
+        @if (canDelete && Model.EstActif) {
+            <form asp-controller="Cmdpsf" asp-action="Supprimer" method="post" style="display:inline" onsubmit="return confirm('Supprimer ce dossier du registre actif ? Les données seront conservées et le dossier pourra être réactivé.');">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" value="@Model.MedecinId" />
+                <button type="submit" class="btn btn-danger"><i class="fa-solid fa-trash"></i> Supprimer (archiver)</button>
+            </form>
+        }
+        <button type="button" class="btn btn-default" onclick="window.print()"><i class="fa-solid fa-print"></i> Imprimer</button>
+    </div>
+    <div id="cmdpsf-print-general" class="panel panel-default"><div class="panel-heading"><strong>Informations générales</strong></div><div class="panel-body"><div class="row">
+        <div class="col-md-4"><strong>Profession :</strong> @(Model.Profession?.Libelle ?? "Médecin")</div>
+        <div class="col-md-4"><strong>Permis :</strong> @Model.Permis</div>
+        <div class="col-md-4"><strong>N° membre :</strong> @Model.NumeroMembreOrdre</div>
+        <div class="col-md-4"><strong>Entrée :</strong> @(Model.DateEntreeFonction?.ToString("yyyy-MM-dd") ?? "—")</div>
+        <div class="col-md-4"><strong>Départ :</strong> @(Model.DateDepart?.ToString("yyyy-MM-dd") ?? "—")</div>
+        <div class="col-md-4"><strong>Expiration permis :</strong> @(Model.DateExpirationPermis?.ToString("yyyy-MM-dd") ?? "—")</div>
+        <div class="col-md-4"><strong>Obtention permis :</strong> @(Model.DateObtentionPermis?.ToString("yyyy-MM-dd") ?? "—")</div>
+        <div class="col-md-4"><strong>Dernière vérification :</strong> @(Model.DateDerniereVerificationOrdre?.ToString("yyyy-MM-dd") ?? "—")</div>
+        <div class="col-md-4"><strong>Référence :</strong> @Model.ReferenceVerificationOrdre</div>
+    </div></div></div>
+    @if (!string.IsNullOrWhiteSpace(Model.Commentaires)) {<div class="panel panel-default"><div class="panel-heading"><strong>Commentaires</strong></div><div class="panel-body" style="white-space:pre-wrap">@Model.Commentaires</div></div>}
+</div>
+<div class="dashboard-card">
+    <h3 style="margin-top:0">Gestion des dossiers associés</h3>
+    <p class="text-muted">Les modules existants utilisent déjà MedecinId. Les droits de chaque module restent applicables. Vérifiez les règles métier avant d'attribuer un privilège propre aux médecins à une autre profession.</p>
+    <div class="row">
+        @foreach (var item in new[]{
+             ("Coordonnées — courriels", "MedecinsCourriels", "envelope"),
+             ("Coordonnées — téléphones", "MedecinsTelephones", "phone"),
+             ("Coordonnées — adresses", "MedecinsAdresses", "location-dot"),
+             ("Affectations cliniques", "MedecinAffectationsCliniques", "building"),
+             ("Installations", "MedecinsInstallations", "hospital"),
+             ("Comités", "MedecinsComites", "users"),
+             ("Cotisations", "CotisationsAnnuelles", "money-bill"),
+             ("Documents", "DocumentsMedecin", "file-lines"),
+             ("Nominations", "NominationsAdministratives", "award"),
+             ("Privilèges — selon profession", "MedecinPrivileges", "shield")
+          }) {
+          <div class="col-md-4" style="margin-bottom:10px">
+            <a class="btn btn-default btn-block" asp-controller="@item.Item2" asp-action="Index" asp-route-medecinId="@Model.MedecinId"><i class="fa-solid fa-@item.Item3"></i> @item.Item1</a>
+          </div>
+        }
+    </div>
+    @if (medecin) { <p><a class="btn btn-primary" asp-controller="Medecins" asp-action="Edit" asp-route-id="@Model.MedecinId"><i class="fa-solid fa-folder-open"></i> Ouvrir le dossier médical complet</a></p> }
+</div>
+
+<style>
+/* L’impression de la fiche doit contenir uniquement les Informations générales. */
+@@media print {
+    body * { visibility: hidden !important; }
+    #cmdpsf-print-general, #cmdpsf-print-general * { visibility: visible !important; }
+    #cmdpsf-print-general {
+        position: absolute !important;
+        left: 0 !important; top: 0 !important;
+        width: 100% !important;
+        margin: 0 !important; padding: 0 !important;
+        border: 1px solid #ddd !important;
+        box-shadow: none !important;
+    }
+    #cmdpsf-print-general .panel-body { display: block !important; }
+    @@page { margin: 12mm; }
+}
+</style>

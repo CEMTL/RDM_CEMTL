@@ -1,0 +1,320 @@
+﻿@model Solution.ViewModels.Medecins.MedecinDetailsModalViewModel
+@using System.Linq
+
+@functions{
+    public string F(DateTime? d)
+    {
+        return d.HasValue ? d.Value.ToString("yyyy-MM-dd") : "";
+    }
+
+    public string M(decimal? value)
+    {
+        return value.HasValue ? value.Value.ToString("N2") : "";
+    }
+}
+
+@{
+    var canManage = true;
+    var privilegesActifs = Model.Privileges.Count(x => x.EstActif);
+    var fitTestsActifs = Model.FitTests.Count(x => x.EstActif);
+    var ententesActives = Model.EntentesFDC.Count(x => x.EstActive);
+}
+
+                    <div class="tab-pane" id="tab-privileges">
+                        <div class="medecin-tab-toolbar">
+                            <div class="summary">@Model.Privileges.Count privilège(s), dont @privilegesActifs actif(s)</div>
+                            @if (canManage)
+                            {
+                                <a href="@Url.Action("Create", "MedecinPrivileges", new { medecinId = Model.MedecinId, returnMedecinId = Model.MedecinId, returnTab = "privileges" })" class="btn btn-success btn-sm">
+                                    <i class="fa-solid fa-plus"></i> Nouveau privilège
+                                </a>
+                            }
+                        </div>
+
+                        @if (Model.Privileges.Any())
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-striped table-hover medecin-tab-table">
+                                    <thead>
+                                        <tr><th>Privilège</th><th>Installation</th><th>Département</th><th>Service</th><th>Début</th><th>Fin</th><th>État</th><th>Actif</th><th style="width:140px;">Actions</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Model.Privileges)
+                                        {
+                                            <tr>
+                                                <td><strong>@item.CodePrivilege</strong>@(string.IsNullOrWhiteSpace(item.CodePrivilege) ? "" : " - ")@item.PrivilegeLibelle</td>
+                                                <td>@item.InstallationLibelle</td>
+                                                <td>@item.DepartementLibelle</td>
+                                                <td>@item.ServiceLibelle</td>
+                                                <td>@F(item.DateDebut)</td>
+                                                <td>@F(item.DateFin)</td>
+                                                <td>@item.Etat</td>
+                                                <td>@(item.EstActif ? "Oui" : "Non")</td>
+                                                <td class="table-actions nowrap">
+                                                    <a href="@Url.Action("Details", "MedecinPrivileges", new { id = item.MedecinPrivilegeId, returnMedecinId = Model.MedecinId, returnTab = "privileges" })" class="btn btn-info btn-sm btn-icon-only" title="Détails"><i class="fa-solid fa-circle-info"></i></a>
+                                                    @if (canManage)
+                                                    {
+                                                        <a href="@Url.Action("Edit", "MedecinPrivileges", new { id = item.MedecinPrivilegeId, returnMedecinId = Model.MedecinId, returnTab = "privileges" })" class="btn btn-warning btn-sm btn-icon-only" title="Modifier"><i class="fa-solid fa-pen-to-square"></i></a>
+                                                        <a href="@Url.Action("Delete", "MedecinPrivileges", new { id = item.MedecinPrivilegeId, returnMedecinId = Model.MedecinId, returnTab = "privileges" })" class="btn btn-danger btn-sm btn-icon-only" title="Supprimer"><i class="fa-solid fa-trash"></i></a>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="medecin-tab-empty">Aucun privilège pour ce médecin.</div>
+                        }
+                    </div>
+
+                    <div class="tab-pane" id="tab-cotisations">
+                        <div class="medecin-tab-toolbar">
+                            <div class="summary">@Model.Cotisations.Count cotisation(s)</div>
+                            @if (canManage)
+                            {
+                                <a href="@Url.Action("Create", "CotisationsAnnuelles", new { medecinId = Model.MedecinId, returnMedecinId = Model.MedecinId, returnTab = "cotisations" })" class="btn btn-success btn-sm">
+                                    <i class="fa-solid fa-plus"></i> Nouvelle cotisation
+                                </a>
+                            }
+                        </div>
+
+                        @if (Model.Cotisations.Any())
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-striped table-hover medecin-tab-table">
+                                    <thead>
+                                        <tr><th>Année</th><th>Code</th><th>Montant initial</th><th>Montant final</th><th>Payé</th><th>État</th><th>Date paiement</th><th>Type paiement</th><th style="width:140px;">Actions</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Model.Cotisations)
+                                        {
+                                            <tr>
+                                                <td>@item.AnneeExercice</td>
+                                                <td>@item.CodeCotisation</td>
+                                                <td>@M(item.MontantInitial)</td>
+                                                <td>@M(item.MontantFinal)</td>
+                                                <td>@M(item.MontantPaye)</td>
+                                                <td>@item.EtatCotisation</td>
+                                                <td>@F(item.DatePaiement)</td>
+                                                <td>@item.TypePaiement</td>
+                                                <td class="table-actions nowrap">
+                                                    <a href="@Url.Action("Details", "CotisationsAnnuelles", new { id = item.CotisationAnnuelleId, returnMedecinId = Model.MedecinId, returnTab = "cotisations" })" class="btn btn-info btn-sm btn-icon-only" title="Détails"><i class="fa-solid fa-circle-info"></i></a>
+                                                    @if (item.MontantPaye.GetValueOrDefault() > 0m && item.DatePaiement.HasValue)
+                                                    {
+                                                        <a href="@Url.Action("Recu", "CotisationsAnnuelles", new { id = item.CotisationAnnuelleId, returnMedecinId = Model.MedecinId, returnTab = "cotisations" })" class="btn btn-success btn-sm btn-icon-only" title="Imprimer le reçu" aria-label="Imprimer le reçu" target="_blank" rel="noopener"><i class="fa-solid fa-print"></i></a>
+                                                    }
+                                                    @if (canManage)
+                                                    {
+                                                        <a href="@Url.Action("Edit", "CotisationsAnnuelles", new { id = item.CotisationAnnuelleId, returnMedecinId = Model.MedecinId, returnTab = "cotisations" })" class="btn btn-warning btn-sm btn-icon-only" title="Modifier"><i class="fa-solid fa-pen-to-square"></i></a>
+                                                        <a href="@Url.Action("Delete", "CotisationsAnnuelles", new { id = item.CotisationAnnuelleId, returnMedecinId = Model.MedecinId, returnTab = "cotisations" })" class="btn btn-danger btn-sm btn-icon-only" title="Supprimer"><i class="fa-solid fa-trash"></i></a>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="medecin-tab-empty">Aucune cotisation pour ce médecin.</div>
+                        }
+                    </div>
+
+                    <div class="tab-pane" id="tab-fittests">
+                        <div class="medecin-tab-toolbar">
+                            <div class="summary">@Model.FitTests.Count Fit Test(s), dont @fitTestsActifs actif(s)</div>
+                            @if (canManage)
+                            {
+                                <a href="@Url.Action("Create", "FitTests", new { medecinId = Model.MedecinId, returnMedecinId = Model.MedecinId, returnTab = "fittests" })" class="btn btn-success btn-sm">
+                                    <i class="fa-solid fa-plus"></i> Nouveau Fit Test
+                                </a>
+                            }
+                        </div>
+
+                        @if (Model.FitTests.Any())
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-striped table-hover medecin-tab-table">
+                                    <thead><tr><th>Date</th><th>Résultat</th><th>Commentaire</th><th>Actif</th><th style="width:140px;">Actions</th></tr></thead>
+                                    <tbody>
+                                        @foreach (var item in Model.FitTests)
+                                        {
+                                            <tr>
+                                                <td>@F(item.DateFitTest)</td>
+                                                <td>@item.Resultat</td>
+                                                <td>@item.Commentaire</td>
+                                                <td>@(item.EstActif ? "Oui" : "Non")</td>
+                                                <td class="table-actions nowrap">
+                                                    <a href="@Url.Action("Details", "FitTests", new { id = item.FitTestId, returnMedecinId = Model.MedecinId, returnTab = "fittests" })" class="btn btn-info btn-sm btn-icon-only" title="Détails"><i class="fa-solid fa-circle-info"></i></a>
+                                                    @if (canManage)
+                                                    {
+                                                        <a href="@Url.Action("Edit", "FitTests", new { id = item.FitTestId, returnMedecinId = Model.MedecinId, returnTab = "fittests" })" class="btn btn-warning btn-sm btn-icon-only" title="Modifier"><i class="fa-solid fa-pen-to-square"></i></a>
+                                                        <a href="@Url.Action("Delete", "FitTests", new { id = item.FitTestId, returnMedecinId = Model.MedecinId, returnTab = "fittests" })" class="btn btn-danger btn-sm btn-icon-only" title="Supprimer"><i class="fa-solid fa-trash"></i></a>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="medecin-tab-empty">Aucun Fit Test pour ce médecin.</div>
+                        }
+                    </div>
+
+                    <div class="tab-pane" id="tab-ententes">
+                        <div class="medecin-tab-toolbar">
+                            <div class="summary">@Model.EntentesFDC.Count entente(s), dont @ententesActives active(s)</div>
+                            @if (canManage)
+                            {
+                                <a href="@Url.Action("Create", "EntentesFDC", new { medecinId = Model.MedecinId, returnMedecinId = Model.MedecinId, returnTab = "ententes" })" class="btn btn-success btn-sm">
+                                    <i class="fa-solid fa-plus"></i> Nouvelle entente FDC
+                                </a>
+                            }
+                        </div>
+
+                        @if (Model.EntentesFDC.Any())
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-striped table-hover medecin-tab-table">
+                                    <thead><tr><th>Type entente</th><th>Date adhésion</th><th>Date fin</th><th>PEM visé</th><th>Active</th><th style="width:140px;">Actions</th></tr></thead>
+                                    <tbody>
+                                        @foreach (var item in Model.EntentesFDC)
+                                        {
+                                            <tr>
+                                                <td>@item.TypeEntenteFDC</td>
+                                                <td>@F(item.DateAdhesion)</td>
+                                                <td>@F(item.DateFin)</td>
+                                                <td>@item.PEMVise</td>
+                                                <td>@(item.EstActive ? "Oui" : "Non")</td>
+                                                <td class="table-actions nowrap">
+                                                    <a href="@Url.Action("Details", "EntentesFDC", new { id = item.EntenteFDCId, returnMedecinId = Model.MedecinId, returnTab = "ententes" })" class="btn btn-info btn-sm btn-icon-only" title="Détails"><i class="fa-solid fa-circle-info"></i></a>
+                                                    @if (canManage)
+                                                    {
+                                                        <a href="@Url.Action("Edit", "EntentesFDC", new { id = item.EntenteFDCId, returnMedecinId = Model.MedecinId, returnTab = "ententes" })" class="btn btn-warning btn-sm btn-icon-only" title="Modifier"><i class="fa-solid fa-pen-to-square"></i></a>
+                                                        <a href="@Url.Action("Delete", "EntentesFDC", new { id = item.EntenteFDCId, returnMedecinId = Model.MedecinId, returnTab = "ententes" })" class="btn btn-danger btn-sm btn-icon-only" title="Supprimer"><i class="fa-solid fa-trash"></i></a>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="medecin-tab-empty">Aucune entente FDC pour ce médecin.</div>
+                        }
+                    </div>
+
+                    <div class="tab-pane" id="tab-comites">
+                        <div class="medecin-tab-toolbar">
+                            <div class="summary">@Model.Comites.Count participation(s)</div>
+                            @if (canManage)
+                            {
+                                <a href="@Url.Action("Create","MedecinsComites",new { medecinId=Model.MedecinId, returnMedecinId=Model.MedecinId, returnTab="comites" })" class="btn btn-success btn-sm"><i class="fa-solid fa-plus"></i> Nouvelle participation</a>
+                            }
+                        </div>
+                        @if(Model.Comites.Any())
+                        {
+                            <table class="table table-bordered table-striped">
+                                <thead><tr><th>Comité</th><th>Rôle</th><th>Début</th><th>Fin</th><th>Commentaire</th><th style="width:140px;">Actions</th></tr></thead>
+                                <tbody>
+                                @foreach(var item in Model.Comites)
+                                {
+                                    <tr>
+                                        <td>@item.Comite</td><td>@item.RoleMembre</td><td>@F(item.DateDebut)</td><td>@F(item.DateFin)</td><td>@item.Commentaire</td>
+                                        <td class="nowrap">
+                                            <a href="@Url.Action("Details","MedecinsComites",new { id=item.MedecinComiteId, returnMedecinId=Model.MedecinId, returnTab="comites" })" class="btn btn-info btn-sm btn-icon-only" title="Détails"><i class="fa-solid fa-circle-info"></i></a>
+                                            @if (canManage)
+                                            {
+                                                <a href="@Url.Action("Edit","MedecinsComites",new { id=item.MedecinComiteId, returnMedecinId=Model.MedecinId, returnTab="comites" })" class="btn btn-warning btn-sm btn-icon-only" title="Modifier"><i class="fa-solid fa-pen-to-square"></i></a>
+                                                <a href="@Url.Action("Delete","MedecinsComites",new { id=item.MedecinComiteId, returnMedecinId=Model.MedecinId, returnTab="comites" })" class="btn btn-danger btn-sm btn-icon-only" title="Supprimer"><i class="fa-solid fa-trash"></i></a>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                                </tbody>
+                            </table>
+                        }
+                        else
+                        {
+                            <div class="medecin-tab-empty">Aucune participation à un comité.</div>
+                        }
+                    </div>
+
+                    <div class="tab-pane" id="tab-documents">
+                        <div class="medecin-tab-toolbar">
+                            <div class="summary">@Model.Documents.Count(x => x.EstActif) document(s) actif(s)</div>
+                            @if (canManage)
+                            {
+                                <a href="@Url.Action("Create","DocumentsMedecin",new { medecinId=Model.MedecinId, returnMedecinId=Model.MedecinId, returnTab="documents"})" class="btn btn-success btn-sm"><i class="fa-solid fa-file-circle-plus"></i> Ajouter un document</a>
+                            }
+                        </div>
+                        @if(Model.Documents.Any())
+                        {
+                            <table class="table table-bordered table-striped">
+                                <thead><tr><th>Type</th><th>Fichier</th><th>Date</th><th>Expiration</th><th>Confidentiel</th><th>État</th><th>Actions</th></tr></thead>
+                                <tbody>
+                                @foreach(var item in Model.Documents)
+                                {
+                                    <tr>
+                                        <td>@item.TypeDocument</td>
+                                        <td>@item.NomFichier</td>
+                                        <td>@F(item.DateDocument)</td>
+                                        <td>@F(item.DateExpiration)</td>
+                                        <td>@(item.Confidentiel ? "Oui" : "")</td>
+                                        <td>@(item.EstActif ? "Actif" : "Archivé")</td>
+                                        <td class="nowrap">
+                                            <a href="@Url.Action("Details","DocumentsMedecin",new { id=item.DocumentMedecinId, returnMedecinId=Model.MedecinId, returnTab="documents"})" class="btn btn-info btn-sm btn-icon-only" title="Détails"><i class="fa-solid fa-circle-info"></i></a>
+                                            @if(item.EstActif)
+                                            {
+                                                <a href="@Url.Action("Download","DocumentsMedecin",new { id=item.DocumentMedecinId})" class="btn btn-primary btn-sm btn-icon-only" title="Télécharger"><i class="fa-solid fa-download"></i></a>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                                </tbody>
+                            </table>
+                        }
+                        else
+                        {
+                            <div class="medecin-tab-empty">Aucun document.</div>
+                        }
+                    </div>
+
+                    <div class="tab-pane" id="tab-alertes">
+                        @if(Model.Alertes.Any())
+                        {
+                            <table class="table table-bordered table-striped">
+                                <thead><tr><th>Catégorie</th><th>Niveau</th><th>Message</th><th>Échéance</th><th>Action</th></tr></thead>
+                                <tbody>
+                                @foreach(var item in Model.Alertes)
+                                {
+                                    <tr class="@(item.Niveau == "danger" ? "danger" : item.Niveau == "warning" ? "warning" : "")">
+                                        <td>@item.Categorie</td>
+                                        <td>@item.Niveau</td>
+                                        <td>@item.Message</td>
+                                        <td>@F(item.DateEcheance)</td>
+                                        <td>
+                                            @if(!string.IsNullOrWhiteSpace(item.Controller) && !string.IsNullOrWhiteSpace(item.Action))
+                                            {
+                                                <a href="@Url.Action(item.Action,item.Controller,new { id=item.Id, returnMedecinId=Model.MedecinId })" class="btn btn-default btn-xs">Ouvrir</a>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                                </tbody>
+                            </table>
+                        }
+                        else
+                        {
+                            <div class="alert alert-success">Aucune alerte calculée pour ce médecin.</div>
+                        }
+                    </div>

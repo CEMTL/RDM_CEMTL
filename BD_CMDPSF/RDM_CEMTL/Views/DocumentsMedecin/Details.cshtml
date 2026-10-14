@@ -1,0 +1,31 @@
+@model Solution.Models.DocumentMedecin
+@{
+    ViewBag.Title = "Détail du document";
+}
+<div class="page-header-custom"><h2>Détail du document</h2></div>
+<div class="dashboard-card">
+    <dl class="dl-horizontal">
+        <dt>Médecin</dt><dd>@Model.Medecin?.Permis - @Model.Medecin?.Nom @Model.Medecin?.Prenom</dd>
+        <dt>Type</dt><dd>@Model.TypeDocument</dd>
+        <dt>Fichier</dt><dd>@Model.NomFichier</dd>
+        <dt>Taille</dt><dd>@((Model.TailleOctets / 1024d).ToString("N0")) Ko</dd>
+        <dt>Date document</dt><dd>@Model.DateDocument?.ToString("yyyy-MM-dd")</dd>
+        <dt>Expiration</dt><dd>@Model.DateExpiration?.ToString("yyyy-MM-dd")</dd>
+        <dt>Entité liée</dt><dd>@Model.EntiteLiee @Model.EntiteId</dd>
+        <dt>Confidentiel</dt><dd>@(Model.Confidentiel ? "Oui" : "Non")</dd>
+        <dt>Déposé</dt><dd>@Model.DateDepot.ToString("yyyy-MM-dd HH:mm") par @Model.DeposePar</dd>
+        <dt>Description</dt><dd style="white-space:pre-wrap">@Model.Description</dd>
+        <dt>SHA-256</dt><dd><code>@Model.HashSHA256</code></dd>
+    </dl>
+    <div class="text-right">
+        @if(Model.EstActif){<a href="@Url.Action("Download",new { id=Model.DocumentMedecinId})" class="btn btn-primary"><i class="fa-solid fa-download"></i> Télécharger</a>}
+        @if (ViewBag.ReturnMedecinId != null)
+        {
+            <a class="btn btn-default" href="@Url.Action("Index","Medecins",new { openMedecin=ViewBag.ReturnMedecinId, tab=ViewBag.ReturnTab ?? "documents"})">Retour au médecin</a>
+        }
+        else
+        {
+            <a class="btn btn-default" href="@Url.Action("Index")">Retour</a>
+        }
+    </div>
+</div>

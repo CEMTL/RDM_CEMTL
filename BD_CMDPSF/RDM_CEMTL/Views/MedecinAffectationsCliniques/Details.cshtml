@@ -1,0 +1,28 @@
+@model Solution.Models.MedecinAffectationClinique
+@{
+    ViewBag.Title = "Détail de l'affectation clinique";
+}
+<div class="page-header-custom"><h2>Détail de l'affectation clinique</h2></div>
+<div class="dashboard-card">
+    <dl class="dl-horizontal">
+        <dt>Médecin</dt><dd>@Model.Medecin?.Permis - @Model.Medecin?.Nom @Model.Medecin?.Prenom</dd>
+        <dt>Département</dt><dd>@Model.Departement?.NomDepartement</dd>
+        <dt>Service</dt><dd>@Model.Service?.NomService</dd>
+        <dt>Installation</dt><dd>@Model.Installation?.NomInstallation</dd>
+        <dt>Type</dt><dd>@Model.TypeAffectation</dd>
+        <dt>Principale</dt><dd>@(Model.EstPrincipale ? "Oui" : "Non")</dd>
+        <dt>Période</dt><dd>@Model.DateDebut?.ToString("yyyy-MM-dd") @if(Model.DateFin.HasValue){<text> → @Model.DateFin.Value.ToString("yyyy-MM-dd")</text>}</dd>
+        <dt>État</dt><dd>@(Model.EstActive ? "Active" : "Terminée")</dd>
+        <dt>Commentaire</dt><dd style="white-space:pre-wrap">@Model.Commentaire</dd>
+    </dl>
+    <div class="text-right">
+        @if (ViewBag.ReturnMedecinId != null)
+        {
+            <a class="btn btn-default" href="@Url.Action("Index","Medecins",new { openMedecin=ViewBag.ReturnMedecinId, tab=ViewBag.ReturnTab ?? "organisation"})">Retour au médecin</a>
+        }
+        else
+        {
+            <a class="btn btn-default" href="@Url.Action("Index")">Retour</a>
+        }
+    </div>
+</div>
