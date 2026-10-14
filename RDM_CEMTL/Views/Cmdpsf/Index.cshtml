@@ -1,0 +1,144 @@
+@{
+    ViewBag.Title = "Registre CMDPSF";
+    bool canEdit = User.IsInRole("Admin") || User.IsInRole("SuperUtilisateur");
+    bool canDelete = User.IsInRole("Admin");
+}
+@await Html.PartialAsync("~/Views/Shared/_Alerts.cshtml")
+<div class="dashboard-card">
+    <h2><i class="fa-solid fa-users"></i> Registre CMDPSF</h2>
+    <p class="text-muted">Médecins, dentistes, pharmaciens et sages-femmes — mêmes informations que le registre médical.</p>
+    @if (canEdit) {
+    <div class="btn-toolbar" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">
+        <a class="btn btn-primary" asp-controller="Cmdpsf" asp-action="Creer" asp-route-profession="MEDECIN"><i class="fa-solid fa-plus"></i> Médecin</a>
+        <a class="btn btn-success" asp-action="Creer" asp-route-profession="DENTISTE"><i class="fa-solid fa-plus"></i> Dentiste</a>
+        <a class="btn btn-success" asp-action="Creer" asp-route-profession="PHARMACIEN"><i class="fa-solid fa-plus"></i> Pharmacien</a>
+        <a class="btn btn-success" asp-action="Creer" asp-route-profession="SAGE_FEMME"><i class="fa-solid fa-plus"></i> Sage-femme</a>
+    </div>
+    }
+</div>
+<div class="dashboard-card" style="margin-bottom:12px">
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <strong><i class="fa-solid fa-file-export"></i> Exporter tous les résultats SQL filtrés :</strong>
+        @if (User.IsInRole("Admin"))
+        {
+            <button class="btn btn-danger js-cmdpsf-export" type="button" data-format="pdf"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+            <button class="btn btn-primary js-cmdpsf-export" type="button" data-format="word"><i class="fa-solid fa-file-word"></i> Word</button>
+            <button class="btn btn-success js-cmdpsf-export" type="button" data-format="excel"><i class="fa-solid fa-file-excel"></i> Excel</button>
+        }
+        else
+        {
+            <span class="text-muted">Export réservé aux administrateurs.</span>
+        }
+        <small class="text-muted">Export serveur indépendant de DataTables. Le nombre de dossiers exportés figure dans le nom du fichier.</small>
+    </div>
+</div>
+<div class="dashboard-card filters-bar">
+    <form id="formRechercheCmdpsf" method="get" asp-action="Index" class="row">
+        <div class="col-md-3 form-group"><label for="profession">Profession</label>
+            <select class="form-control" id="profession" name="profession">
+                <option value="">Toutes les professions</option>
+                <option value="MEDECIN">Médecins</option><option value="DENTISTE">Dentistes</option>
+                <option value="PHARMACIEN">Pharmaciens</option><option value="SAGE_FEMME">Sages-femmes</option>
+            </select>
+        </div>
+        <div class="col-md-5 form-group"><label for="recherche">Recherche dans toutes les colonnes</label>
+            <input id="recherche" name="recherche" value="@ViewBag.Recherche" class="form-control" placeholder="Permis, nom, coordonnées, installation..." />
+        </div>
+        <div class="col-md-2 form-group"><label style="display:block">Statut</label>
+            <label class="checkbox-inline"><input id="actifsSeulement" name="actifsSeulement" value="true" type="checkbox" checked="@(ViewBag.ActifsSeulement == true)" /> Actifs uniquement</label>
+        </div>
+        <div class="col-md-2 form-group"><label style="display:block">&nbsp;</label>
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-magnifying-glass"></i> Rechercher</button>
+            <a class="btn btn-default" asp-action="Index" title="Réinitialiser"><i class="fa-solid fa-rotate-left"></i></a>
+        </div>
+    </form>
+</div>
+<div class="dashboard-card"><div class="table-responsive">
+    <table id="tableCmdpsf" class="table table-bordered table-striped table-hover registre-table" style="width:100%">
+        <thead><tr><th>Profession</th><th>Permis</th><th>Professionnel</th><th>Type permis</th><th>Statut</th><th>Catégorie</th><th>Téléphone</th><th>Courriel</th><th>Installation</th><th>Nomination</th><th>Actif</th><th class="cmdpsf-actions-column">Actions</th></tr></thead>
+        <tbody></tbody>
+    </table>
+</div></div>
+<div id="cmdpsfDetailsModal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"><div class="modal-dialog" style="width:95%;max-width:1400px"><div class="modal-content" id="cmdpsfDetailsModalContent"></div></div></div>
+<form id="cmdpsfSuppression" asp-controller="Cmdpsf" asp-action="Supprimer" method="post" style="display:none">@Html.AntiForgeryToken()<input type="hidden" name="id" id="cmdpsfSuppressionId" /></form>
+@section Scripts {
+<script>
+$(function () {
+    var initialProfession = '@(ViewBag.Profession ?? "")';
+    $('#profession').val(initialProfession);
+    var canEdit = @(canEdit ? "true" : "false");
+    var canDelete = @(canDelete ? "true" : "false");
+    function safe(value) { return $('<div>').text(value == null ? '' : String(value)).html(); }
+    var table = $('#tableCmdpsf').DataTable({
+        processing:true,serverSide:true,searching:false,autoWidth:false,
+        pageLength:10,lengthMenu:[[5,10,25,50,100],[5,10,25,50,100]],order:[[2,'asc']],
+        ajax:{url:'@Url.Action("GetRegistre","Cmdpsf")',type:'POST',data:function(d){
+            d.profession=$('#profession').val();d.recherche=$('#recherche').val();d.actifsSeulement=$('#actifsSeulement').prop('checked');
+        }},
+        language:{processing:'Traitement en cours...',lengthMenu:'Afficher _MENU_ éléments',info:'Affichage de _START_ à _END_ sur _TOTAL_',infoEmpty:'Aucun professionnel',zeroRecords:'Aucun résultat',emptyTable:'Aucun dossier',paginate:{previous:'Précédent',next:'Suivant'}},
+        columns:[
+            {data:'Profession'},{data:'Permis'},{data:'NomComplet'},{data:'TypePermis'},
+            {data:'StatutMedecin'},{data:'CategoriePratique'},{data:'TelephonePrincipal'},
+            {data:'CourrielPrincipal'},{data:'InstallationPrincipale'},{data:'NominationActive'},
+            {data:'EstActif'},
+            {data:'MedecinId',orderable:false,searchable:false,render:function(id,type,row){
+                if (type!=='display') return id;
+                var result='<div class="cmdpsf-actions"><a class="btn btn-info btn-sm btn-icon-only" title="Consulter" href="@Url.Action("Details","Cmdpsf")?id='+id+'"><i class="fa-solid fa-circle-info"></i></a>';
+                if(canEdit){
+                    var editUrl=row.CodeProfession==='MEDECIN'?'@Url.Action("Edit","Medecins")':'@Url.Action("Modifier","Cmdpsf")';
+                    result+=' <a class="btn btn-warning btn-sm btn-icon-only" title="Modifier" href="'+editUrl+'?id='+id+'"><i class="fa-solid fa-pen-to-square"></i></a>';
+                }
+                if(canDelete&&row.EstActifBool) result+=' <button type="button" class="btn btn-danger btn-sm btn-icon-only js-supprimer" data-id="'+id+'" title="Supprimer (archiver)"><i class="fa-solid fa-trash"></i></button>';
+                return result + '</div>';
+            }}
+        ],columnDefs:[{targets:[0,1,2,3,4,5,6,7,8,9,10],render:$.fn.dataTable.render.text()}]
+    });
+    $('.js-cmdpsf-export').on('click', function () {
+        var params = new URLSearchParams({
+            format: $(this).data('format'),
+            profession: $('#profession').val() || '',
+            recherche: $('#recherche').val() || '',
+            actifsSeulement: $('#actifsSeulement').prop('checked') ? 'true' : 'false'
+        });
+        window.location.href = '@Url.Action("Exporter", "Cmdpsf")' + '?' + params.toString();
+    });
+    $('#formRechercheCmdpsf').on('submit',function(e){e.preventDefault();table.ajax.reload();});
+    $('#profession,#actifsSeulement').on('change',function(){table.ajax.reload();});
+    $(document).on('click','.js-supprimer',function(){
+        if(confirm('Archiver ce professionnel ? Ses données associées seront conservées.')){
+            $('#cmdpsfSuppressionId').val($(this).data('id'));
+            $('#cmdpsfSuppression').submit();
+        }
+    });
+});
+</script>
+}
+
+<style>
+/* Alignement horizontal des actions Consulter / Modifier / Archiver. */
+#tableCmdpsf th.cmdpsf-actions-column,
+#tableCmdpsf td:last-child {
+    white-space: nowrap !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+}
+#tableCmdpsf .cmdpsf-actions {
+    display: inline-flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    white-space: nowrap;
+}
+#tableCmdpsf .cmdpsf-actions .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    margin: 0;
+    flex: 0 0 30px;
+}
+</style>

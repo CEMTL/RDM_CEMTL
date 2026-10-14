@@ -1,0 +1,37 @@
+@model Solution.ViewModels.MedecinsComites.MedecinComiteDetailsViewModel
+@{
+    ViewBag.Title = "Supprimer la participation au comité";
+}
+
+<div class="page-header-custom"><h2>Supprimer la participation au comité</h2></div>
+<div class="dashboard-card">
+    <div class="alert alert-warning">Confirmez-vous la suppression de cette participation au comité ?</div>
+    <dl class="dl-horizontal">
+        <dt>Médecin</dt><dd>@Model.MedecinLibelle</dd>
+        <dt>Comité</dt><dd>@Model.ComiteLibelle</dd>
+        <dt>Rôle</dt><dd>@Model.RoleMembre</dd>
+        <dt>Date début</dt><dd>@(Model.DateDebut.HasValue ? Model.DateDebut.Value.ToString("yyyy-MM-dd") : "-")</dd>
+        <dt>Date fin</dt><dd>@(Model.DateFin.HasValue ? Model.DateFin.Value.ToString("yyyy-MM-dd") : "-")</dd>
+        <dt>Commentaire</dt><dd style="white-space:pre-wrap;">@Model.Commentaire</dd>
+    </dl>
+
+    @using (Html.BeginForm("Delete", "MedecinsComites", null, FormMethod.Post, null, null))
+    {
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="id" value="@Model.MedecinComiteId" />
+        @if (ViewBag.ReturnMedecinId != null)
+        {
+            <input type="hidden" name="returnMedecinId" value="@ViewBag.ReturnMedecinId" />
+            <input type="hidden" name="returnTab" value="@ViewBag.ReturnTab" />
+        }
+        <button type="submit" class="btn btn-danger"><i class="fa-solid fa-trash"></i> Supprimer</button>
+        @if (ViewBag.ReturnMedecinId != null)
+        {
+            <a href="@Url.Action("Index", "Cmdpsf", new { openMedecin = ViewBag.ReturnMedecinId, tab = ViewBag.ReturnTab })" class="btn btn-default">Annuler</a>
+        }
+        else
+        {
+            <a href="@Url.Action("Index")" class="btn btn-default">Annuler</a>
+        }
+    }
+</div>

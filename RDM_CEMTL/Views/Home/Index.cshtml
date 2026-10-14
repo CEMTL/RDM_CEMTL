@@ -1,0 +1,253 @@
+﻿@model Solution.ViewModels.Shared.TableauBordAlertesViewModel
+@using Solution.ViewModels.Shared
+@{
+    ViewBag.Title = "Tableau de bord";
+    var alertes = Model ?? new TableauBordAlertesViewModel();
+}
+
+<style>
+    .dashboard-simple-header {
+        margin: 0 0 18px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    .dashboard-simple-header h2 {
+        margin: 0;
+        font-weight: 700;
+        color: #1f2937;
+    }
+    .dashboard-simple-header p {
+        margin: 5px 0 0;
+        color: #6b7280;
+    }
+    .dashboard-updated {
+        margin-top: 7px;
+        color: #64748b;
+        font-size: 12px;
+    }
+    .dashboard-kpis {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(180px, 1fr));
+        gap: 14px;
+        margin-bottom: 18px;
+    }
+    .dashboard-kpi {
+        display: block;
+        min-height: 104px;
+        padding: 16px 18px;
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-left: 5px solid #d1d5db;
+        border-radius: 8px;
+        box-shadow: 0 1px 5px rgba(15, 23, 42, .05);
+        color: inherit;
+        text-decoration: none !important;
+    }
+    .dashboard-kpi:hover,
+    .dashboard-kpi:focus {
+        background: #fafafa;
+        color: inherit;
+        text-decoration: none;
+    }
+    .dashboard-kpi.medecins { border-left-color: #198754; }
+    .dashboard-kpi.privileges { border-left-color: #dc3545; }
+    .dashboard-kpi.surveillance { border-left-color: #f59e0b; }
+    .dashboard-kpi .value {
+        font-size: 30px;
+        line-height: 1;
+        font-weight: 800;
+        color: #111827;
+    }
+    .dashboard-kpi .title {
+        margin-top: 8px;
+        font-weight: 700;
+        color: #374151;
+    }
+    .dashboard-kpi .detail {
+        margin-top: 3px;
+        color: #6b7280;
+        font-size: 12px;
+    }
+    .dashboard-followups {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(130px, 1fr));
+        gap: 10px;
+        margin-bottom: 18px;
+    }
+    .dashboard-followup {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 10px 12px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 7px;
+        color: #334155;
+        text-decoration: none !important;
+    }
+    .dashboard-followup:hover,
+    .dashboard-followup:focus {
+        background: #f1f5f9;
+        color: #0f172a;
+    }
+    .dashboard-followup .count {
+        min-width: 28px;
+        padding: 2px 7px;
+        border-radius: 999px;
+        background: #e2e8f0;
+        color: #0f172a;
+        font-weight: 800;
+        text-align: center;
+    }
+    .dashboard-alerts {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    .dashboard-alerts-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 13px 16px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    .dashboard-alerts-header h3 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 700;
+    }
+    .dashboard-alert-row {
+        display: grid;
+        grid-template-columns: 120px minmax(190px, 1fr) 2.2fr 105px 44px;
+        gap: 10px;
+        align-items: center;
+        padding: 10px 16px;
+        border-bottom: 1px solid #eef2f7;
+    }
+    .dashboard-alert-row:last-child { border-bottom: 0; }
+    .dashboard-alert-tag {
+        display: inline-block;
+        max-width: 115px;
+        padding: 3px 8px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 700;
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .dashboard-alert-tag.danger { background: #fee2e2; color: #991b1b; }
+    .dashboard-alert-tag.warning { background: #ffedd5; color: #9a3412; }
+    .dashboard-alert-tag.info { background: #e0f2fe; color: #075985; }
+    .dashboard-empty {
+        padding: 20px 16px;
+        color: #3c763d;
+        background: #f4fbf4;
+    }
+    @@media (max-width: 900px) {
+        .dashboard-kpis { grid-template-columns: 1fr; }
+        .dashboard-followups { grid-template-columns: repeat(2, minmax(130px, 1fr)); }
+        .dashboard-alert-row { grid-template-columns: 1fr; }
+    }
+    @@media (max-width: 520px) {
+        .dashboard-followups { grid-template-columns: 1fr; }
+    }
+</style>
+
+<div class="dashboard-simple-header">
+    <h2><i class="fa-solid fa-gauge-high"></i> Tableau de bord</h2>
+    <p>Vue rapide des médecins et des éléments qui nécessitent une intervention.</p>
+    @if (alertes.DateGeneration != default)
+    {
+        <div class="dashboard-updated">
+            <i class="fa-regular fa-clock"></i>
+            Données mises à jour à @alertes.DateGeneration.ToString("HH:mm:ss").
+        </div>
+    }
+</div>
+
+<div class="dashboard-kpis">
+    <a class="dashboard-kpi medecins" href="@Url.Action("Index", "Cmdpsf", new { profession = "MEDECIN", actifsSeulement = true })">
+        <div class="value">@alertes.MedecinsActifs</div>
+        <div class="title">Médecins actifs</div>
+        <div class="detail">@alertes.TotalMedecins médecin(s) au registre</div>
+    </a>
+
+    <a class="dashboard-kpi privileges" href="@Url.Action("Index", "MedecinPrivileges")">
+        <div class="value">@alertes.Privileges30Jours</div>
+        <div class="title">Privilèges à échéance</div>
+        <div class="detail">dans les 30 prochains jours</div>
+    </a>
+
+    <a class="dashboard-kpi surveillance" href="@Url.Action("Index", "MedecinPrivileges")">
+        <div class="value">@(alertes.Privileges30Jours + alertes.Privileges90Jours)</div>
+        <div class="title">Privilèges à surveiller</div>
+        <div class="detail">à échéance dans les 90 prochains jours</div>
+    </a>
+</div>
+
+<div class="dashboard-followups" aria-label="Résumé des suivis">
+    <a class="dashboard-followup" href="@Url.Action("Index", "CotisationsAnnuelles")">
+        <span>Cotisations non réglées</span><span class="count">@alertes.CotisationsNonReglees</span>
+    </a>
+    <a class="dashboard-followup" href="@Url.Action("Index", "FitTests")">
+        <span>Fit Tests à renouveler</span><span class="count">@alertes.FitTestsAEcheance</span>
+    </a>
+    <a class="dashboard-followup" href="@Url.Action("Index", "EntentesFDC")">
+        <span>Ententes à échéance</span><span class="count">@alertes.EntentesFdc90Jours</span>
+    </a>
+    <a class="dashboard-followup" href="@Url.Action("Index", "AffectationsOrganisationnelles")">
+        <span>Affectations à valider</span><span class="count">@alertes.AffectationsAValider</span>
+    </a>
+    <a class="dashboard-followup" href="@Url.Action("Index", "DocumentsMedecin")">
+        <span>Documents à échéance</span><span class="count">@alertes.Documents90Jours</span>
+    </a>
+</div>
+
+<div class="dashboard-alerts">
+    <div class="dashboard-alerts-header">
+        <h3><i class="fa-solid fa-triangle-exclamation"></i> À traiter</h3>
+        <a href="@Url.Action("Index", "Cmdpsf", new { profession = "MEDECIN" })" class="btn btn-default btn-sm">
+            <i class="fa-solid fa-user-doctor"></i> Registre
+        </a>
+    </div>
+
+    @if (alertes.Alertes.Any())
+    {
+        foreach (var a in alertes.Alertes)
+        {
+            <div class="dashboard-alert-row">
+                <div>
+                    <span class="dashboard-alert-tag @a.Niveau" title="@a.Categorie">@a.Categorie</span>
+                </div>
+                <div>
+                    <a href="@Url.Action("Edit", "Medecins", new { id = a.MedecinId, tab = "alertes" })">
+                        <strong>@a.Medecin</strong>
+                    </a>
+                </div>
+                <div>@a.Message</div>
+                <div>@(a.DateEcheance.HasValue ? a.DateEcheance.Value.ToString("yyyy-MM-dd") : "")</div>
+                <div class="text-right">
+                    @if (!string.IsNullOrWhiteSpace(a.Controller) && !string.IsNullOrWhiteSpace(a.Action))
+                    {
+                        <a class="btn btn-default btn-xs"
+                           href="@Url.Action(a.Action, a.Controller, new { id = a.Id, returnMedecinId = a.MedecinId })"
+                           title="Ouvrir">
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    }
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="dashboard-empty">
+            <i class="fa-solid fa-circle-check"></i> Aucun élément prioritaire à traiter actuellement.
+        </div>
+    }
+</div>

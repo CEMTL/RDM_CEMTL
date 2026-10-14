@@ -1,0 +1,67 @@
+@model IEnumerable<Solution.ViewModels.DocumentsMedecin.DocumentMedecinListViewModel>
+@{
+    int cmdpsfReturnId;
+    bool aFicheCmdpsf = int.TryParse(Context.Request.Query["medecinId"].ToString(), out cmdpsfReturnId) && cmdpsfReturnId > 0;
+}
+@if (aFicheCmdpsf) {
+    <div class="dashboard-card"><a class="btn btn-default" asp-controller="Cmdpsf" asp-action="Details" asp-route-id="@cmdpsfReturnId"><i class="fa-solid fa-arrow-left"></i> Retour à la fiche CMDPSF</a></div>
+}
+
+@{
+    ViewBag.Title = "Documents des médecins";
+    var canManage = ViewBag.CanManage != null && (bool)ViewBag.CanManage;
+}
+<div class="page-header-custom">
+    <div class="row">
+        <div class="col-md-8">
+            <h2>Documents des médecins</h2>
+            <p class="text-muted">Documents administratifs, décisions, formulaires et pièces justificatives.</p>
+        </div>
+        <div class="col-md-4 text-right" style="margin-top:25px;">
+            @if (canManage)
+            {
+                <a href="@Url.Action("Create")" class="btn btn-success"><i class="fa-solid fa-file-circle-plus"></i> Nouveau document</a>
+            }
+        </div>
+    </div>
+</div>
+<div class="dashboard-card">
+    @using (Html.BeginForm("Index", "DocumentsMedecin", FormMethod.Get, new { @class = "form-inline", style = "margin-bottom:15px;" }))
+    {
+        <input type="text" name="search" value="@ViewBag.Search" class="form-control" style="min-width:280px;" placeholder="Médecin, type, fichier..." />
+        @Html.DropDownList("medecinId", (SelectList)ViewBag.MedecinId, "-- Tous les médecins --", new { @class = "form-control" })
+        <label class="checkbox-inline"><input type="checkbox" name="actifsSeulement" value="true" @(ViewBag.ActifsSeulement ? "checked" : "") /> Actifs seulement</label>
+        <button class="btn btn-primary" type="submit"><i class="fa-solid fa-filter"></i> Filtrer</button>
+        <a class="btn btn-default" href="@Url.Action("Index")">Réinitialiser</a>
+    }
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead><tr><th>Médecin</th><th>Type</th><th>Fichier</th><th>Date document</th><th>Expiration</th><th>Déposé par</th><th>État</th><th style="width:150px;">Actions</th></tr></thead>
+            <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td><a href="@Url.Action("Index","Medecins",new { openMedecin=item.MedecinId, tab="documents"})">@item.Medecin</a></td>
+                    <td>@item.TypeDocument @if(item.Confidentiel){<span class="label label-warning">Confidentiel</span>}</td>
+                    <td>@item.NomFichier <small class="text-muted">(@((item.TailleOctets / 1024d).ToString("N0")) Ko)</small></td>
+                    <td>@item.DateDocument?.ToString("yyyy-MM-dd")</td>
+                    <td>@item.DateExpiration?.ToString("yyyy-MM-dd")</td>
+                    <td>@item.DeposePar</td>
+                    <td>@(item.EstActif ? "Actif" : "Archivé")</td>
+                    <td class="table-actions nowrap">
+                        <a href="@Url.Action("Details",new { id=item.DocumentMedecinId})" class="btn btn-info btn-sm btn-icon-only" title="Détails"><i class="fa-solid fa-circle-info"></i></a>
+                        @if (item.EstActif)
+                        {
+                            <a href="@Url.Action("Download",new { id=item.DocumentMedecinId})" class="btn btn-primary btn-sm btn-icon-only" title="Télécharger"><i class="fa-solid fa-download"></i></a>
+                        }
+                        @if (canManage && item.EstActif)
+                        {
+                            <a href="@Url.Action("Delete",new { id=item.DocumentMedecinId})" class="btn btn-danger btn-sm btn-icon-only" title="Archiver"><i class="fa-solid fa-box-archive"></i></a>
+                        }
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>

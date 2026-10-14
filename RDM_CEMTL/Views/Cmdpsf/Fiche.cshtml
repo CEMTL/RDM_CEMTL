@@ -1,0 +1,49 @@
+﻿@model Solution.ViewModels.CmdpsfProfessionViewModel
+@{
+    bool creation = Model.MedecinId == 0;
+    ViewBag.Title = creation ? "Nouveau professionnel CMDPSF" : "Modifier le professionnel CMDPSF";
+}
+@await Html.PartialAsync("~/Views/Shared/_Alerts.cshtml")
+<div class="dashboard-card">
+<h2><i class="fa-solid fa-id-card"></i> @ViewBag.Title</h2>
+<p class="text-muted">Les champs marqués * sont obligatoires. La création est identique pour les quatre professions. Les onglets complémentaires du médecin sont disponibles après enregistrement, en modification.</p>
+<form asp-controller="Cmdpsf" asp-action="Enregistrer" method="post">
+@Html.AntiForgeryToken()
+<input type="hidden" asp-for="MedecinId" />
+@if (!ViewData.ModelState.IsValid)
+{
+    <div asp-validation-summary="All" class="alert alert-danger"></div>
+}
+<div class="panel panel-default"><div class="panel-heading"><strong>Identification</strong></div><div class="panel-body"><div class="row">
+<div class="col-md-4 form-group"><label asp-for="CodeProfession">Profession *</label>
+@if (creation) {
+<select asp-for="CodeProfession" class="form-control"><option value="MEDECIN">Médecin</option><option value="DENTISTE">Dentiste</option><option value="PHARMACIEN">Pharmacien</option><option value="SAGE_FEMME">Sage-femme</option></select>
+} else {
+<input type="hidden" asp-for="CodeProfession" /><input class="form-control" value="@Model.CodeProfession" disabled />
+}
+</div>
+<div class="col-md-4 form-group"><label asp-for="Permis">Numéro de permis *</label><input asp-for="Permis" class="form-control" maxlength="20" required /><span asp-validation-for="Permis" class="text-danger"></span></div>
+<div class="col-md-4 form-group"><label asp-for="NumeroMembreOrdre">Numéro de membre de l'ordre</label><input asp-for="NumeroMembreOrdre" class="form-control" /></div>
+<div class="col-md-6 form-group"><label asp-for="Nom">Nom *</label><input asp-for="Nom" class="form-control" required /><span asp-validation-for="Nom" class="text-danger"></span></div>
+<div class="col-md-6 form-group"><label asp-for="Prenom">Prénom *</label><input asp-for="Prenom" class="form-control" required /><span asp-validation-for="Prenom" class="text-danger"></span></div>
+</div></div></div>
+<div class="panel panel-default"><div class="panel-heading"><strong>Permis et dates</strong></div><div class="panel-body"><div class="row">
+<div class="col-md-4 form-group"><label asp-for="DateObtentionPermis">Date d'obtention du permis</label><input asp-for="DateObtentionPermis" asp-format="{0:yyyy-MM-dd}" type="date" class="form-control" /></div>
+<div class="col-md-4 form-group"><label asp-for="DateExpirationPermis">Date d'expiration (si applicable)</label><input asp-for="DateExpirationPermis" asp-format="{0:yyyy-MM-dd}" type="date" class="form-control" /></div>
+<div class="col-md-4 form-group"><label asp-for="DateDerniereVerificationOrdre">Dernière vérification de l'ordre</label><input asp-for="DateDerniereVerificationOrdre" asp-format="{0:yyyy-MM-dd}" type="date" class="form-control" /></div>
+<div class="col-md-6 form-group"><label asp-for="ReferenceVerificationOrdre">Référence de vérification</label><input asp-for="ReferenceVerificationOrdre" class="form-control" /></div>
+<div class="col-md-3 form-group"><label asp-for="DateEntreeFonction">Entrée en fonction</label><input asp-for="DateEntreeFonction" asp-format="{0:yyyy-MM-dd}" type="date" class="form-control" /></div>
+<div class="col-md-3 form-group"><label asp-for="DateDepart">Date de départ</label><input asp-for="DateDepart" asp-format="{0:yyyy-MM-dd}" type="date" class="form-control" /></div>
+</div></div></div>
+<div class="panel panel-default"><div class="panel-heading"><strong>Statut et commentaires</strong></div><div class="panel-body">
+<div class="checkbox"><label><input asp-for="EstActif" /> Dossier actif</label></div>
+<div class="form-group"><label asp-for="Commentaires">Commentaires</label><textarea asp-for="Commentaires" class="form-control" rows="4"></textarea></div>
+</div></div>
+<div class="form-group">
+<button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Enregistrer</button>
+<a class="btn btn-default" asp-action="@(creation ? "Index" : "Details")" asp-route-id="@(creation ? (int?)null : Model.MedecinId)"><i class="fa-solid fa-xmark"></i> Annuler</a>
+@if (!creation) { <a class="btn btn-info" asp-action="Details" asp-route-id="@Model.MedecinId"><i class="fa-solid fa-circle-info"></i> Détails et modules associés</a> }
+</div>
+</form>
+</div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }
