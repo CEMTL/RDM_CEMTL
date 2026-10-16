@@ -1,4 +1,4 @@
-@model Solution.ViewModels.LoginViewModel
+﻿@model Solution.ViewModels.LoginViewModel
 @{
     Layout = null;
     ViewData["Title"] = "Connexion RDM";
@@ -145,6 +145,12 @@
             color: #697887;
             font-size: 13px;
             line-height: 1.5;
+        }
+        @@media (max-width: 480px) {
+            .login-page { padding: 10px; }
+            .login-header, .login-body { padding: 20px 16px; }
+            .login-header h1 { font-size: 21px; overflow-wrap: anywhere; }
+            .login-card, .intro, .note { min-width: 0; max-width: 100%; overflow-wrap: anywhere; }
         }
         .domain-example {
             color: #5f6d7a;

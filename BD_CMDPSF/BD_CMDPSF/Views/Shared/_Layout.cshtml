@@ -157,6 +157,8 @@
     </style>
 
     @await RenderSectionAsync("Styles", required: false)
+    <!-- Surcharge partagée : affichage sur téléphones et petits écrans. -->
+    <link rel="stylesheet" href="@Url.Content("~/Content/registre-responsive.css")" asp-append-version="true" />
 </head>
 <body>
 
@@ -371,6 +373,7 @@
                 }
             </nav>
         </aside>
+        <button type="button" class="sidebar-backdrop" id="sidebarBackdrop" aria-label="Fermer le menu" tabindex="-1"></button>
 
         <main class="main-content">
             <div class="topbar">
@@ -386,6 +389,8 @@
                             class="sidebar-toggle mobile-toggle"
                             id="sidebarMobileToggle"
                             title="Ouvrir ou fermer le menu"
+                            aria-controls="appSidebar"
+                            aria-expanded="false"
                             aria-label="Ouvrir ou fermer le menu">
                         <i class="fa-solid fa-bars"></i>
                     </button>
@@ -444,6 +449,7 @@
     <script src="@Url.Content("~/Scripts/bootstrap.min.js")"></script>
     <script src="@Url.Content("~/Scripts/jquery.dataTables.min.js")"></script>
     <script src="@Url.Content("~/Scripts/dataTables.bootstrap.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/registre-responsive.js")" asp-append-version="true"></script>
     @if (afficherExportAdmin)
     {
         <script src="@Url.Content("~/Scripts/registre-admin-export.js")"></script>
@@ -486,6 +492,7 @@
             var body = document.body;
             var toggle = document.getElementById('sidebarToggle');
             var mobileToggle = document.getElementById('sidebarMobileToggle');
+            var sidebarBackdrop = document.getElementById('sidebarBackdrop');
             var storageKey = 'registre-cemtl-sidebar-collapsed';
 
             function setCollapsed(collapsed) {
@@ -508,9 +515,30 @@
                 });
             }
 
+            function closeMobileMenu() {
+                body.classList.remove('sidebar-open');
+                if (mobileToggle) mobileToggle.setAttribute('aria-expanded', 'false');
+            }
+
             if (mobileToggle) {
                 mobileToggle.addEventListener('click', function () {
-                    body.classList.toggle('sidebar-open');
+                    var isOpen = body.classList.toggle('sidebar-open');
+                    mobileToggle.setAttribute('aria-expanded', String(isOpen));
+                });
+            }
+            if (sidebarBackdrop) {
+                sidebarBackdrop.addEventListener('click', closeMobileMenu);
+            }
+            document.addEventListener('keydown', function (event) {
+                if (event.key === 'Escape') closeMobileMenu();
+            });
+            window.addEventListener('resize', function () {
+                if (window.innerWidth > 900) closeMobileMenu();
+            });
+            var sidebarNav = document.querySelector('#appSidebar .menu-groups');
+            if (sidebarNav) {
+                sidebarNav.addEventListener('click', function (event) {
+                    if (event.target.closest('a')) closeMobileMenu();
                 });
             }
 

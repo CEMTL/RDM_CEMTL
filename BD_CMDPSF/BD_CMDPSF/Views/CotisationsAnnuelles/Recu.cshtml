@@ -1,4 +1,4 @@
-@model Solution.ViewModels.CotisationsAnnuelles.CotisationRecuViewModel
+﻿@model Solution.ViewModels.CotisationsAnnuelles.CotisationRecuViewModel
 @{
     Layout = null;
     var description = string.IsNullOrWhiteSpace(Model.Description)
@@ -206,6 +206,12 @@
             .header, .footer-meta { flex-direction: column; }
             .receipt-id { text-align: left; }
             .amount-box { align-items: flex-start; flex-direction: column; gap: 8px; }
+            .toolbar, .identity { flex-wrap: wrap; }
+            .identity, .organization, .recipient { min-width: 0; max-width: 100%; overflow-wrap: anywhere; }
+            .receipt { padding: 20px 14px; }
+            .receipt-id { white-space: normal; overflow-wrap: anywhere; }
+            .details th, .details td { overflow-wrap: anywhere; }
+            h1 { font-size: 25px; margin-top: 22px; }
         }
     </style>
 </head>

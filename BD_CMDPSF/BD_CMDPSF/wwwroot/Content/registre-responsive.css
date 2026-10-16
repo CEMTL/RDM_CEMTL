@@ -1,0 +1,153 @@
+/* Registre CMDPSF - Adaptation commune des pages aux écrans étroits.
+   Les tableaux conservent toutes leurs colonnes, accessibles par un balayage
+   horizontal à l'intérieur du tableau (jamais hors de la page). */
+
+html, body { width: 100%; max-width: 100%; }
+*, *::before, *::after { box-sizing: border-box; }
+.app-shell { width: 100%; max-width: 100%; min-width: 0; }
+.sidebar { flex-shrink: 0; }
+.main-content { flex: 1 1 0; min-width: 0; max-width: 100%; }
+.main-content > *, .main-content .dashboard-card,
+.main-content .stat-card, .main-content .registre-form-card,
+.main-content .registre-detail-card, .main-content .registre-delete-card,
+.main-content .panel, .main-content .panel-body,
+.main-content .tab-content, .main-content .tab-pane { min-width: 0; max-width: 100%; }
+.topbar > div, .topbar-actions { min-width: 0; }
+.topbar h1, .page-header-custom h2,
+.main-content h2, .main-content h3 { overflow-wrap: anywhere; }
+.topbar-actions { flex-wrap: wrap; }
+.topbar-user { min-width: 0; max-width: 100%; overflow-wrap: anywhere; white-space: normal; }
+.main-content img, .main-content svg, .modal-body img { max-width: 100%; height: auto; }
+.main-content pre, .modal-body pre { max-width: 100%; overflow-x: auto; }
+.main-content .form-control { max-width: 100%; }
+.main-content .dashboard-card, .main-content .panel-body, .modal .modal-body { overflow-wrap: anywhere; }
+.main-content .row > [class*="col-"],
+.modal-body .row > [class*="col-"] { min-width: 0; }
+
+/* Le style initial appliquait overflow:hidden à .table-responsive,
+   ce qui masquait les colonnes et empêchait le défilement au doigt. */
+.main-content .table-responsive,
+.main-content .table-scroll-shell,
+.modal .table-responsive,
+.modal .table-scroll-shell {
+    display: block;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    border-radius: 12px;
+}
+.main-content .table-responsive > table.table,
+.main-content .table-scroll-shell > table.table,
+.modal .table-responsive > table.table,
+.modal .table-scroll-shell > table.table {
+    width: max-content;
+    min-width: 100%;
+    max-width: none;
+    margin-bottom: 0;
+}
+/* Les menus déroulants de DataTables et les tableaux n'ont pas de largeur
+   minimale imposée au contenu de leur carte. */
+.main-content .dataTables_wrapper,
+.main-content .dataTables_wrapper > .row,
+.main-content .dataTables_wrapper .col-sm-6,
+.main-content .dataTables_wrapper .col-sm-12 { min-width: 0; max-width: 100%; }
+.main-content .dataTables_wrapper .dt-buttons,
+.main-content .btn-toolbar,
+.main-content .filters-actions .actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.main-content .dataTables_wrapper .pagination { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 4px; }
+.main-content .dataTables_wrapper .pagination > li > a,
+.main-content .dataTables_wrapper .pagination > li > span { margin-left: 0; }
+.main-content .pagination { max-width: 100%; }
+.table-scroll-hint {
+    display: none;
+    font-size: 12px;
+    line-height: 1.4;
+    font-weight: 600;
+    color: #475569;
+    margin: 6px 0 8px;
+}
+.table-scroll-shell:focus-visible, .table-responsive:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+}
+.sidebar-backdrop { display: none; }
+
+@media (max-width: 900px) {
+    .main-content { width: 100%; flex: none; }
+    .sidebar { width: min(280px, calc(100vw - 32px)); height: 100dvh; min-height: 0; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; }
+    body.sidebar-collapsed .sidebar { width: min(280px, calc(100vw - 32px)); }
+    .sidebar-backdrop { display: none; position: fixed; inset: 0; border: 0; background: rgba(15, 23, 42, .52); z-index: 1029; }
+    body.sidebar-open .sidebar-backdrop { display: block; }
+    .topbar { gap: 12px; }
+}
+
+@media (max-width: 767px) {
+    .main-content { padding: 12px !important; }
+    .topbar { padding: 14px !important; margin-bottom: 14px; }
+    .topbar h1 { font-size: clamp(20px, 6vw, 26px); }
+    .mobile-toggle { color: #1e293b !important; background: #fff !important; border: 1px solid #cbd5e1 !important; min-width: 42px; min-height: 42px; }
+    /* Menus déroulants des actions dans la grille d'organisation. */
+    .organisation-card .dropdown.open > .dropdown-menu {
+        position: static;
+        float: none;
+        min-width: 0 !important;
+        width: min(320px, calc(100vw - 70px));
+        max-width: calc(100vw - 70px);
+    }
+    .organisation-actions-dropdown { min-width: 0 !important; max-width: calc(100vw - 70px); }
+    .organisation-action-item { flex-wrap: wrap; }
+    .topbar-actions { display: flex; gap: 8px; align-items: flex-start; margin-top: 12px; }
+    .topbar-user { padding: 7px 10px; font-size: 12px; }
+    .page-header-custom h2 { font-size: 20px; }
+    .dashboard-card, .stat-card, .registre-form-card,
+    .registre-detail-card, .registre-delete-card { padding: 12px !important; border-radius: 12px; }
+    .dashboard-grid, .dashboard-links, .filters-grid,
+    .registre-form-grid { grid-template-columns: minmax(0, 1fr) !important; gap: 10px; }
+    .definition-grid { grid-template-columns: minmax(0, 1fr); gap: 5px; }
+    .definition-grid dd { margin-bottom: 10px; overflow-wrap: anywhere; }
+    .page-header-custom, .registre-toolbar,
+    .registre-actions-bar, .filters-actions { align-items: stretch; }
+    .registre-toolbar .actions, .filters-actions .actions,
+    .registre-actions-bar { flex-wrap: wrap; }
+    .main-content .filters-bar input.form-control,
+    .main-content .filters-bar select.form-control,
+    .main-content input[style*="min-width"],
+    .main-content select[style*="min-width"] { min-width: 0 !important; width: 100%; }
+    .main-content .dataTables_wrapper .dataTables_length,
+    .main-content .dataTables_wrapper .dataTables_filter,
+    .main-content .dataTables_wrapper .dataTables_info,
+    .main-content .dataTables_wrapper .dataTables_paginate { float: none; width: 100%; text-align: left; }
+    .main-content .dataTables_wrapper .dataTables_filter label { display: block; max-width: 100%; white-space: normal; }
+    .main-content .dataTables_wrapper .dataTables_filter input { width: 100%; max-width: 100%; min-width: 0; margin: 6px 0 0; }
+    .main-content .dataTables_wrapper .pagination { justify-content: center; }
+    .main-content .dataTables_wrapper .dt-buttons { justify-content: flex-start; }
+    .main-content .table-responsive > table.table,
+    .main-content .table-scroll-shell > table.table,
+    .modal .table-responsive > table.table,
+    .modal .table-scroll-shell > table.table { font-size: 12px; }
+    .main-content .table-responsive th,
+    .main-content .table-responsive td,
+    .main-content .table-scroll-shell th,
+    .main-content .table-scroll-shell td { padding: 7px 8px; }
+    .table-scroll-hint.is-visible { display: block; }
+    .main-content .nav-tabs { display: flex; flex-wrap: wrap; gap: 3px; max-width: 100%; }
+    .main-content .nav-tabs > li { float: none; margin-bottom: 2px; }
+    .main-content .nav-tabs > li > a { padding: 7px 9px; font-size: 12px; white-space: normal; overflow-wrap: anywhere; }
+    .modal-dialog, .modal-dialog[style] { width: calc(100% - 16px) !important; max-width: none !important; margin: 8px auto; }
+    .modal .modal-body { padding: 12px; max-width: 100%; }
+    .modal .modal-content { max-width: 100%; }
+    .modal .nav-tabs { display: flex; flex-wrap: wrap; max-width: 100%; }
+    .modal .nav-tabs > li { float: none; }
+    .admin-export-toolbar .btn-group { display: inline-flex; flex-wrap: wrap; max-width: 100%; }
+    .admin-export-toolbar .admin-export-status { min-width: 0; overflow-wrap: anywhere; }
+}
+
+@media (max-width: 360px) {
+    .main-content { padding: 8px !important; }
+    .topbar { padding: 10px !important; }
+    .dashboard-card, .stat-card, .registre-form-card,
+    .registre-detail-card, .registre-delete-card { padding: 10px !important; }
+    .main-content .btn { white-space: normal; }
+}
